@@ -13,7 +13,7 @@ lint:
 test:
 	cd /Users/idhanani/Desktop/benchmarks/infbench && uv run python -m tests.test_basic && uv run python -m tests.test_aggregations
 
-setup-configs:
+setup:
 	@echo "📦 Setting up configs directory..."
 	@mkdir -p configs
 	@cp deepep_config.json configs/
