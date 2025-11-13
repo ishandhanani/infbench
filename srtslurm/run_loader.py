@@ -162,7 +162,7 @@ class RunLoader:
     def _load_benchmark_results(self, run: BenchmarkRun) -> None:
         """Load benchmark results from profiler output files.
 
-        Looks for directories like "vllm_isl_1024_osl_1024/" and parses JSON files.
+        Looks for directories like "sa-bench_isl_1024_osl_1024/" or "vllm_isl_1024_osl_1024/" and parses JSON files.
 
         Args:
             run: BenchmarkRun object to populate with results
@@ -170,17 +170,27 @@ class RunLoader:
         run_path = run.metadata.path
 
         # Look for profiler result directories
-        profiler_pattern = re.compile(
-            rf"{run.profiler.profiler_type}_isl_{run.profiler.isl}_osl_{run.profiler.osl}"
-        )
+        # Support both new naming (sa-bench) and old naming (vllm) for backward compatibility
+        profiler_type = run.profiler.profiler_type
+        if profiler_type == "sa-bench":
+            # Try sa-bench first, fall back to vllm for old runs
+            patterns = [
+                rf"sa-bench_isl_{run.profiler.isl}_osl_{run.profiler.osl}",
+                rf"vllm_isl_{run.profiler.isl}_osl_{run.profiler.osl}",
+            ]
+        else:
+            # For other types (sglang, gap, manual), use exact match
+            patterns = [rf"{profiler_type}_isl_{run.profiler.isl}_osl_{run.profiler.osl}"]
 
-        for entry in os.listdir(run_path):
-            if profiler_pattern.match(entry):
-                result_dir = os.path.join(run_path, entry)
-                if os.path.isdir(result_dir):
-                    results = self._parse_profiler_results(result_dir)
-                    run.profiler.add_benchmark_results(results)
-                    break
+        for pattern_str in patterns:
+            profiler_pattern = re.compile(pattern_str)
+            for entry in os.listdir(run_path):
+                if profiler_pattern.match(entry):
+                    result_dir = os.path.join(run_path, entry)
+                    if os.path.isdir(result_dir):
+                        results = self._parse_profiler_results(result_dir)
+                        run.profiler.add_benchmark_results(results)
+                        return  # Found results, stop searching
 
     def _parse_profiler_results(self, result_dir: str) -> dict:
         """Parse profiler result JSON files.
