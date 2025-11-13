@@ -224,10 +224,11 @@ def _runs_to_dataframe(run_dicts: list[dict]):
         # Create a row for each concurrency level
         for i in range(len(output_tps)):
             tps = output_tps[i]
-            tps_per_gpu = tps / total_gpus
+            output_tps_per_gpu = tps / total_gpus
             
             # Get total TPS for this concurrency level
             total_token_tps = total_tps[i] if i < len(total_tps) else None
+            total_tps_per_gpu = total_token_tps / total_gpus if total_token_tps else None
 
             tpot = run.get("mean_tpot_ms", [])[i] if i < len(run.get("mean_tpot_ms", [])) else None
             tps_per_user = 1000 / tpot if tpot and tpot > 0 else 0
@@ -250,7 +251,8 @@ def _runs_to_dataframe(run_dicts: list[dict]):
                 "Concurrency": concurrencies[i] if i < len(concurrencies) else "N/A",
                 "Output TPS": tps,
                 "Total TPS": total_token_tps if total_token_tps else "N/A",
-                "Output TPS/GPU": tps_per_gpu,
+                "Output TPS/GPU": output_tps_per_gpu,
+                "Total TPS/GPU": total_tps_per_gpu if total_tps_per_gpu else "N/A",
                 "Output TPS/User": tps_per_user,
                 "Mean TTFT (ms)": run.get("mean_ttft_ms", [])[i]
                 if i < len(run.get("mean_ttft_ms", []))
@@ -738,9 +740,9 @@ def main():
     st.sidebar.header("Pareto Graph Options")
     y_axis_metric = st.sidebar.radio(
         "Y-axis metric",
-        options=["Output TPS/GPU", "Total TPS"],
+        options=["Output TPS/GPU", "Total TPS/GPU"],
         index=0,
-        help="Choose between per-GPU efficiency (decode only) or total throughput (input + output)",
+        help="Choose between decode throughput per GPU or total throughput per GPU (input + output)",
     )
     show_cutoff = st.sidebar.checkbox("Show TPS/User cutoff line", value=False)
     cutoff_value = st.sidebar.number_input(
@@ -798,14 +800,14 @@ def main():
     with tab1:
         st.subheader("Pareto Frontier Analysis")
         
-        if y_axis_metric == "Total TPS":
+        if y_axis_metric == "Total TPS/GPU":
             st.markdown("""
-            This graph shows the trade-off between **Total Token Throughput** (input + output tokens/s) and
+            This graph shows the trade-off between **Total TPS/GPU** (input + output tokens/s per GPU) and
             **Output TPS/User** (throughput per user).
             """)
         else:
             st.markdown("""
-            This graph shows the trade-off between **Output TPS/GPU** (decode efficiency) and
+            This graph shows the trade-off between **Output TPS/GPU** (decode tokens/s per GPU) and
             **Output TPS/User** (throughput per user).
             """)
 

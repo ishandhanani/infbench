@@ -462,8 +462,8 @@ def calculate_pareto_frontier(df: pd.DataFrame, y_metric: str = "Output TPS/GPU"
 
     Args:
         df: DataFrame with 'Output TPS/User' and y_metric columns
-        y_metric: Y-axis metric to use ("Output TPS/GPU" or "Total TPS")
-                 "Total TPS" = total_token_throughput (input + output tokens/s)
+        y_metric: Y-axis metric to use ("Output TPS/GPU" or "Total TPS/GPU")
+                 Both metrics are normalized per GPU
 
     Returns:
         List of (x, y) tuples representing frontier points, sorted by x
@@ -512,8 +512,8 @@ def create_pareto_graph(
         show_cutoff: Whether to show vertical cutoff line
         cutoff_value: X-axis value for cutoff line (TPS/User)
         show_frontier: Whether to show the Pareto frontier
-        y_metric: Y-axis metric to plot ("Output TPS/GPU" or "Total TPS")
-                 "Total TPS" shows total_token_throughput (input + output tokens/s)
+        y_metric: Y-axis metric to plot ("Output TPS/GPU" or "Total TPS/GPU")
+                 Both metrics are normalized per GPU
     """
     fig = go.Figure()
 
@@ -659,9 +659,9 @@ def create_pareto_graph(
         )
 
     # Determine title and axis labels based on y_metric
-    if y_metric == "Total TPS":
-        title_text = "Pareto Frontier: Total TPS vs Output TPS/User"
-        y_axis_title = "Total TPS (tokens/s)"
+    if y_metric == "Total TPS/GPU":
+        title_text = "Pareto Frontier: Total TPS/GPU vs Output TPS/User"
+        y_axis_title = "Total TPS/GPU"
     else:
         title_text = "Pareto Frontier: Output TPS/GPU vs Output TPS/User"
         y_axis_title = "Output TPS/GPU"
