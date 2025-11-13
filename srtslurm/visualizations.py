@@ -6,11 +6,35 @@ Provides generic graph builders to reduce repetition and improve maintainability
 
 from collections import defaultdict
 from collections.abc import Callable
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+
+
+def parse_elapsed_time(timestamps: list[str]) -> list[float]:
+    """Convert timestamp strings to elapsed seconds from the first timestamp.
+
+    Args:
+        timestamps: List of timestamp strings in format "YYYY-MM-DD HH:MM:SS"
+
+    Returns:
+        List of elapsed seconds (float) from the first timestamp
+    """
+    if not timestamps:
+        return []
+
+    try:
+        dt_objects = [datetime.strptime(ts, "%Y-%m-%d %H:%M:%S") for ts in timestamps]
+        start_time = dt_objects[0]
+        elapsed = [(dt - start_time).total_seconds() for dt in dt_objects]
+        return elapsed
+    except (ValueError, AttributeError) as e:
+        # Fallback to sample numbers if parsing fails
+        print(f"Warning: Failed to parse timestamps: {e}")
+        return list(range(len(timestamps)))
 
 
 def aggregate_all_nodes(node_metrics_list: list[dict]) -> list[dict]:
@@ -270,8 +294,11 @@ def create_node_metric_graph(
                 values.append(value)
 
         if timestamps:
+            # Convert timestamps to elapsed seconds
+            elapsed_seconds = parse_elapsed_time(timestamps)
+
             trace_config = {
-                "x": list(range(len(timestamps))),
+                "x": elapsed_seconds,
                 "y": values,
                 "mode": mode,
                 "name": label,
@@ -285,14 +312,14 @@ def create_node_metric_graph(
                 trace_config["stackgroup"] = stackgroup
 
             trace_config["hovertemplate"] = (
-                f"<b>{label}</b><br>" + "Sample: %{x}<br>" + f"{y_label}: %{{y:.2f}}<extra></extra>"
+                f"<b>{label}</b><br>" + "Time: %{x:.1f}s<br>" + f"{y_label}: %{{y:.2f}}<extra></extra>"
             )
 
             fig.add_trace(go.Scatter(**trace_config))
 
     fig.update_layout(
         title=title,
-        xaxis_title="Sample Number",
+        xaxis_title="Elapsed Time (seconds)",
         yaxis_title=y_label,
         hovermode="closest",
         height=400,
@@ -351,7 +378,8 @@ def create_stacked_metric_graph(
 
     # Sort by timestamp and create arrays
     sorted_times = sorted(data_by_time.keys())
-    x_vals = list(range(len(sorted_times)))
+    # Convert timestamps to elapsed seconds
+    x_vals = parse_elapsed_time(sorted_times)
 
     # Add traces in order (bottom to top of stack)
     for metric_cfg in metrics_config:
@@ -372,7 +400,7 @@ def create_stacked_metric_graph(
 
     fig.update_layout(
         title=title,
-        xaxis_title="Sample Number",
+        xaxis_title="Elapsed Time (seconds)",
         yaxis_title="Number of Requests",
         hovermode="x unified",
         height=400,

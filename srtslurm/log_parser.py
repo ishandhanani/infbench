@@ -8,6 +8,10 @@ import logging
 import os
 import re
 
+import pandas as pd
+
+from .cache_manager import CacheManager
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
@@ -22,13 +26,30 @@ class NodeAnalyzer:
     def parse_run_logs(self, run_path: str) -> list:
         """Parse all node log files in a run directory.
 
+        Uses parquet caching to avoid re-parsing on subsequent loads.
+
         Args:
             run_path: Path to the run directory containing .err files
 
         Returns:
             List of NodeMetrics objects, one per node
         """
+        # Initialize cache manager
+        cache_mgr = CacheManager(run_path)
 
+        # Define source patterns for cache validation (.err files)
+        source_patterns = ["*.err"]
+
+        # Try to load from cache first
+        if cache_mgr.is_cache_valid("node_metrics", source_patterns):
+            cached_df = cache_mgr.load_from_cache("node_metrics")
+            if cached_df is not None and not cached_df.empty:
+                # Reconstruct NodeMetrics objects from DataFrame
+                nodes = self._deserialize_node_metrics(cached_df)
+                logger.info(f"Loaded {len(nodes)} nodes from cache")
+                return nodes
+
+        # Cache miss or invalid - parse from .err files
         nodes = []
 
         if not os.path.exists(run_path):
@@ -53,6 +74,11 @@ class NodeAnalyzer:
 
         if total_err_files == 0:
             logger.warning(f"No prefill/decode .err files found in {run_path}")
+
+        # Save to cache if we have data
+        if nodes:
+            cache_df = self._serialize_node_metrics(nodes)
+            cache_mgr.save_to_cache("node_metrics", cache_df, source_patterns)
 
         return nodes
 
@@ -231,6 +257,199 @@ class NodeAnalyzer:
             True if any node has batch data
         """
         return any(len(n.batches) > 0 for n in nodes)
+
+    def _serialize_node_metrics(self, nodes: list) -> pd.DataFrame:
+        """Serialize NodeMetrics objects to a DataFrame for caching.
+
+        Args:
+            nodes: List of NodeMetrics objects
+
+        Returns:
+            DataFrame with all batch and memory metrics
+        """
+        rows = []
+
+        for node in nodes:
+            node_info = node.node_info
+            config = node.config
+
+            # Serialize batch metrics
+            for batch in node.batches:
+                row = {
+                    # Node identification
+                    "node": node_info.get("node", ""),
+                    "worker_type": node_info.get("worker_type", ""),
+                    "worker_id": node_info.get("worker_id", ""),
+                    # Config
+                    "tp_size": config.get("tp_size"),
+                    "dp_size": config.get("dp_size"),
+                    "ep_size": config.get("ep_size"),
+                    # Metric type
+                    "metric_type": "batch",
+                    # Batch data
+                    "timestamp": batch.timestamp,
+                    "dp": batch.dp,
+                    "tp": batch.tp,
+                    "ep": batch.ep,
+                    "batch_type": batch.batch_type,
+                    "new_seq": batch.new_seq,
+                    "new_token": batch.new_token,
+                    "cached_token": batch.cached_token,
+                    "token_usage": batch.token_usage,
+                    "running_req": batch.running_req,
+                    "queue_req": batch.queue_req,
+                    "prealloc_req": batch.prealloc_req,
+                    "inflight_req": batch.inflight_req,
+                    "transfer_req": batch.transfer_req,
+                    "preallocated_usage": batch.preallocated_usage,
+                    "num_tokens": batch.num_tokens,
+                    "input_throughput": batch.input_throughput,
+                    "gen_throughput": batch.gen_throughput,
+                }
+                rows.append(row)
+
+            # Serialize memory metrics
+            for mem in node.memory_snapshots:
+                row = {
+                    # Node identification
+                    "node": node_info.get("node", ""),
+                    "worker_type": node_info.get("worker_type", ""),
+                    "worker_id": node_info.get("worker_id", ""),
+                    # Config
+                    "tp_size": config.get("tp_size"),
+                    "dp_size": config.get("dp_size"),
+                    "ep_size": config.get("ep_size"),
+                    # Metric type
+                    "metric_type": "memory",
+                    # Memory data
+                    "timestamp": mem.timestamp,
+                    "dp": mem.dp,
+                    "tp": mem.tp,
+                    "ep": mem.ep,
+                    "avail_mem_gb": mem.avail_mem_gb,
+                    "mem_usage_gb": mem.mem_usage_gb,
+                    "kv_cache_gb": mem.kv_cache_gb,
+                    "kv_tokens": mem.kv_tokens,
+                }
+                rows.append(row)
+
+        return pd.DataFrame(rows)
+
+    def _deserialize_node_metrics(self, df: pd.DataFrame) -> list:
+        """Deserialize NodeMetrics objects from a cached DataFrame.
+
+        Args:
+            df: DataFrame with cached node metrics
+
+        Returns:
+            List of NodeMetrics objects
+        """
+        from .models import BatchMetrics, MemoryMetrics, NodeMetrics
+
+        nodes = []
+
+        # Group by node
+        for (node_name, worker_type, worker_id), group_df in df.groupby(
+            ["node", "worker_type", "worker_id"], dropna=False
+        ):
+            node_info = {
+                "node": node_name,
+                "worker_type": worker_type,
+                "worker_id": worker_id,
+            }
+
+            # Extract config (same for all rows in this node)
+            config = {}
+            if not group_df.empty:
+                first_row = group_df.iloc[0]
+                if pd.notna(first_row.get("tp_size")):
+                    config["tp_size"] = int(first_row["tp_size"])
+                if pd.notna(first_row.get("dp_size")):
+                    config["dp_size"] = int(first_row["dp_size"])
+                if pd.notna(first_row.get("ep_size")):
+                    config["ep_size"] = int(first_row["ep_size"])
+
+            # Separate batch and memory metrics
+            batch_df = group_df[group_df["metric_type"] == "batch"]
+            memory_df = group_df[group_df["metric_type"] == "memory"]
+
+            # Reconstruct batch metrics
+            batches = []
+            for _, row in batch_df.iterrows():
+                batch = BatchMetrics(
+                    timestamp=row["timestamp"],
+                    dp=int(row["dp"]) if pd.notna(row["dp"]) else 0,
+                    tp=int(row["tp"]) if pd.notna(row["tp"]) else 0,
+                    ep=int(row["ep"]) if pd.notna(row["ep"]) else 0,
+                    batch_type=row["batch_type"],
+                    new_seq=int(row["new_seq"]) if pd.notna(row.get("new_seq")) else None,
+                    new_token=int(row["new_token"]) if pd.notna(row.get("new_token")) else None,
+                    cached_token=(
+                        int(row["cached_token"]) if pd.notna(row.get("cached_token")) else None
+                    ),
+                    token_usage=row.get("token_usage") if pd.notna(row.get("token_usage")) else None,
+                    running_req=(
+                        int(row["running_req"]) if pd.notna(row.get("running_req")) else None
+                    ),
+                    queue_req=int(row["queue_req"]) if pd.notna(row.get("queue_req")) else None,
+                    prealloc_req=(
+                        int(row["prealloc_req"]) if pd.notna(row.get("prealloc_req")) else None
+                    ),
+                    inflight_req=(
+                        int(row["inflight_req"]) if pd.notna(row.get("inflight_req")) else None
+                    ),
+                    transfer_req=(
+                        int(row["transfer_req"]) if pd.notna(row.get("transfer_req")) else None
+                    ),
+                    preallocated_usage=(
+                        row.get("preallocated_usage")
+                        if pd.notna(row.get("preallocated_usage"))
+                        else None
+                    ),
+                    num_tokens=int(row["num_tokens"]) if pd.notna(row.get("num_tokens")) else None,
+                    input_throughput=(
+                        row.get("input_throughput")
+                        if pd.notna(row.get("input_throughput"))
+                        else None
+                    ),
+                    gen_throughput=(
+                        row.get("gen_throughput") if pd.notna(row.get("gen_throughput")) else None
+                    ),
+                )
+                batches.append(batch)
+
+            # Reconstruct memory metrics
+            memory_snapshots = []
+            for _, row in memory_df.iterrows():
+                mem = MemoryMetrics(
+                    timestamp=row["timestamp"],
+                    dp=int(row["dp"]) if pd.notna(row["dp"]) else 0,
+                    tp=int(row["tp"]) if pd.notna(row["tp"]) else 0,
+                    ep=int(row["ep"]) if pd.notna(row["ep"]) else 0,
+                    metric_type="memory",
+                    avail_mem_gb=(
+                        row.get("avail_mem_gb") if pd.notna(row.get("avail_mem_gb")) else None
+                    ),
+                    mem_usage_gb=(
+                        row.get("mem_usage_gb") if pd.notna(row.get("mem_usage_gb")) else None
+                    ),
+                    kv_cache_gb=(
+                        row.get("kv_cache_gb") if pd.notna(row.get("kv_cache_gb")) else None
+                    ),
+                    kv_tokens=int(row["kv_tokens"]) if pd.notna(row.get("kv_tokens")) else None,
+                )
+                memory_snapshots.append(mem)
+
+            # Create NodeMetrics object
+            node = NodeMetrics(
+                node_info=node_info,
+                batches=batches,
+                memory_snapshots=memory_snapshots,
+                config=config,
+            )
+            nodes.append(node)
+
+        return nodes
 
     # Private helper methods
 
