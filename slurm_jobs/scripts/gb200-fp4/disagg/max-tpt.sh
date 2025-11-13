@@ -105,7 +105,7 @@ if [ "$mode" = "prefill" ]; then
         --skip-tokenizer-init \
         --disaggregation-mode prefill \
         --decode-log-interval 1000 \
-        --max-running-requests 5632 \
+        --max-running-requests 30000 \
         --context-length 2176 \
         --disable-radix-cache \
         --disable-shared-experts-fusion \
@@ -114,7 +114,7 @@ if [ "$mode" = "prefill" ]; then
         --attention-backend trtllm_mla \
         --kv-cache-dtype fp8_e4m3 \
         --enable-single-batch-overlap \
-        --chunked-prefill-size 131072 \
+        --chunked-prefill-size 65536 \
         --eplb-algorithm deepseek \
         --trust-remote-code \
         --disable-cuda-graph \
@@ -200,7 +200,7 @@ elif [ "$mode" = "decode" ]; then
         --moe-a2a-backend deepep \
         --deepep-mode low_latency \
         --ep-dispatch-algorithm static \
-        --cuda-graph-bs 1024 \
+        --cuda-graph-bs 1 2 4 8 16 24 32 40 48 56 64 72 80 88 96 104 112 120 128 136 144 152 160 168 176 184 192 200 208 216 224 232 240 248 256 264 272 280 288 296 304 312 320 328 336 344 352 360 368 376 384 416 448 480 512 544 576 608 640 672 704 736 768 800 832 864 896 928 960 992 1024 \
         --num-reserved-decode-tokens 112 \
         --ep-num-redundant-experts 32 \
         --eplb-algorithm deepseek \
