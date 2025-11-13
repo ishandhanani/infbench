@@ -143,7 +143,7 @@ def create_job_metadata(
             "use_dynamo_whls": args.use_dynamo_whls,
             "log_dir": args.log_dir if args.log_dir else "repo_root",
         },
-        "profiler_metadata": profiler_config,
+        "profiler_metadata": benchmark_config,
     }
 
     # Add mode-specific metadata
@@ -269,10 +269,10 @@ def _parse_command_line_args(args: list[str] | None = None) -> argparse.Namespac
     )
 
     parser.add_argument(
-        "--profiler",
+        "--benchmark",
         type=str,
-        help="Profiler configurations. Example: "
-        + '"type=vllm; isl=8192; osl=1024; concurrencies=16x2048x4096x8192; req-rate=inf"',
+        help="Benchmark configurations. Example: "
+        + '"type=sa-bench; isl=8192; osl=1024; concurrencies=16x2048x4096x8192; req-rate=inf"',
     )
 
     parser.add_argument(
@@ -427,37 +427,48 @@ def main(input_args: list[str] | None = None):
         if args.num_additional_frontends < 0:
             raise ValueError("Number of additional frontends cannot be negative")
 
-    # parse profiler configs
-    profiler_config = {}
-    if args.profiler:
-        for key_val_pair in args.profiler.split("; "):
+    # parse benchmark configs
+    benchmark_config = {}
+    if args.benchmark:
+        for key_val_pair in args.benchmark.split("; "):
             key, val = key_val_pair.split("=")
-            profiler_config[key] = val
+            benchmark_config[key] = val
 
-    # validate profiler configs
-    if profiler_config == {} or profiler_config["type"] == "manual":
+    # validate benchmark configs
+    if benchmark_config == {} or benchmark_config["type"] == "manual":
         parsable_config = ""
-        profiler_config["type"] = "manual"
-    elif profiler_config["type"] in ["sglang", "vllm", "gap"]:
+        benchmark_config["type"] = "manual"
+    elif benchmark_config["type"] == "sa-bench":
         parsable_config = ""
-        need_keys = ["isl", "osl", "concurrencies"]
-        assert all([key in profiler_config for key in need_keys])
-        assert profiler_config["isl"].isnumeric()
-        parsable_config = f"{parsable_config} {profiler_config['isl']}"
-        assert profiler_config["osl"].isnumeric()
-        parsable_config = f"{parsable_config} {profiler_config['osl']}"
-        assert all([x.isnumeric() for x in profiler_config["concurrencies"].split("x")])
-        parsable_config = f"{parsable_config} {profiler_config['concurrencies']}"
+        need_keys = ["isl", "osl", "concurrencies", "req-rate"]
+        assert all([key in benchmark_config for key in need_keys])
+        assert benchmark_config["isl"].isnumeric()
+        parsable_config = f"{parsable_config} {benchmark_config['isl']}"
+        assert benchmark_config["osl"].isnumeric()
+        parsable_config = f"{parsable_config} {benchmark_config['osl']}"
+        assert all([x.isnumeric() for x in benchmark_config["concurrencies"].split("x")])
+        parsable_config = f"{parsable_config} {benchmark_config['concurrencies']}"
+        assert (
+            benchmark_config["req-rate"] == "inf"
+            or benchmark_config["req-rate"].isnumeric()
+        )
+        parsable_config = f"{parsable_config} {benchmark_config['req-rate']}"
+    elif benchmark_config["type"] == "gpqa":
+        parsable_config = ""
+        # Parse gpqa-specific parameters
+        if "num-examples" in benchmark_config:
+            assert benchmark_config["num-examples"].isnumeric()
+            parsable_config = f"{parsable_config} {benchmark_config['num-examples']}"
+        else:
+            parsable_config = f"{parsable_config} 250"  # default
 
-        if profiler_config["type"] in ["sglang", "vllm"]:
-            assert "req-rate" in profiler_config
-            assert (
-                profiler_config["req-rate"] == "inf"
-                or profiler_config["req-rate"].isnumeric()
-            )
-            parsable_config = f"{parsable_config} {profiler_config['req-rate']}"
+        if "num-threads" in benchmark_config:
+            assert benchmark_config["num-threads"].isnumeric()
+            parsable_config = f"{parsable_config} {benchmark_config['num-threads']}"
+        else:
+            parsable_config = f"{parsable_config} 512"  # default
     else:
-        assert False, profiler_config["type"]
+        assert False, benchmark_config["type"]
 
     # Generate timestamp for log directory naming
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -510,9 +521,9 @@ def main(input_args: list[str] | None = None):
         "enable_multiple_frontends": args.enable_multiple_frontends,
         "num_additional_frontends": args.num_additional_frontends,
         "use_init_location": args.use_init_location,
-        "do_profile": profiler_config["type"] != "manual",
-        "profiler_type": profiler_config["type"],
-        "profiler_arg": parsable_config,
+        "do_benchmark": benchmark_config["type"] != "manual",
+        "benchmark_type": benchmark_config["type"],
+        "benchmark_arg": parsable_config,
         "timestamp": timestamp,
         "enable_config_dump": args.enable_config_dump,
         "use_dynamo_whls": args.use_dynamo_whls,

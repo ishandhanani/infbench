@@ -16,7 +16,7 @@ decode_gpus=$4
 total_gpus=$((prefill_gpus+decode_gpus))
 
 source /scripts/benchmark_utils.sh
-work_dir="/scripts/vllm/"
+work_dir="/scripts/sa-bench/"
 cd $work_dir
 
 chosen_isl=$5
@@ -65,7 +65,7 @@ do
 done
 set +e
 
-result_dir="/logs/vllm_isl_${chosen_isl}_osl_${chosen_osl}"
+result_dir="/logs/sa-bench_isl_${chosen_isl}_osl_${chosen_osl}"
 mkdir -p $result_dir
 
 set -e
