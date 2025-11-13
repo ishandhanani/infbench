@@ -310,6 +310,13 @@ def _parse_command_line_args(args: list[str] | None = None) -> argparse.Namespac
         help="Directory to save logs (default: repo root). Path relative to slurm_jobs/ or absolute.",
     )
 
+    parser.add_argument(
+        "--sglang-config",
+        type=str,
+        default=None,
+        help="Path to sglang YAML config file (optional). Path relative to config-dir or absolute.",
+    )
+
     return parser.parse_args(args)
 
 
@@ -487,6 +494,17 @@ def main(input_args: list[str] | None = None):
     else:
         template_path = "job_script_template_disagg.j2"
 
+    # Process sglang_config path - make it container-accessible
+    sglang_config = ""
+    if args.sglang_config:
+        sglang_config_path = pathlib.Path(args.sglang_config)
+        if sglang_config_path.is_absolute():
+            # If absolute, use as-is (assume it's already accessible)
+            sglang_config = str(sglang_config_path)
+        else:
+            # If relative, assume it's relative to config_dir and map to container path
+            sglang_config = f"/configs/{args.sglang_config}"
+
     template_vars = {
         "job_name": args.job_name,
         "total_nodes": total_nodes,
@@ -517,6 +535,7 @@ def main(input_args: list[str] | None = None):
         "enable_config_dump": args.enable_config_dump,
         "use_dynamo_whls": args.use_dynamo_whls,
         "log_dir_prefix": log_dir_prefix,
+        "sglang_config": sglang_config,
     }
 
     # Create temporary file for sbatch script

@@ -75,6 +75,7 @@ if [ "$mode" = "prefill" ]; then
     command_suffix=""
     if [[ "${USE_INIT_LOCATIONS,,}" == "true" ]]; then command_suffix=" "; fi
     if [[ -n "${DUMP_CONFIG_PATH}" ]]; then command_suffix="${command_suffix} --dump-config-to ${DUMP_CONFIG_PATH}"; fi
+    if [[ -n "${SGLANG_CONFIG_PATH}" ]]; then command_suffix="${command_suffix} --config ${SGLANG_CONFIG_PATH} --config-key prefill"; fi
 
     # we have to install pre-release cutedsl for a integer overflow fix
     python3 -m pip install --no-cache-dir --upgrade --pre nvidia-cutlass-dsl
@@ -160,6 +161,7 @@ elif [ "$mode" = "decode" ]; then
     command_suffix=""
     if [[ "${USE_INIT_LOCATIONS,,}" == "true" ]]; then command_suffix=" "; fi
     if [[ -n "${DUMP_CONFIG_PATH}" ]]; then command_suffix="${command_suffix} --dump-config-to ${DUMP_CONFIG_PATH}"; fi
+    if [[ -n "${SGLANG_CONFIG_PATH}" ]]; then command_suffix="${command_suffix} --config ${SGLANG_CONFIG_PATH} --config-key decode"; fi
 
     # tmp working branch for pipecleaning
     cd /sgl-workspace/sglang

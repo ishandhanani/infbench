@@ -1,0 +1,22 @@
+# Example: Manual disaggregated config with different params for prefill and decode
+# Use this pattern when you need DIFFERENT parameters for prefill vs decode
+
+prefill:
+  # Prefill-specific parameters
+  max-running-requests: 30000
+  context-length: 2200
+  chunked-prefill-size: 131072
+  max-total-tokens: 524288
+  mem-fraction-static: 0.75
+  disable-cuda-graph: true
+
+decode:
+  # Decode-specific parameters  
+  max-running-requests: 45000
+  context-length: 2200
+  chunked-prefill-size: 36864
+  max-total-tokens: 3122380
+  mem-fraction-static: 0.82
+  cuda-graph-bs: [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80]
+  decode-log-interval: 1000
+
