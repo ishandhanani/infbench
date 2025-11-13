@@ -1,0 +1,20 @@
+# Example Parameter Sweep Configuration
+# This demonstrates how to sweep over SLURM params and SGLang args
+
+slurm:
+  # Sweep over different cluster configurations (disaggregated mode)
+  prefill_nodes: [6, 12]
+  decode_nodes: [12, 24]
+  prefill_workers: [3]
+  decode_workers: [1, 2]
+
+sglang:
+  # Sweep over SGLang runtime parameters
+  # These map directly to dynamo.sglang CLI flags (use hyphens like the flags)
+  # For disaggregated mode, these params apply to BOTH prefill and decode
+  # (they will be nested under 'prefill' and 'decode' keys automatically)
+  max-running-requests: [5632, 8000, 10000]
+  context-length: [2176, 4096]
+  mem-fraction-static: [0.82, 0.84]
+  chunked-prefill-size: [131072, 262144]
+

@@ -255,6 +255,7 @@ def setup_env_vars_for_gpu_script(
     use_init_locations: bool = True,
     dump_config_path: str | None = None,
     use_dynamo_whls: bool = False,
+    sglang_config_path: str | None = None,
 ):
     """Setup environment variables required by GPU scripts (gb200-fp8.sh)"""
     os.environ["HOST_IP_MACHINE"] = host_ip
@@ -268,6 +269,10 @@ def setup_env_vars_for_gpu_script(
         os.environ["DUMP_CONFIG_PATH"] = dump_config_path
     else:
         os.environ.pop("DUMP_CONFIG_PATH", None)
+    if sglang_config_path:
+        os.environ["SGLANG_CONFIG_PATH"] = sglang_config_path
+    else:
+        os.environ.pop("SGLANG_CONFIG_PATH", None)
 
     logging.info(f"Set HOST_IP: {host_ip}")
     logging.info(f"Set PORT: {port}")
@@ -278,6 +283,8 @@ def setup_env_vars_for_gpu_script(
     logging.info(f"Set USE_DYNAMO_WHLS: {use_dynamo_whls}")
     if dump_config_path:
         logging.info(f"Set DUMP_CONFIG_PATH: {dump_config_path}")
+    if sglang_config_path:
+        logging.info(f"Set SGLANG_CONFIG_PATH: {sglang_config_path}")
 
 
 def get_gpu_command(
@@ -389,6 +396,7 @@ def setup_prefill_worker(
     use_init_locations: bool = True,
     dump_config_path: str | None = None,
     use_dynamo_whls: bool = False,
+    sglang_config_path: str | None = None,
 ) -> int:
     """
     Setup the prefill worker.
@@ -411,6 +419,7 @@ def setup_prefill_worker(
         use_init_locations=use_init_locations,
         dump_config_path=dump_config_path,
         use_dynamo_whls=use_dynamo_whls,
+        sglang_config_path=sglang_config_path,
     )
 
     # Use appropriate GPU script instead of generating command directly
@@ -430,6 +439,7 @@ def setup_decode_worker(
     use_init_locations: bool = True,
     dump_config_path: str | None = None,
     use_dynamo_whls: bool = False,
+    sglang_config_path: str | None = None,
 ) -> int:
     """
     Setup the decode worker.
@@ -468,6 +478,7 @@ def setup_aggregated_worker(
     multiple_frontends_enabled: bool = False,
     dump_config_path: str | None = None,
     use_dynamo_whls: bool = False,
+    sglang_config_path: str | None = None,
 ) -> int:
     """
     Setup the aggregated worker.
@@ -493,6 +504,7 @@ def setup_aggregated_worker(
         use_init_locations=False,
         dump_config_path=dump_config_path,
         use_dynamo_whls=use_dynamo_whls,
+        sglang_config_path=sglang_config_path,
     )
 
     # Use appropriate aggregated GPU script
@@ -552,6 +564,7 @@ def main(input_args: list[str] | None = None):
             args.use_init_locations,
             args.dump_config_path,
             args.use_dynamo_whls,
+            args.sglang_config_path,
         )
     elif args.worker_type == "decode":
         setup_decode_worker(
@@ -566,6 +579,7 @@ def main(input_args: list[str] | None = None):
             args.use_init_locations,
             args.dump_config_path,
             args.use_dynamo_whls,
+            args.sglang_config_path,
         )
     elif args.worker_type == "aggregated":
         setup_aggregated_worker(
@@ -580,6 +594,7 @@ def main(input_args: list[str] | None = None):
             args.multiple_frontends_enabled,
             args.dump_config_path,
             args.use_dynamo_whls,
+            args.sglang_config_path,
         )
 
     logging.info(f"{args.worker_type.capitalize()} worker setup complete")

@@ -43,6 +43,7 @@ fi
 # Construct command suffix for config dump
 command_suffix=""
 if [[ -n "${DUMP_CONFIG_PATH}" ]]; then command_suffix="--dump-config-to ${DUMP_CONFIG_PATH}"; fi
+if [[ -n "${SGLANG_CONFIG_PATH}" ]]; then command_suffix="${command_suffix} --config ${SGLANG_CONFIG_PATH}"; fi
 
 set -x
 export TORCH_DISTRIBUTED_DEFAULT_TIMEOUT=1800
