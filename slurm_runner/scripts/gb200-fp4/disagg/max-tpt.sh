@@ -139,6 +139,7 @@ if [ "$mode" = "prefill" ]; then
 # which was previously limiting us to DISPATCH_TOKENS and cuda-graph-bs == 384
 # For now use 12 nodes for fp4 since flashinfer_cutedsl requires experts per gpu < 8
 # We have 288 (256 + 32 redundant) => 288/48 = 6
+# Apparently removing --enable-single-batch-overlap the above 12 node requirement
 
 elif [ "$mode" = "decode" ]; then
     set -x
@@ -211,7 +212,6 @@ elif [ "$mode" = "decode" ]; then
         --tp-size "$TOTAL_GPUS" \
         --ep-size "$TOTAL_GPUS" \
         --dp-size "$TOTAL_GPUS" \
-        --enable-single-batch-overlap \
         --enable-dp-attention \
         --stream-interval 50 \
         --mem-fraction-static 0.82 ${command_suffix}
