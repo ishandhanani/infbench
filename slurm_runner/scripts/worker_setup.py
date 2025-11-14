@@ -16,6 +16,7 @@ The script will:
 import argparse
 import logging
 import os
+import platform
 import socket
 import subprocess
 import time
@@ -29,6 +30,22 @@ ETCD_PEER_PORT = 2380
 NATS_PORT = 4222
 DIST_INIT_PORT = 29500
 ETCD_LISTEN_ADDR = "http://0.0.0.0"
+
+
+def get_architecture_wheel_suffix() -> str:
+    """
+    Detect system architecture and return the appropriate wheel suffix.
+
+    Returns:
+        "aarch64" for ARM64 (GB200), "x86_64" for x86_64 (H100)
+    """
+    arch = platform.machine()
+    if arch == "aarch64":
+        return "aarch64"
+    elif arch == "x86_64":
+        return "x86_64"
+    else:
+        raise RuntimeError(f"Unsupported architecture: {arch}")
 
 
 def setup_logging(level: int = logging.INFO) -> None:
@@ -372,7 +389,8 @@ def setup_frontend_worker(
     # All frontends run the ingress server
     frontend_cmd = "python3 -m dynamo.frontend --http-port=8000"
     if use_dynamo_whls:
-        frontend_cmd = "python3 -m pip install /configs/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_aarch64.whl && python3 -m pip install /configs/ai_dynamo-0.6.1-py3-none-any.whl && python3 -m dynamo.frontend --http-port=8000"
+        arch = get_architecture_wheel_suffix()
+        frontend_cmd = f"python3 -m pip install /configs/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_{arch}.whl && python3 -m pip install /configs/ai_dynamo-0.6.1-py3-none-any.whl && python3 -m dynamo.frontend --http-port=8000"
     return run_command(frontend_cmd)
 
 
