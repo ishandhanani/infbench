@@ -29,7 +29,7 @@ setup:
 	echo "⬇️  Downloading ai_dynamo_runtime for aarch64 (GB200)..."; \
 	wget -q --show-progress -P configs https://files.pythonhosted.org/packages/b8/0c/076268db6ff2c87663a0d70f7ce7a6a1c566ac1383981d9c82437de2ff98/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_aarch64.whl; \
 	echo "⬇️  Downloading ai_dynamo_runtime for x86_64 (H100)..."; \
-	wget -q --show-progress -P configs https://files.pythonhosted.org/packages/PLACEHOLDER_HASH/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_x86_64.whl || echo "⚠️  x86_64 wheel URL not configured yet. Please update Makefile with correct PyPI URL."; \
+	wget -q --show-progress -P configs https://files.pythonhosted.org/packages/99/fc/cd7172407aeb07fc83fa94eb51281280847e5ec7fb3c6aedb1a02cf4e7ea/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_x86_64.whl; \
 	echo "⬇️  Downloading NATS ($(NATS_VERSION)) for $$ARCH_SHORT..."; \
 	NATS_DEB="nats-server-$(NATS_VERSION)-$$ARCH_SHORT.deb"; \
 	NATS_URL="https://github.com/nats-io/nats-server/releases/download/$(NATS_VERSION)/$$NATS_DEB"; \
