@@ -151,9 +151,51 @@ For non-disaggregated deployments:
 
 (Use `--agg-*` instead of `--prefill-*` and `--decode-*`)
 
+## Multi-Cluster Support
+
+infbench now supports **multiple cluster types** with robust IP discovery that adapts to different network configurations.
+
+### Supported Clusters
+
+- **GB200 clusters** (e.g., ptyche, lyris)
+- **H100 clusters** (e.g., EOS)
+- Any SLURM cluster with standard networking
+
+### Network Interface Configuration
+
+The network interface can be specified in `srtslurm.yaml` or via `--network-interface`:
+
+**GB200 clusters** typically use interfaces like `enP6p9s0np0`
+**H100/EOS clusters** typically use interfaces like `eth3`
+
+Example for EOS:
+```bash
+python3 submit_job_script.py \
+  --gpu-type h100-fp8 \
+  --network-interface eth3 \
+  --partition batch \
+  # ... other args
+```
+
+Or add to `srtslurm.yaml`:
+```yaml
+cluster:
+  network_interface: "eth3"  # For EOS
+```
+
+### Automatic Fallback
+
+If the specified network interface doesn't exist or isn't provided, the system automatically tries:
+
+1. **Specific interface** (if `--network-interface` is provided)
+2. **`hostname -I`** (first non-loopback IP)
+3. **`ip route`** (default route source IP)
+
+This fallback mechanism ensures jobs work across different cluster configurations without modification.
+
 ## Troubleshooting
 
-**Network interface issues**: The templates use `ip addr show $NETWORK_INTERFACE` to find node IPs. If this doesn't work on your cluster, modify the templates or set your interface correctly.
+**Network interface issues**: The templates now use robust IP discovery with automatic fallback. If you know your cluster's network interface (e.g., `eth3` for EOS, `enP6p9s0np0` for GB200), specify it via `--network-interface` or in `srtslurm.yaml` for best performance. The system will fall back to auto-detection if needed.
 
 **Missing configs**: Ensure you ran `make setup` from repo root to download required binaries.
 

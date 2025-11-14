@@ -37,6 +37,9 @@ set +x
 
 mkdir -p "${OUTPUT_DIR}" "${LOG_DIR}"
 
+# Source utility functions for robust IP discovery
+source "${SCRIPT_DIR}/slurm_utils.sh"
+
 nodes=($(scontrol show hostnames $SLURM_NODELIST))
 if [ ${#nodes[@]} -ne $TOTAL_NODES ]; then
     echo "Error: Expected $TOTAL_NODES nodes but got ${#nodes[@]} nodes"
@@ -58,9 +61,9 @@ done
 
 NGINX_NODE=${nodes[0]}
 MASTER_NODE=${nodes[1]}
-MASTER_IP=$(srun --nodes=1 --ntasks=1 --nodelist=$MASTER_NODE ip addr show $NETWORK_INTERFACE | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)
+MASTER_IP=$(get_node_ip "$MASTER_NODE" "$SLURM_JOB_ID" "$NETWORK_INTERFACE")
 if [ -z "$MASTER_IP" ]; then
-    echo "Error: Could not retrieve IP address for master host $MASTER_NODE on interface $NETWORK_INTERFACE"
+    echo "Error: Could not retrieve IP address for master host $MASTER_NODE"
     exit 1
 fi
 echo "Master IP address (node 1): $MASTER_IP"
@@ -84,7 +87,7 @@ if [ "$ADDITIONAL_FRONTENDS" -gt 0 ]; then
     for i in $(seq 1 $ADDITIONAL_FRONTENDS); do
         if [ $frontend_node_idx -lt $TOTAL_NODES ]; then
             node_name=${nodes[$frontend_node_idx]}
-            node_ip=$(srun --nodes=1 --ntasks=1 --nodelist=$node_name ip addr show $NETWORK_INTERFACE | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)
+            node_ip=$(get_node_ip "$node_name" "$SLURM_JOB_ID" "$NETWORK_INTERFACE")
             frontend_hosts+=("$node_name")
             frontend_ips+=("$node_ip")
             echo "Additional frontend $i on node $frontend_node_idx: $node_name ($node_ip)"
@@ -122,9 +125,9 @@ PY
 {% else %}
 {% raw %}
 # Traditional architecture - first aggregated worker node handles everything
-MASTER_IP=$(srun --nodes=1 --ntasks=1 --nodelist=${nodes[0]} ip addr show $NETWORK_INTERFACE | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)
+MASTER_IP=$(get_node_ip "${nodes[0]}" "$SLURM_JOB_ID" "$NETWORK_INTERFACE")
 if [ -z "$MASTER_IP" ]; then
-    echo "Error: Could not retrieve IP address for master host ${nodes[0]} on interface $NETWORK_INTERFACE"
+    echo "Error: Could not retrieve IP address for master host ${nodes[0]}"
     exit 1
 fi
 echo "Master IP address: $MASTER_IP"
@@ -231,7 +234,7 @@ for worker_idx in $(seq 0 $((AGG_WORKERS - 1))); do
     leader_node=${nodes[$leader_idx]}
 
     # Get leader IP for this worker group
-    LEADER_IP=$(srun --nodes=1 --ntasks=1 --nodelist=$leader_node ip addr show $NETWORK_INTERFACE | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)
+    LEADER_IP=$(get_node_ip "$leader_node" "$SLURM_JOB_ID" "$NETWORK_INTERFACE")
     echo "Aggregated worker $worker_idx leader: $leader_node ($LEADER_IP)"
 
     # Launch all nodes for this worker
