@@ -1,4 +1,4 @@
-.PHONY: lint test setup-configs dashboard sync-to-cloud delete-from-cloud cleanup
+.PHONY: lint test setup-configs dashboard sync-to-cloud sync-run delete-from-cloud cleanup
 
 NATS_VERSION ?= v2.10.28
 ETCD_VERSION ?= v3.5.21
@@ -20,6 +20,16 @@ sync-to-cloud:
 	@echo "☁️  Syncing benchmark results to cloud storage..."
 	@echo "📁 Logs directory: $(LOGS_DIR)"
 	@uv run python -m srtslurm.sync_results --logs-dir $(LOGS_DIR) push-all
+	@echo "✅ Sync complete!"
+
+sync-run:
+	@if [ -z "$(RUN_ID)" ]; then \
+		echo "❌ Error: RUN_ID not specified"; \
+		echo "Usage: make sync-run RUN_ID=3667_1P_1D_20251110_192145"; \
+		exit 1; \
+	fi
+	@echo "☁️  Syncing run $(RUN_ID) to cloud storage..."
+	@uv run python -m srtslurm.sync_results --logs-dir $(LOGS_DIR) push $(RUN_ID)
 	@echo "✅ Sync complete!"
 
 delete-from-cloud:
