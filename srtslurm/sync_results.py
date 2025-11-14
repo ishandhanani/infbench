@@ -22,6 +22,10 @@ Usage Examples:
     # Push/pull specific run
     python -m srtslurm.sync_results push 3667_1P_1D_20251110_192145
     python -m srtslurm.sync_results pull 3667_1P_1D_20251110_192145
+    
+    # Delete run from cloud (requires confirmation)
+    python -m srtslurm.sync_results delete 3667_1P_1D_20251110_192145
+    python -m srtslurm.sync_results delete 3667_1P_1D_20251110_192145 --force
 
 Commands:
     test          - Test cloud connection
@@ -30,6 +34,7 @@ Commands:
     push-all      - Push all local runs (skips existing files)
     pull          - Pull specific run (skips existing files)
     pull-missing  - Pull all runs from cloud (skips existing files)
+    delete        - Delete specific run from cloud (DESTRUCTIVE!)
 """
 
 import argparse
@@ -182,6 +187,34 @@ def cmd_list_remote(args, sync_manager):
     return 0
 
 
+def cmd_delete(args, sync_manager):
+    """Delete a run from cloud storage."""
+    run_id = args.run_id
+    
+    # Check if run exists
+    if not sync_manager.run_exists_in_cloud(run_id):
+        logger.error(f"Run {run_id} does not exist in cloud storage")
+        return 1
+    
+    # Confirm deletion unless --force is used
+    if not args.force:
+        logger.warning(f"⚠️  WARNING: This will permanently delete run {run_id} from cloud storage!")
+        response = input("Type the run ID to confirm deletion: ")
+        if response != run_id:
+            logger.info("Deletion cancelled")
+            return 0
+    
+    logger.info(f"Deleting {run_id} from cloud storage...")
+    success, deleted = sync_manager.delete_run(run_id, progress_callback)
+    
+    if success:
+        logger.info(f"✓ Successfully deleted {deleted} files")
+        return 0
+    else:
+        logger.error(f"✗ Failed to delete run (deleted {deleted} files before error)")
+        return 1
+
+
 def cmd_test(args, sync_manager):
     """Test cloud storage connection."""
     logger.info("Testing cloud storage connection...")
@@ -228,6 +261,11 @@ def main():
     # List remote command
     subparsers.add_parser("list-remote", help="List all runs in cloud storage")
 
+    # Delete command
+    delete_parser = subparsers.add_parser("delete", help="Delete a run from cloud storage")
+    delete_parser.add_argument("run_id", help="Run ID (directory name) to delete")
+    delete_parser.add_argument("--force", action="store_true", help="Skip confirmation prompt")
+
     # Test command
     subparsers.add_parser("test", help="Test cloud storage connection")
 
@@ -251,6 +289,7 @@ def main():
         "pull": cmd_pull,
         "pull-missing": cmd_pull_missing,
         "list-remote": cmd_list_remote,
+        "delete": cmd_delete,
         "test": cmd_test,
     }
 

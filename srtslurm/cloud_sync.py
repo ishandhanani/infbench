@@ -308,6 +308,49 @@ class CloudSyncManager:
             logger.error(f"Failed to check if run exists: {e}")
             return False
 
+    def delete_run(self, run_id: str, progress_callback=None) -> tuple[bool, int]:
+        """Delete a run from cloud storage.
+
+        Args:
+            run_id: Run directory name to delete
+            progress_callback: Optional callback function(current, total, filename)
+
+        Returns:
+            Tuple of (success: bool, deleted_count: int)
+        """
+        logger.warning(f"Deleting run {run_id} from cloud storage...")
+
+        # List all files for this run
+        remote_files = self.list_remote_files(run_id)
+        
+        if not remote_files:
+            logger.warning(f"No files found for run {run_id}")
+            return False, 0
+
+        logger.info(f"Found {len(remote_files)} files to delete")
+
+        # Delete all files
+        deleted = 0
+        total = len(remote_files)
+        
+        for rel_path in remote_files:
+            s3_key = f"{self.prefix}{run_id}/{rel_path}"
+            
+            try:
+                self.s3.delete_object(Bucket=self.bucket, Key=s3_key)
+                deleted += 1
+                
+                if progress_callback:
+                    progress_callback(deleted, total, rel_path)
+                
+                logger.debug(f"Deleted {rel_path}")
+            except Exception as e:
+                logger.error(f"Failed to delete {rel_path}: {e}")
+                return False, deleted
+
+        logger.info(f"Successfully deleted {deleted} files for run {run_id}")
+        return True, deleted
+
     def test_connection(self) -> bool:
         """Test connection to cloud storage.
 
