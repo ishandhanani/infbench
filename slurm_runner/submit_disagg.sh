@@ -7,7 +7,7 @@ usage() {
 This script aims to provide a one-liner call to the submit_job_script.py,
 so that the deployment process can be further simplified.
 
-To use this script, fill in the following script and run it under your `slurm_jobs` directory:
+To use this script, fill in the following script and run it under your `slurm_runner` directory:
 ======== begin script area ========
 export SLURM_ACCOUNT=
 export SLURM_PARTITION=

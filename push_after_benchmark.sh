@@ -17,7 +17,7 @@ set -e  # Exit on error
 
 # Find the sync script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SYNC_SCRIPT="$SCRIPT_DIR/slurm_jobs/scripts/sync_results.py"
+SYNC_SCRIPT="$SCRIPT_DIR/slurm_runner/scripts/sync_results.py"
 
 if [ ! -f "$SYNC_SCRIPT" ]; then
     echo "Error: sync_results.py not found at $SYNC_SCRIPT"

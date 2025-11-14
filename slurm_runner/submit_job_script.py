@@ -307,7 +307,7 @@ def _parse_command_line_args(args: list[str] | None = None) -> argparse.Namespac
         "--log-dir",
         type=str,
         default=None,
-        help="Directory to save logs (default: repo root/logs). Path relative to slurm_jobs/ or absolute.",
+        help="Directory to save logs (default: repo root/logs). Path relative to slurm_runner/ or absolute.",
     )
 
     return parser.parse_args(args)
@@ -490,18 +490,18 @@ def main(input_args: list[str] | None = None):
     if args.log_dir:
         base_log_dir = pathlib.Path(args.log_dir)
         if not base_log_dir.is_absolute():
-            # Relative to slurm_jobs directory - use as-is in template
+            # Relative to slurm_runner directory - use as-is in template
             log_dir_prefix = args.log_dir
         else:
-            # Absolute path - compute relative from slurm_jobs/
-            slurm_jobs_dir = pathlib.Path(__file__).parent
+            # Absolute path - compute relative from slurm_runner/
+            slurm_runner_dir = pathlib.Path(__file__).parent
             try:
-                log_dir_prefix = str(base_log_dir.relative_to(slurm_jobs_dir))
+                log_dir_prefix = str(base_log_dir.relative_to(slurm_runner_dir))
             except ValueError:
-                # Not relative to slurm_jobs, use absolute
+                # Not relative to slurm_runner, use absolute
                 log_dir_prefix = str(base_log_dir)
     else:
-        # Default: repo root/logs (parent of slurm_jobs/)/logs = "../logs" from slurm_jobs/
+        # Default: repo root/logs (parent of slurm_runner/)/logs = "../logs" from slurm_runner/
         log_dir_prefix = "../logs"
 
     # Select template based on mode
@@ -567,10 +567,10 @@ def main(input_args: list[str] | None = None):
         if args.log_dir:
             base_log_dir = pathlib.Path(args.log_dir)
             if not base_log_dir.is_absolute():
-                # Relative to slurm_jobs directory
+                # Relative to slurm_runner directory
                 base_log_dir = pathlib.Path(__file__).parent / base_log_dir
         else:
-            # Default: repo root/logs (parent directory of slurm_jobs/ + logs)
+            # Default: repo root/logs (parent directory of slurm_runner/ + logs)
             base_log_dir = pathlib.Path(__file__).parent.parent / "logs"
         
         log_dir_path = base_log_dir / log_dir_name

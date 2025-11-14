@@ -34,7 +34,7 @@ exclude = [
     "*.egg-info",
     ".venv",
     "venv",
-    "slurm_jobs",
+    "slurm_runner",
 ]
 
 # Line length to match black default

@@ -33,8 +33,8 @@ Each SLURM job creates a unique log directory in the repo root using the job ID,
 
 You can customize the log directory location using the `--log-dir` argument:
 
-- **Default**: Logs saved to repo root (parent of `slurm_jobs/`)
-- **Relative path**: `--log-dir logs/` saves to `slurm_jobs/logs/`
+- **Default**: Logs saved to repo root (parent of `slurm_runner/`)
+- **Relative path**: `--log-dir logs/` saves to `slurm_runner/logs/`
 - **Absolute path**: `--log-dir /path/to/logs` saves to that absolute path
 
 ## Usage

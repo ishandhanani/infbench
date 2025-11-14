@@ -31,7 +31,7 @@ python3 submit_job_script.py \
   --log-dir /mnt/lustre01/users-public/slurm-shared/joblogs
 ```
 
-For more info on the submission script see [slurm_jobs/README.md](slurm_jobs/README.md)
+For more info on the submission script see [slurm_runner/README.md](slurm_runner/README.md)
 
 ## Run the UI
 
@@ -111,8 +111,8 @@ In the dashboard sidebar:
 Or pull manually:
 
 ```bash
-python slurm_jobs/scripts/sync_results.py pull-missing
-python slurm_jobs/scripts/sync_results.py list-remote
+python slurm_runner/scripts/sync_results.py pull-missing
+python slurm_runner/scripts/sync_results.py list-remote
 ```
 
 ## What It Does

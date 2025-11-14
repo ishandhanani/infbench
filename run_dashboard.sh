@@ -8,4 +8,4 @@ echo ""
 echo "🎉 Launching dashboard..."
 echo "   The dashboard will open in your browser at http://localhost:8501"
 echo ""
-uv run streamlit run app.py
+uv run streamlit run dashboard/app.py
