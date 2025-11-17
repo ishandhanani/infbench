@@ -50,7 +50,7 @@ if [[ "${PROFILING_MODE}" == "prefill" ]]; then
     BATCH_SIZE=24
     INPUT_LEN=1024
     OUTPUT_LEN=2
-    PROFILE_STEPS_ARG=""
+    PROFILE_STEPS_ARG="--profile-steps 15"
     echo "Running prefill profiling with batch=${BATCH_SIZE}, input_len=${INPUT_LEN}, output_len=${OUTPUT_LEN}"
 else
     # Decode profiling: large batch, short input, longer output with profile steps
@@ -76,6 +76,7 @@ python3 -m sglang.bench_one_batch_server \
     --input-len ${INPUT_LEN} \
     --output-len ${OUTPUT_LEN} \
     ${PROFILE_STEPS_ARG} \
+    --skip-warmup \
     --profile
 exit_code=$?
 set +x
