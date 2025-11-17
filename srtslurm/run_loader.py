@@ -63,6 +63,13 @@ class RunLoader:
             try:
                 run = BenchmarkRun.from_json_file(path)
                 if run is not None:
+                    # Skip profiling jobs (they don't have benchmark results)
+                    if run.profiler.profiler_type == "torch-profiler":
+                        reason = "Profiling job (no benchmark results)"
+                        logger.debug(f"Skipping profiling job {run.job_id}")
+                        skipped.append((run.job_id, run_dir, reason))
+                        continue
+
                     # Load benchmark results from profiler output files
                     self._load_benchmark_results(run)
 
