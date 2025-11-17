@@ -280,6 +280,7 @@ def setup_env_vars_for_gpu_script(
     dump_config_path: str | None = None,
     use_dynamo_whls: bool = False,
     sglang_torch_profiler: bool = False,
+    worker_type: str = "aggregated",
 ):
     """Setup environment variables required by GPU scripts (gb200-fp8.sh)"""
     os.environ["HOST_IP_MACHINE"] = host_ip
@@ -291,7 +292,8 @@ def setup_env_vars_for_gpu_script(
     os.environ["USE_DYNAMO_WHLS"] = str(use_dynamo_whls)
     os.environ["USE_SGLANG_LAUNCH_SERVER"] = str(sglang_torch_profiler)
     if sglang_torch_profiler:
-        os.environ["SGLANG_TORCH_PROFILER_DIR"] = "/logs/profiles"
+        # Set profiler directory with worker-type-specific subdirectory
+        os.environ["SGLANG_TORCH_PROFILER_DIR"] = f"/logs/profiles/{worker_type}"
     if dump_config_path:
         os.environ["DUMP_CONFIG_PATH"] = dump_config_path
     else:
@@ -306,7 +308,7 @@ def setup_env_vars_for_gpu_script(
     logging.info(f"Set USE_DYNAMO_WHLS: {use_dynamo_whls}")
     logging.info(f"Set USE_SGLANG_LAUNCH_SERVER: {sglang_torch_profiler}")
     if sglang_torch_profiler:
-        logging.info(f"Set SGLANG_TORCH_PROFILER_DIR: /logs/profiles")
+        logging.info(f"Set SGLANG_TORCH_PROFILER_DIR: /logs/profiles/{worker_type}")
     if dump_config_path:
         logging.info(f"Set DUMP_CONFIG_PATH: {dump_config_path}")
 
@@ -445,6 +447,7 @@ def setup_prefill_worker(
         dump_config_path=dump_config_path,
         use_dynamo_whls=use_dynamo_whls,
         sglang_torch_profiler=sglang_torch_profiler,
+        worker_type="prefill",
     )
 
     # Use appropriate GPU script instead of generating command directly
@@ -485,6 +488,7 @@ def setup_decode_worker(
         dump_config_path=dump_config_path,
         use_dynamo_whls=use_dynamo_whls,
         sglang_torch_profiler=sglang_torch_profiler,
+        worker_type="decode",
     )
 
     # Use appropriate GPU script instead of generating command directly
@@ -531,6 +535,7 @@ def setup_aggregated_worker(
         dump_config_path=dump_config_path,
         use_dynamo_whls=use_dynamo_whls,
         sglang_torch_profiler=sglang_torch_profiler,
+        worker_type="aggregated",
     )
 
     # Use appropriate aggregated GPU script
