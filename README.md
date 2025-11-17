@@ -39,7 +39,7 @@ See [slurm_runner/README.md](slurm_runner/README.md) for detailed options.
 ### 3. Analyze Results
 
 ```bash
-./run_dashboard.sh
+uv run streamlit run dashboard/app.py
 ```
 
 Opens interactive dashboard at http://localhost:8501
