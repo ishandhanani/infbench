@@ -271,6 +271,12 @@ def _parse_command_line_args(args: list[str] | None = None) -> argparse.Namespac
     )
 
     parser.add_argument(
+        "--sglang-torch-profiler",
+        action="store_true",
+        help="Enable torch profiling mode using sglang.launch_server (mutually exclusive with --benchmark)",
+    )
+
+    parser.add_argument(
         "--extra-slurm-args",
         action="append",
         default=[],
@@ -304,9 +310,34 @@ def _parse_command_line_args(args: list[str] | None = None) -> argparse.Namespac
 
 def _validate_args(args: argparse.Namespace) -> None:
     """Validate arguments and ensure aggregated and disaggregated args are mutually exclusive."""
+    # Validate profiling mode constraints
+    if args.sglang_torch_profiler:
+        if args.benchmark:
+            raise ValueError(
+                "Cannot specify both --sglang-torch-profiler and --benchmark. "
+                "Profiling mode is mutually exclusive with benchmarking."
+            )
+
+        # Check for multiple workers in profiling mode
+        if hasattr(args, 'agg_workers') and args.agg_workers and args.agg_workers > 1:
+            raise ValueError(
+                "Profiling mode requires single worker only. "
+                f"Got --agg-workers={args.agg_workers}"
+            )
+        if hasattr(args, 'prefill_workers') and args.prefill_workers and args.prefill_workers > 1:
+            raise ValueError(
+                "Profiling mode requires single worker only. "
+                f"Got --prefill-workers={args.prefill_workers}"
+            )
+        if hasattr(args, 'decode_workers') and args.decode_workers and args.decode_workers > 1:
+            raise ValueError(
+                "Profiling mode requires single worker only. "
+                f"Got --decode-workers={args.decode_workers}"
+            )
+
     # Config file is in repo root (parent of slurm_runner/)
     config_path = str(pathlib.Path(__file__).parent.parent / "srtslurm.yaml")
-    
+
     # Validate cluster settings with config file fallback
     try:
         args.account, args.partition, args.network_interface = validate_cluster_settings(
@@ -594,13 +625,16 @@ def main(input_args: list[str] | None = None):
         "enable_multiple_frontends": args.enable_multiple_frontends,
         "num_additional_frontends": args.num_additional_frontends,
         "use_init_location": args.use_init_location,
-        "do_benchmark": benchmark_config["type"] != "manual",
+        "do_benchmark": benchmark_config["type"] != "manual" if not args.sglang_torch_profiler else False,
         "benchmark_type": benchmark_config["type"],
         "benchmark_arg": parsable_config,
         "timestamp": timestamp,
         "enable_config_dump": args.enable_config_dump,
         "use_dynamo_whls": True,  # Always true when config-dir is set
         "log_dir_prefix": log_dir_prefix,
+        "profiling_enabled": args.sglang_torch_profiler,
+        "profiling_dir": "/logs/profiles",
+        "profiling_mode": "decode",  # Will be overridden for prefill job in disagg mode
     }
 
     # Create temporary file for sbatch script
@@ -609,13 +643,51 @@ def main(input_args: list[str] | None = None):
     temp_file.close()
 
     try:
-        _, rendered_script = generate_job_script(
-            template_path, temp_path, **template_vars
-        )
-
         submitted_job_ids = []
-        job_id = submit_job(temp_path, args.extra_slurm_args)
-        submitted_job_ids.append(job_id)
+
+        # Handle disaggregated profiling mode: submit 2 separate jobs (prefill + decode)
+        if args.sglang_torch_profiler and not is_aggregated:
+            # Submit prefill profiling job
+            template_vars_prefill = template_vars.copy()
+            template_vars_prefill["profiling_mode"] = "prefill"
+            template_vars_prefill["total_nodes"] = prefill_nodes
+            template_vars_prefill["decode_nodes"] = 0
+            template_vars_prefill["decode_workers"] = 0
+
+            _, rendered_script_prefill = generate_job_script(
+                template_path, temp_path, **template_vars_prefill
+            )
+
+            prefill_job_id = submit_job(temp_path, args.extra_slurm_args)
+            submitted_job_ids.append(prefill_job_id)
+            logging.info(f"Submitted prefill profiling job: {prefill_job_id}")
+
+            # Submit decode profiling job
+            template_vars_decode = template_vars.copy()
+            template_vars_decode["profiling_mode"] = "decode"
+            template_vars_decode["total_nodes"] = decode_nodes
+            template_vars_decode["prefill_nodes"] = 0
+            template_vars_decode["prefill_workers"] = 0
+
+            _, rendered_script_decode = generate_job_script(
+                template_path, temp_path, **template_vars_decode
+            )
+
+            decode_job_id = submit_job(temp_path, args.extra_slurm_args)
+            submitted_job_ids.append(decode_job_id)
+            logging.info(f"Submitted decode profiling job: {decode_job_id}")
+
+            # Store both scripts for later saving
+            rendered_script = f"# Prefill Job:\n{rendered_script_prefill}\n\n# Decode Job:\n{rendered_script_decode}"
+            job_id = prefill_job_id  # Use prefill job ID for log directory naming
+        else:
+            # Normal mode or aggregated profiling mode: single job submission
+            _, rendered_script = generate_job_script(
+                template_path, temp_path, **template_vars
+            )
+
+            job_id = submit_job(temp_path, args.extra_slurm_args)
+            submitted_job_ids.append(job_id)
 
         # Create log directory with new naming format IMMEDIATELY after submission
         # SLURM will write log.out/log.err to this directory when job starts

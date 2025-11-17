@@ -33,6 +33,15 @@ fi
 echo "Mode: $mode"
 echo "Command: dynamo"
 
+# Determine which command to use based on profiling mode
+if [[ "${SGLANG_TORCH_PROFILER_ENABLED,,}" == "true" ]]; then
+    PYTHON_MODULE="sglang.launch_server"
+    echo "Profiling mode enabled - using sglang.launch_server"
+else
+    PYTHON_MODULE="dynamo.sglang"
+    echo "Normal mode - using dynamo.sglang"
+fi
+
 # Check if required environment variables are set
 if [ -z "$HOST_IP_MACHINE" ]; then
     echo "Error: HOST_IP_MACHINE environment variable is not set"
@@ -99,7 +108,7 @@ if [ "$mode" = "prefill" ]; then
     SGL_DISABLE_TP_MEMORY_INBALANCE_CHECK=1 \
     PYTHONUNBUFFERED=1 \
     numactl --cpunodebind=0 --membind=0 \
-    python3 -m dynamo.sglang \
+    python3 -m $PYTHON_MODULE \
         --disaggregation-mode prefill \
         --host 0.0.0.0 \
         --decode-log-interval 1000 \
@@ -177,7 +186,7 @@ elif [ "$mode" = "decode" ]; then
     SGLANG_DEEPEP_NUM_MAX_DISPATCH_TOKENS_PER_RANK=384 \
     SGLANG_CUTEDSL_MOE_NVFP4_DISPATCH=1 \
     SGLANG_FP4_GEMM_BACKEND=cutlass \
-    python3 -m dynamo.sglang \
+    python3 -m $PYTHON_MODULE \
         --disaggregation-mode decode \
         --host 0.0.0.0 \
         --decode-log-interval 1000 \

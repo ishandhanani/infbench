@@ -31,6 +31,9 @@ CONFIG_DIR="{{ config_dir }}"
 CONTAINER_IMAGE="{{ container_image }}"
 NETWORK_INTERFACE="{{ network_interface }}"
 GPU_TYPE="{{ gpu_type | default('h100') }}"
+PROFILING_ENABLED="{{ profiling_enabled }}"
+PROFILING_DIR="{{ profiling_dir }}"
+PROFILING_MODE="{{ profiling_mode }}"
 set +x
 
 {% raw %}
@@ -164,6 +167,7 @@ ENROOT_ARGS="\
     --no-container-entrypoint \
     --no-container-mount-home \
     --container-mounts=${MODEL_DIR}:/model/,${CONFIG_DIR}:/configs/,${SCRIPT_DIR}:/scripts/,${OUTPUT_DIR}:/outputs/,${LOG_DIR}:/logs/ \
+    --export=ALL,SGLANG_TORCH_PROFILER_ENABLED=${PROFILING_ENABLED},SGLANG_TORCH_PROFILER_DIR=${PROFILING_DIR},PROFILING_MODE=${PROFILING_MODE} \
 "
 
 # Build common worker arguments
@@ -287,12 +291,17 @@ echo "scancel $SLURM_JOB_ID"
 
 {% endraw %}
 
-PROFILER_TYPE={{ profiler_type }}
-PROFILER_ARGS="{{ profiler_arg }}"
-
-{% if do_profile %}
+{% if profiling_enabled %}
 {% raw %}
-srun --nodes=1 --ntasks=1 $ENROOT_ARGS --jobid $SLURM_JOB_ID -w ${nodes[0]} --output=${LOG_DIR}/profile.out --error=${LOG_DIR}/profile.err --overlap bash /scripts/${PROFILER_TYPE}/bench.sh 0 $AGG_WORKERS $PREFILL_GPUS $DECODE_GPUS $TOTAL_GPUS ${PROFILER_ARGS} &
+# Run torch profiling
+srun --nodes=1 --ntasks=1 $ENROOT_ARGS --jobid $SLURM_JOB_ID -w ${nodes[0]} --output=${LOG_DIR}/profile.out --error=${LOG_DIR}/profile.err --overlap bash /scripts/profile.sh 0 $AGG_WORKERS $PREFILL_GPUS $DECODE_GPUS $TOTAL_GPUS &
+{% endraw %}
+{% elif do_benchmark %}
+{% raw %}
+# Run benchmark
+BENCHMARK_TYPE={{ benchmark_type }}
+BENCHMARK_ARGS="{{ benchmark_arg }}"
+srun --nodes=1 --ntasks=1 $ENROOT_ARGS --jobid $SLURM_JOB_ID -w ${nodes[0]} --output=${LOG_DIR}/benchmark.out --error=${LOG_DIR}/benchmark.err --overlap bash /scripts/${BENCHMARK_TYPE}/bench.sh 0 $AGG_WORKERS $PREFILL_GPUS $DECODE_GPUS $TOTAL_GPUS ${BENCHMARK_ARGS} &
 {% endraw %}
 {% endif %}
 

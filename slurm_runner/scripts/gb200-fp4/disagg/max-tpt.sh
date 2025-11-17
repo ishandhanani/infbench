@@ -33,6 +33,15 @@ fi
 echo "Mode: $mode"
 echo "Command: dynamo"
 
+# Determine which command to use based on profiling mode
+if [[ "${SGLANG_TORCH_PROFILER_ENABLED,,}" == "true" ]]; then
+    PYTHON_MODULE="sglang.launch_server"
+    echo "Profiling mode enabled - using sglang.launch_server"
+else
+    PYTHON_MODULE="dynamo.sglang"
+    echo "Normal mode - using dynamo.sglang"
+fi
+
 # Check if required environment variables are set
 if [ -z "$HOST_IP_MACHINE" ]; then
     echo "Error: HOST_IP_MACHINE environment variable is not set"
@@ -97,7 +106,7 @@ if [ "$mode" = "prefill" ]; then
     SGLANG_USE_MESSAGE_QUEUE_BROADCASTER=0 \
     SGLANG_DISABLE_TP_MEMORY_INBALANCE_CHECK=1 \
     PYTHONUNBUFFERED=1 \
-    python3 -m dynamo.sglang \
+    python3 -m $PYTHON_MODULE \
         --served-model-name deepseek-ai/DeepSeek-R1 \
         --model-path /model/ \
         --disaggregation-mode prefill \
@@ -174,7 +183,7 @@ elif [ "$mode" = "decode" ]; then
     SGLANG_FLASHINFER_FP4_GEMM_BACKEND=cutlass \
     DYN_SKIP_SGLANG_LOG_FORMATTING=1 \
     PYTHONUNBUFFERED=1 \
-    python3 -m dynamo.sglang \
+    python3 -m $PYTHON_MODULE \
         --served-model-name deepseek-ai/DeepSeek-R1 \
         --model-path /model/ \
         --trust-remote-code \
