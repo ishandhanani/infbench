@@ -134,7 +134,7 @@ def render_sidebar(logs_dir, runs):
         for run in sorted_runs:
             if run.metadata.container and run.metadata.container != "N/A":
                 container_values.add(run.metadata.container)
-        
+
         if container_values:
             container_options = sorted(container_values)
             selected_containers = st.multiselect(
@@ -143,15 +143,40 @@ def render_sidebar(logs_dir, runs):
                 default=container_options,
                 key="container_filter",
             )
-            
+
             if selected_containers:
                 sorted_runs = [
                     r for r in sorted_runs
-                    if r.metadata.container in selected_containers or 
+                    if r.metadata.container in selected_containers or
                        (not r.metadata.container and "N/A" in selected_containers)
                 ]
         else:
             st.caption("No container information available")
+
+    # 5. Tags Filter
+    with st.sidebar.expander("🏷️ Tags", expanded=False):
+        all_tags = set()
+        for run in sorted_runs:
+            if run.tags:
+                all_tags.update(run.tags)
+
+        if all_tags:
+            tag_options = sorted(all_tags)
+            selected_tags = st.multiselect(
+                "Select tags",
+                options=tag_options,
+                default=[],
+                key="tags_filter",
+                help="Show only runs that have ALL selected tags"
+            )
+
+            if selected_tags:
+                sorted_runs = [
+                    r for r in sorted_runs
+                    if r.tags and all(tag in r.tags for tag in selected_tags)
+                ]
+        else:
+            st.caption("No tags found")
     
     # Show filter results
     st.sidebar.caption(f"✅ {len(sorted_runs)} runs match filters")
@@ -168,7 +193,12 @@ def render_sidebar(logs_dir, runs):
         gpu_suffix = f" [{gpu_type}]" if gpu_type else ""
         # Include job ID to ensure unique labels
         label = f"Job {run.job_id} | {topology} | {isl}/{osl}{gpu_suffix}"
-        
+
+        # Add tags to label if they exist
+        if run.tags:
+            tags_str = ", ".join(run.tags)
+            label += f" 🏷️ {tags_str}"
+
         run_labels.append(label)
         label_to_run[label] = run
     
@@ -179,13 +209,60 @@ def render_sidebar(logs_dir, runs):
         default=run_labels[: min(3, len(run_labels))],
         help="Select one or more runs to visualize",
     )
-    
+
     if not selected_labels:
         st.warning("Please select at least one run to visualize.")
         return None, None, None, None, None
-    
+
     # Filter runs based on selected labels
     filtered_runs = [label_to_run[label] for label in selected_labels]
+
+    # Tags Section
+    st.sidebar.divider()
+    st.sidebar.subheader("Tags")
+
+    # Show tag editor for each selected run
+    for run in filtered_runs:
+        with st.sidebar.expander(f"Job {run.job_id}", expanded=False):
+            # Display current tags
+            current_tags = run.tags if run.tags else []
+
+            # Tag input
+            tag_input = st.text_input(
+                "Add tag",
+                key=f"tag_input_{run.job_id}",
+                placeholder="Enter tag name...",
+                label_visibility="collapsed"
+            )
+
+            col_add, col_clear = st.columns([1, 1])
+            with col_add:
+                if st.button("Add", key=f"add_tag_{run.job_id}", disabled=not tag_input):
+                    if tag_input and tag_input not in current_tags:
+                        new_tags = current_tags + [tag_input]
+                        loader = RunLoader(logs_dir)
+                        if loader.update_tags(run.metadata.path, new_tags):
+                            st.success(f"Added tag: {tag_input}")
+                            components.load_data.clear()
+                            st.rerun()
+
+            # Display and manage existing tags
+            if current_tags:
+                st.caption("Current tags:")
+                for tag in current_tags:
+                    col_tag, col_remove = st.columns([3, 1])
+                    with col_tag:
+                        st.text(f"• {tag}")
+                    with col_remove:
+                        if st.button("×", key=f"remove_{run.job_id}_{tag}"):
+                            new_tags = [t for t in current_tags if t != tag]
+                            loader = RunLoader(logs_dir)
+                            if loader.update_tags(run.metadata.path, new_tags):
+                                st.success(f"Removed tag: {tag}")
+                                components.load_data.clear()
+                                st.rerun()
+            else:
+                st.caption("No tags yet")
     
     # Check for incomplete runs
     incomplete_runs = [run for run in filtered_runs if not run.is_complete]

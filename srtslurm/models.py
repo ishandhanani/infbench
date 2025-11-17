@@ -225,6 +225,7 @@ class BenchmarkRun:
     profiler: ProfilerResults
     is_complete: bool = True
     missing_concurrencies: list[int] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
 
     @classmethod
     def from_json_file(cls, run_path: str) -> "BenchmarkRun | None":
@@ -253,8 +254,9 @@ class BenchmarkRun:
 
             metadata = RunMetadata.from_json(json_data, run_path)
             profiler = ProfilerResults.from_json(json_data)
+            tags = json_data.get("tags", [])
 
-            return cls(metadata=metadata, profiler=profiler)
+            return cls(metadata=metadata, profiler=profiler, tags=tags)
         except Exception:
             return None
 

@@ -571,3 +571,44 @@ class RunLoader:
                 rows.append(row)
 
         return pd.DataFrame(rows)
+
+    def update_tags(self, run_path: str, tags: list[str]) -> bool:
+        """Update tags for a run by modifying its {jobid}.json file.
+
+        Args:
+            run_path: Path to the run directory
+            tags: List of tag strings to set
+
+        Returns:
+            True if successful, False otherwise
+        """
+        # Handle both relative and absolute paths
+        if not os.path.isabs(run_path):
+            run_path = os.path.join(self.logs_dir, run_path)
+
+        # Extract job ID from directory name
+        dirname = os.path.basename(run_path)
+        job_id = dirname.split("_")[0]
+        json_path = os.path.join(run_path, f"{job_id}.json")
+
+        if not os.path.exists(json_path):
+            logger.error(f"Metadata JSON not found: {json_path}")
+            return False
+
+        try:
+            # Read existing JSON
+            with open(json_path, "r") as f:
+                json_data = json.load(f)
+
+            # Update tags
+            json_data["tags"] = tags
+
+            # Write back to file
+            with open(json_path, "w") as f:
+                json.dump(json_data, f, indent=2)
+
+            logger.info(f"Updated tags for {job_id}: {tags}")
+            return True
+        except Exception as e:
+            logger.error(f"Error updating tags for {json_path}: {e}")
+            return False
