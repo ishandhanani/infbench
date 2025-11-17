@@ -646,31 +646,34 @@ def main(input_args: list[str] | None = None):
         submitted_job_ids = []
 
         # Handle disaggregated profiling mode: submit 2 separate jobs (prefill + decode)
+        # Use aggregated template for each job since they're standalone
         if args.sglang_torch_profiler and not is_aggregated:
-            # Submit prefill profiling job
+            # Submit prefill profiling job (use aggregated template)
             template_vars_prefill = template_vars.copy()
             template_vars_prefill["profiling_mode"] = "prefill"
             template_vars_prefill["total_nodes"] = prefill_nodes
-            template_vars_prefill["decode_nodes"] = 0
-            template_vars_prefill["decode_workers"] = 0
+            template_vars_prefill["agg_nodes"] = prefill_nodes
+            template_vars_prefill["agg_workers"] = prefill_workers
+            template_vars_prefill["is_aggregated"] = True
 
             _, rendered_script_prefill = generate_job_script(
-                template_path, temp_path, **template_vars_prefill
+                "job_script_template_agg.j2", temp_path, **template_vars_prefill
             )
 
             prefill_job_id = submit_job(temp_path, args.extra_slurm_args)
             submitted_job_ids.append(prefill_job_id)
             logging.info(f"Submitted prefill profiling job: {prefill_job_id}")
 
-            # Submit decode profiling job
+            # Submit decode profiling job (use aggregated template)
             template_vars_decode = template_vars.copy()
             template_vars_decode["profiling_mode"] = "decode"
             template_vars_decode["total_nodes"] = decode_nodes
-            template_vars_decode["prefill_nodes"] = 0
-            template_vars_decode["prefill_workers"] = 0
+            template_vars_decode["agg_nodes"] = decode_nodes
+            template_vars_decode["agg_workers"] = decode_workers
+            template_vars_decode["is_aggregated"] = True
 
             _, rendered_script_decode = generate_job_script(
-                template_path, temp_path, **template_vars_decode
+                "job_script_template_agg.j2", temp_path, **template_vars_decode
             )
 
             decode_job_id = submit_job(temp_path, args.extra_slurm_args)
