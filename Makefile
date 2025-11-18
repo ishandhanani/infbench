@@ -3,6 +3,7 @@
 NATS_VERSION ?= v2.10.28
 ETCD_VERSION ?= v3.5.21
 LOGS_DIR ?= logs
+ARCH ?= $(shell uname -m)
 
 default:
 	./run_dashboard.sh
@@ -43,11 +44,11 @@ delete-from-cloud:
 setup:
 	@echo "📦 Setting up configs and logs directories..."
 	@mkdir -p logs
-	@ARCH=$$(uname -m); \
-	case "$$ARCH" in \
+	@echo "🖥️  Using architecture: $(ARCH)"
+	@case "$(ARCH)" in \
 		x86_64)  ARCH_SHORT="amd64" ;; \
 		aarch64) ARCH_SHORT="arm64" ;; \
-		*) echo "❌ Unsupported architecture: $$ARCH"; exit 1 ;; \
+		*) echo "❌ Unsupported architecture: $(ARCH)"; exit 1 ;; \
 	esac; \
 	echo "⬇️  Downloading Python wheels..."; \
 	wget -q --show-progress -P configs https://files.pythonhosted.org/packages/dc/b7/62fb0edaeae0943731d0e1d3e1455b0a8a94ef448aa5bd8ffe33288ab464/ai_dynamo-0.6.1-py3-none-any.whl; \
@@ -94,8 +95,8 @@ setup:
 		account=$${account:-restricted}; \
 		read -p "Enter SLURM partition [batch]: " partition; \
 		partition=$${partition:-batch}; \
-		read -p "Enter network interface (leave blank to auto-detect via hostname/ip route): " network; \
-		network=$${network:-}; \
+		read -p "Enter network interface [enP6p9s0np0]: " network; \
+		network=$${network:-enP6p9s0np0}; \
 		read -p "Enter GPUs per node [8]: " gpus_per_node; \
 		gpus_per_node=$${gpus_per_node:-8}; \
 		read -p "Enter time limit [4:00:00]: " time_limit; \

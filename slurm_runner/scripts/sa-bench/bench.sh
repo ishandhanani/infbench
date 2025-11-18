@@ -35,7 +35,7 @@ wait_for_model $head_node $head_port $n_prefill $n_decode $wait_for_model_check_
 
 # run a quick curl request against the model to do an accuracy spot check
 curl http://${head_node}:${head_port}/v1/chat/completions   -H "Content-Type: application/json"   -d '{
-    "model": "${model_name}",
+    "model": "deepseek-ai/DeepSeek-R1",
     "messages": [
       {
         "role": "user",

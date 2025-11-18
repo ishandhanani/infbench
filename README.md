@@ -7,7 +7,8 @@ Benchmarking toolkit for Dynamo and SGLang on SLURM clusters with interactive an
 ### 1. Setup (One-Time)
 
 ```bash
-make setup
+# add ARCH when login node is aarch64 and you are trying to run on GB200
+make setup ARCH=aarch64
 ```
 
 This downloads dependencies (nats, etcd, dynamo wheels) and creates `srtslurm.yaml` with your cluster settings and stores them in a folder called `configs`. This is automatically mounted to the container when you submit a job and all pieces are accessible via the `/config` mount.
