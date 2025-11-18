@@ -47,9 +47,9 @@ wait_until_ready "http://${head_node}:${head_port}"
 # Determine profiling parameters based on mode
 if [[ "${PROFILING_MODE}" == "prefill" ]]; then
     # Prefill profiling: smaller batch, long input, short output
-    BATCH_SIZE=24
+    BATCH_SIZE=48
     INPUT_LEN=1024
-    OUTPUT_LEN=2
+    OUTPUT_LEN=10
     PROFILE_STEPS_ARG="--profile-steps 15"
     echo "Running prefill profiling with batch=${BATCH_SIZE}, input_len=${INPUT_LEN}, output_len=${OUTPUT_LEN}"
 else
