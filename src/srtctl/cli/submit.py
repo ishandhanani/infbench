@@ -37,6 +37,38 @@ def setup_logging(level: int = logging.INFO) -> None:
     )
 
 
+def render_commands_file(backend, sglang_config_path: Path, output_path: Path) -> Path:
+    """Generate commands.sh file with rendered SGLang commands.
+
+    Args:
+        backend: SGLang backend instance
+        sglang_config_path: Path to sglang_config.yaml
+        output_path: Where to save commands.sh
+
+    Returns:
+        Path to generated commands.sh
+    """
+    content = "#!/bin/bash\n"
+    content += "# Generated SGLang commands\n"
+    content += f"# Config: {sglang_config_path}\n\n"
+    content += "# ============================================================\n"
+    content += "# PREFILL WORKER COMMAND\n"
+    content += "# ============================================================\n\n"
+    content += backend.render_command(mode="prefill", config_path=sglang_config_path)
+    content += "\n\n"
+    content += "# ============================================================\n"
+    content += "# DECODE WORKER COMMAND\n"
+    content += "# ============================================================\n\n"
+    content += backend.render_command(mode="decode", config_path=sglang_config_path)
+    content += "\n"
+
+    with open(output_path, "w") as f:
+        f.write(content)
+    output_path.chmod(0o755)
+
+    return output_path
+
+
 class DryRunContext:
     """Context for dry-run mode - creates output directory and saves artifacts"""
 
@@ -78,24 +110,7 @@ class DryRunContext:
     def save_rendered_commands(self, backend, sglang_config_path: Path) -> Path:
         """Save just the rendered commands (no sbatch headers)"""
         commands_path = self.output_dir / "commands.sh"
-
-        content = "#!/bin/bash\n"
-        content += "# Generated SGLang commands\n"
-        content += f"# Config: {sglang_config_path}\n\n"
-        content += "# ============================================================\n"
-        content += "# PREFILL WORKER COMMAND\n"
-        content += "# ============================================================\n\n"
-        content += backend.render_command(mode="prefill", config_path=sglang_config_path)
-        content += "\n\n"
-        content += "# ============================================================\n"
-        content += "# DECODE WORKER COMMAND\n"
-        content += "# ============================================================\n\n"
-        content += backend.render_command(mode="decode", config_path=sglang_config_path)
-        content += "\n"
-
-        with open(commands_path, "w") as f:
-            f.write(content)
-        commands_path.chmod(0o755)
+        render_commands_file(backend, sglang_config_path, commands_path)
         logging.info(f"  ✓ Saved rendered commands: {commands_path.name}")
         return commands_path
 
@@ -367,24 +382,7 @@ def submit_sweep(config_path: Path, dry_run: bool = False):
                     shutil.copy(sglang_config_path, job_dir / "sglang_config.yaml")
 
                     # Save rendered commands (like single dry-run does)
-                    commands_path = job_dir / "commands.sh"
-                    content = "#!/bin/bash\n"
-                    content += "# Generated SGLang commands\n"
-                    content += f"# Config: {job_dir / 'sglang_config.yaml'}\n\n"
-                    content += "# ============================================================\n"
-                    content += "# PREFILL WORKER COMMAND\n"
-                    content += "# ============================================================\n\n"
-                    content += backend.render_command(mode="prefill", config_path=sglang_config_path)
-                    content += "\n\n"
-                    content += "# ============================================================\n"
-                    content += "# DECODE WORKER COMMAND\n"
-                    content += "# ============================================================\n\n"
-                    content += backend.render_command(mode="decode", config_path=sglang_config_path)
-                    content += "\n"
-
-                    with open(commands_path, "w") as f:
-                        f.write(content)
-                    commands_path.chmod(0o755)
+                    render_commands_file(backend, sglang_config_path, job_dir / "commands.sh")
 
             logging.info(f"  ✓ Saved to: {job_dir.name}")
 
