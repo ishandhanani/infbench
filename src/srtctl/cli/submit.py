@@ -359,12 +359,32 @@ def submit_sweep(config_path: Path, dry_run: bool = False):
             with open(job_dir / "config.yaml", "w") as f:
                 yaml.dump(config, f, default_flow_style=False)
 
-            # Generate SGLang config
+            # Generate SGLang config and commands
             if config.get("backend", {}).get("type") == "sglang":
                 backend = SGLangBackend(config)
                 sglang_config_path = backend.generate_config_file(params)
                 if sglang_config_path:
                     shutil.copy(sglang_config_path, job_dir / "sglang_config.yaml")
+
+                    # Save rendered commands (like single dry-run does)
+                    commands_path = job_dir / "commands.sh"
+                    content = "#!/bin/bash\n"
+                    content += "# Generated SGLang commands\n"
+                    content += f"# Config: {job_dir / 'sglang_config.yaml'}\n\n"
+                    content += "# ============================================================\n"
+                    content += "# PREFILL WORKER COMMAND\n"
+                    content += "# ============================================================\n\n"
+                    content += backend.render_command(mode="prefill", config_path=sglang_config_path)
+                    content += "\n\n"
+                    content += "# ============================================================\n"
+                    content += "# DECODE WORKER COMMAND\n"
+                    content += "# ============================================================\n\n"
+                    content += backend.render_command(mode="decode", config_path=sglang_config_path)
+                    content += "\n"
+
+                    with open(commands_path, "w") as f:
+                        f.write(content)
+                    commands_path.chmod(0o755)
 
             logging.info(f"  ✓ Saved to: {job_dir.name}")
 
@@ -376,7 +396,8 @@ def submit_sweep(config_path: Path, dry_run: bool = False):
         print(f"Output: {sweep_dir}")
         print("\nEach job directory contains:")
         print("  - config.yaml (expanded config)")
-        print("  - sglang_config.yaml (if applicable)")
+        print("  - sglang_config.yaml (SGLang flags)")
+        print("  - commands.sh (full bash commands)")
         print("\n" + "=" * 60 + "\n")
 
         return

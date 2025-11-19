@@ -88,7 +88,7 @@ class SGLangBackend(Backend):
         lines = []
 
         # Environment variables
-        env_vars = self.get_environment_vars(mode)
+        env_vars = self.get_environment_vars(mode) or {}
         for key, val in env_vars.items():
             lines.append(f"{key}={val} \\")
 
