@@ -84,5 +84,5 @@ class Backend(ABC):
         return self.backend_config.get(env_key, {})
 
     def is_disaggregated(self) -> bool:
-        """Check if running in disaggregated mode."""
-        return self.resources.get("agg_nodes") is None
+        """Check if running in disaggregated mode (has prefill/decode nodes)."""
+        return self.resources.get("prefill_nodes") is not None

@@ -199,7 +199,7 @@ def submit_single(config_path: Path = None, config: dict = None, dry_run: bool =
             logging.info(f"✅ Job submitted successfully with ID: {job_id}")
 
             # Create log directory
-            is_aggregated = "agg_nodes" in config.get("resources", {})
+            is_aggregated = config.get("resources", {}).get("prefill_nodes") is None
             if is_aggregated:
                 agg_workers = config["resources"]["agg_workers"]
                 log_dir_name = f"{job_id}_{agg_workers}A_{timestamp}"
