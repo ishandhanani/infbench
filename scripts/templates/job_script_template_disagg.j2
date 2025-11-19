@@ -27,7 +27,7 @@ LOG_DIR="{{ log_dir_prefix }}/${SLURM_JOB_ID}_{{ prefill_workers }}P_{{ decode_w
 {% else %}
 LOG_DIR="${SLURM_SUBMIT_DIR}/{{ log_dir_prefix }}/${SLURM_JOB_ID}_{{ prefill_workers }}P_{{ decode_workers }}D_{{ timestamp }}"
 {% endif %}
-SCRIPT_DIR="${SLURM_SUBMIT_DIR}"
+SCRIPT_DIR="${SLURM_SUBMIT_DIR}/scripts"
 OUTPUT_DIR="${SLURM_SUBMIT_DIR}/outputs"
 MODEL_DIR="{{ model_dir }}"
 CONFIG_DIR="{{ config_dir }}"
