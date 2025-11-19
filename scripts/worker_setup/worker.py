@@ -18,7 +18,6 @@ def setup_prefill_worker(
     master_ip: str,
     nodes_per_worker: int,
     gpu_type: str,
-    script_variant: str,
     multiple_frontends_enabled: bool = False,
     sglang_torch_profiler: bool = False,
     sglang_config_path: str | None = None,
@@ -55,7 +54,6 @@ def setup_decode_worker(
     master_ip: str,
     nodes_per_worker: int,
     gpu_type: str,
-    script_variant: str,
     sglang_torch_profiler: bool = False,
     sglang_config_path: str | None = None,
 ) -> int:

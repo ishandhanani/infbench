@@ -62,13 +62,22 @@ class SGLangBackend(Backend):
             sglang_cfg = expand_template(sglang_cfg, params)
             logging.info(f"Expanded config with params: {params}")
 
-        # Extract prefill and decode configs (no merging)
-        # Convert underscore keys to dash keys for dynamo.sglang compatibility
+        # Validate that all keys use dashes, not underscores
+        for mode in ["prefill", "decode"]:
+            if mode in sglang_cfg:
+                for key in sglang_cfg[mode].keys():
+                    if "_" in key:
+                        raise ValueError(
+                            f"Invalid key '{key}' in sglang_config.{mode}: "
+                            f"Keys must use dashes (kebab-case), not underscores. "
+                            f"Use '{key.replace('_', '-')}' instead."
+                        )
+
+        # Extract prefill and decode configs (no conversion needed - already using dashes)
         result = {}
         for mode in ["prefill", "decode"]:
             if mode in sglang_cfg:
-                # Convert all keys from underscore to dash format
-                result[mode] = {key.replace("_", "-"): value for key, value in sglang_cfg[mode].items()}
+                result[mode] = sglang_cfg[mode]
 
         # Write to temp file
         fd, temp_path = tempfile.mkstemp(suffix=".yaml", prefix="sglang_config_")

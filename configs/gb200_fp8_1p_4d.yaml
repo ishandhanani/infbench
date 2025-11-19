@@ -10,12 +10,12 @@ model:
   precision: "fp8"
 
 resources:
-  gpu_type: "gb200"
+  gpu_type: "gb200-fp8"
   prefill_nodes: 1
   decode_nodes: 4
   prefill_workers: 1
   decode_workers: 1
-  gpus_per_node: 4
+  gpus_per_node: 8
 
 slurm:
   account: "your-account"
@@ -67,86 +67,96 @@ backend:
   sglang_config:
     prefill:
       # Model configuration
-      served_model_name: "deepseek-ai/DeepSeek-R1"
-      model_path: "/model/"
-      trust_remote_code: true
+      served-model-name: "deepseek-ai/DeepSeek-R1"
+      model-path: "/model/"
+      trust-remote-code: true
 
       # KV cache and attention
-      kv_cache_dtype: "fp8_e4m3"
-      attention_backend: "trtllm_mla"
+      kv-cache-dtype: "fp8_e4m3"
+      attention-backend: "trtllm_mla"
 
       # Quantization
       quantization: "fp8"
-      moe_runner_backend: "flashinfer_trtllm"
+      moe-runner-backend: "flashinfer_trtllm"
 
       # Radix cache disabled
-      disable_radix_cache: true
+      disable-radix-cache: true
 
       # Other flags
       host: "0.0.0.0"
-      stream_interval: 10
-      watchdog_timeout: 1000000
-      context_length: 2200
+      stream-interval: 10
+      watchdog-timeout: 1000000
+      context-length: 2200
 
       # Prefill-specific mode
-      disaggregation_mode: "prefill"
+      disaggregation-mode: "prefill"
 
       # Memory and token limits
-      mem_fraction_static: 0.95
-      max_total_tokens: 8192
-      chunked_prefill_size: 8192
-      cuda_graph_max_bs: 128
+      mem-fraction-static: 0.95
+      max-total-tokens: 8192
+      chunked-prefill-size: 8192
+      cuda-graph-max-bs: 128
 
       # Request handling
-      max_running_requests: 512
-      load_balance_method: "round_robin"
-      scheduler_recv_interval: 10
+      max-running-requests: 512
+      load-balance-method: "round_robin"
+      scheduler-recv-interval: 10
 
       # Performance optimizations
-      enable_flashinfer_allreduce_fusion: true
-      enable_symm_mem: true
-      moe_dense_tp_size: 1
+      enable-flashinfer-allreduce-fusion: true
+      enable-symm-mem: true
+      moe-dense-tp-size: 1
+
+      # Parallelism configuration
+      tensor-parallel-size: 8
+      data-parallel-size: 1
+      expert-parallel-size: 1
 
     decode:
       # Model configuration
-      served_model_name: "deepseek-ai/DeepSeek-R1"
-      model_path: "/model/"
-      trust_remote_code: true
+      served-model-name: "deepseek-ai/DeepSeek-R1"
+      model-path: "/model/"
+      trust-remote-code: true
 
       # KV cache and attention
-      kv_cache_dtype: "fp8_e4m3"
-      attention_backend: "trtllm_mla"
+      kv-cache-dtype: "fp8_e4m3"
+      attention-backend: "trtllm_mla"
 
       # Quantization
       quantization: "fp8"
-      moe_runner_backend: "flashinfer_trtllm"
+      moe-runner-backend: "flashinfer_trtllm"
 
       # Radix cache disabled
-      disable_radix_cache: true
+      disable-radix-cache: true
 
       # Other flags
       host: "0.0.0.0"
-      stream_interval: 10
-      watchdog_timeout: 1000000
-      context_length: 2200
+      stream-interval: 10
+      watchdog-timeout: 1000000
+      context-length: 2200
 
       # Decode-specific mode
-      disaggregation_mode: "decode"
+      disaggregation-mode: "decode"
 
       # Memory and token limits
-      mem_fraction_static: 0.95
-      chunked_prefill_size: 8192
-      cuda_graph_max_bs: 128
+      mem-fraction-static: 0.95
+      chunked-prefill-size: 8192
+      cuda-graph-max-bs: 128
 
       # Request handling
-      max_running_requests: 512
-      scheduler_recv_interval: 10
+      max-running-requests: 512
+      scheduler-recv-interval: 10
 
       # Performance optimizations
-      enable_flashinfer_allreduce_fusion: true
-      enable_symm_mem: true
-      moe_dense_tp_size: 1
-      prefill_round_robin_balance: true
+      enable-flashinfer-allreduce-fusion: true
+      enable-symm-mem: true
+      moe-dense-tp-size: 1
+      prefill-round-robin-balance: true
+
+      # Parallelism configuration
+      tensor-parallel-size: 8
+      data-parallel-size: 1
+      expert-parallel-size: 1
 
 benchmark:
   type: "sa-bench"
