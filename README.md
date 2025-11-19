@@ -72,7 +72,23 @@ benchmark:
 
 Logs saved to `../infbench/logs/{JOB_ID}_{P}P_{D}D_{TIMESTAMP}/`
 
-### 3. Analyze Results
+### 3. Profile Performance (Optional)
+
+For detailed torch profiling of prefill/decode operations:
+
+```bash
+# Run with profiling enabled
+uv run srtctl configs/gb200_fp8_profiling.yaml
+```
+
+Key differences for profiling:
+- Uses `sglang.launch_server` instead of `dynamo.sglang`
+- Set `backend.enable_profiling: true` in your config
+- Profiling results saved to `/logs/profiles/{mode}/` (prefill/decode/aggregated)
+- Each worker type profiled separately
+- See `configs/gb200_fp8_profiling.yaml` for example
+
+### 4. Analyze Results
 
 ```bash
 uv run streamlit run analysis/dashboard/app.py

@@ -279,7 +279,7 @@ class SGLangBackend(Backend):
             "enable_config_dump": self.config.get("enable_config_dump", True),
             "use_dynamo_whls": True,
             "log_dir_prefix": "../logs",  # Relative to scripts/
-            "sglang_torch_profiler": False,
+            "sglang_torch_profiler": self.backend_config.get("enable_profiling", False),
         }
 
         # Select template based on mode

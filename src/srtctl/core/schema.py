@@ -139,6 +139,12 @@ class BackendConfig(BaseModel):
     enable_multiple_frontends: bool = True
     num_additional_frontends: int = 9
 
+    # Profiling settings
+    enable_profiling: bool = Field(
+        False,
+        description="Enable torch profiling mode (uses sglang.launch_server instead of dynamo.sglang)",
+    )
+
 
 class JobConfig(BaseModel):
     """Complete job configuration."""
