@@ -1,0 +1,155 @@
+# GB200 FP4 Max Throughput Configuration
+# Converted from slurm_runner/scripts/gb200-fp4/disagg/max-tpt.sh
+# Reference: https://github.com/sgl-project/sglang/issues/10903 (low-prec decode setup)
+
+name: "gb200-fp4-max-tpt"
+
+slurm:
+  account: "your-account"
+  partition: "gpu"
+  time_limit: "04:00:00"
+
+resources:
+  prefill_nodes: 1
+  decode_nodes: 12
+  prefill_workers: 1
+  decode_workers: 1
+  gpus_per_node: 4
+
+model:
+  path: "/models/deepseek-r1"
+  container: "/containers/sglang.sqsh"
+
+backend:
+  type: "sglang"
+
+  environment:
+    # Shared environment variables
+    TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
+    PYTHONUNBUFFERED: "1"
+    DYN_SKIP_SGLANG_LOG_FORMATTING: "1"
+
+    # FP4/FP8 settings
+    SGLANG_NVFP4_CKPT_FP8_GEMM_IN_ATTN: "1"
+    SGLANG_PER_TOKEN_GROUP_QUANT_8BIT_V2: "1"
+
+    # Disaggregation settings
+    SGLANG_DISAGGREGATION_HEARTBEAT_MAX_FAILURE: "100000"
+    SGLANG_DISAGGREGATION_BOOTSTRAP_TIMEOUT: "100000"
+    SGLANG_DISAGGREGATION_WAITING_TIMEOUT: "100000"
+    SGLANG_HACK_SEQ_BOOTSTRAP_ROOM: "1"
+
+    # Mooncake/NCCL settings
+    MC_TE_METRIC: "true"
+    MC_FORCE_MNNVL: "1"
+    NCCL_MNNVL_ENABLE: "1"
+    NCCL_CUMEM_ENABLE: "1"
+    SGLANG_MOONCAKE_CUSTOM_MEM_POOL: "True"
+
+    # Other settings
+    SGLANG_USE_MESSAGE_QUEUE_BROADCASTER: "0"
+    SGLANG_DISABLE_TP_MEMORY_INBALANCE_CHECK: "1"
+
+  sglang_config:
+    shared:
+      # Model configuration
+      served_model_name: "deepseek-ai/DeepSeek-R1"
+      model_path: "/model/"
+      trust_remote_code: true
+
+      # KV cache and attention
+      kv_cache_dtype: "fp8_e4m3"
+      attention_backend: "trtllm_mla"
+
+      # Quantization
+      quantization: "modelopt_fp4"
+      moe_runner_backend: "flashinfer_cutedsl"
+
+      # Radix cache disabled
+      disable_radix_cache: true
+      disable_chunked_prefix_cache: true
+
+      # Other shared flags
+      host: "0.0.0.0"
+      stream_interval: 50
+      decode_log_interval: 1000
+      watchdog_timeout: 1000000
+      context_length: 2176
+      disable_shared_experts_fusion: true
+      eplb_algorithm: "deepseek"
+      disaggregation_bootstrap_port: 30001
+
+    prefill:
+      # Prefill-specific mode
+      disaggregation_mode: "prefill"
+
+      # Memory and token limits
+      mem_fraction_static: 0.84
+      max_total_tokens: 131072
+      max_prefill_tokens: 32768
+      chunked_prefill_size: 65536
+
+      # Request handling
+      max_running_requests: 30000
+      load_balance_method: "round_robin"
+
+      # Performance optimizations
+      enable_single_batch_overlap: true
+      disable_cuda_graph: true
+
+      # Parallelism settings (filled by submit script)
+      enable_dp_attention: true
+      # ep_size, tp_size, dp_size set automatically based on resources
+
+    decode:
+      # Decode-specific mode
+      disaggregation_mode: "decode"
+
+      # Memory and token limits
+      mem_fraction_static: 0.82
+      max_total_tokens: 3122380
+      chunked_prefill_size: 786432
+
+      # Request handling
+      max_running_requests: 67584
+
+      # DeepEP configuration
+      moe_a2a_backend: "deepep"
+      deepep_mode: "low_latency"
+      ep_dispatch_algorithm: "static"
+      ep_num_redundant_experts: 32
+
+      # CUDA graphs (extensive batch size list)
+      cuda_graph_bs: [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 264, 272, 280, 288, 296, 304, 312, 320, 328, 336, 344, 352, 360, 368, 376, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 1024]
+      num_reserved_decode_tokens: 112
+
+      # Additional decode optimizations
+      moe_dense_tp_size: 1
+      enable_dp_lm_head: true
+      prefill_round_robin_balance: true
+      enable_dp_attention: true
+
+      # Parallelism settings (filled by submit script)
+      # ep_size, tp_size, dp_size set automatically based on resources
+
+  # Decode-specific environment variables (appended during decode worker setup)
+  decode_environment:
+    SGLANG_DEEPEP_NUM_MAX_DISPATCH_TOKENS_PER_RANK: "1024"
+    SGLANG_CUTEDSL_MOE_NVFP4_DISPATCH: "1"
+    SGLANG_FLASHINFER_FP4_GEMM_BACKEND: "cutlass"
+
+benchmark:
+  type: "sa-bench"
+  isl: 1024
+  osl: 1024
+  concurrencies: [1024]
+  req_rate: "inf"
+
+# Notes:
+# - This config uses the low-prec decode setup from sglang/issues/10903
+# - FP4 requires 12 decode nodes since flashinfer_cutedsl requires experts_per_gpu < 8
+#   (288 experts total / 48 GPUs = 6 experts per GPU)
+# - SGLANG_DEEPEP_NUM_MAX_DISPATCH_TOKENS_PER_RANK and cuda-graph-bs at 1024 until
+#   DeepEP merges https://github.com/deepseek-ai/DeepEP/pull/440
+# - nvidia-cutlass-dsl pre-release install needed for integer overflow fix
+# - Removing --enable-single-batch-overlap may relax 12 node requirement

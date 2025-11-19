@@ -1,6 +1,9 @@
 # Logs directory - ignore all benchmark runs
 logs/*/
 
+# Dry-run output directories (local testing artifacts)
+dry-runs/
+
 # Also ignore benchmark run directories in root (legacy)
 [0-9]*_[0-9]*P_[0-9]*D_[0-9]*_[0-9]*/
 
