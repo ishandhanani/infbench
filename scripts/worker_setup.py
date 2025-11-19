@@ -363,48 +363,62 @@ def build_sglang_command_from_yaml(worker_type: str, sglang_config_path: str) ->
     return " ".join(cmd_parts)
 
 
-def get_gpu_command(worker_type: str, gpu_type: str, script_variant: str, sglang_config_path: str = None) -> str:
-    """Generate command to run SGLang worker.
+def install_dynamo_wheels(gpu_type: str) -> None:
+    """Install dynamo wheels if needed.
 
-    For YAML configs (script_variant='max-tpt' with sglang_config_path provided):
-        Builds command directly from YAML config
+    Args:
+        gpu_type: GPU type to determine architecture (e.g., "gb200-fp8", "h100-fp8")
+    """
+    use_dynamo_whls = os.environ.get("USE_DYNAMO_WHLS", "").lower() == "true"
+    if not use_dynamo_whls:
+        logging.info("Skipping dynamo wheel installation (USE_DYNAMO_WHLS not set)")
+        return
 
-    For legacy configs:
-        Falls back to bash scripts in scripts/legacy/{gpu_type}/
+    arch = get_wheel_arch_from_gpu_type(gpu_type)
+    logging.info(f"Installing dynamo wheels for architecture: {arch}")
+
+    # Install runtime wheel
+    runtime_whl = f"/configs/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_{arch}.whl"
+    logging.info(f"Installing {runtime_whl}")
+    result = subprocess.run(
+        ["python3", "-m", "pip", "install", runtime_whl],
+        capture_output=True,
+        text=True
+    )
+    if result.returncode != 0:
+        logging.error(f"Failed to install runtime wheel: {result.stderr}")
+        raise RuntimeError(f"Failed to install {runtime_whl}")
+
+    # Install dynamo wheel
+    dynamo_whl = "/configs/ai_dynamo-0.6.1-py3-none-any.whl"
+    logging.info(f"Installing {dynamo_whl}")
+    result = subprocess.run(
+        ["python3", "-m", "pip", "install", dynamo_whl],
+        capture_output=True,
+        text=True
+    )
+    if result.returncode != 0:
+        logging.error(f"Failed to install dynamo wheel: {result.stderr}")
+        raise RuntimeError(f"Failed to install {dynamo_whl}")
+
+    logging.info("Successfully installed dynamo wheels")
+
+
+def get_gpu_command(worker_type: str, sglang_config_path: str) -> str:
+    """Generate command to run SGLang worker using YAML config.
 
     Args:
         worker_type: "prefill", "decode", or "aggregated"
-        gpu_type: e.g. "gb200-fp8", "h100-fp8"
-        script_variant: Legacy script name (e.g., "max-tpt")
-        sglang_config_path: Path to sglang_config.yaml (for YAML configs)
+        sglang_config_path: Path to sglang_config.yaml
 
     Returns:
         Command string to execute
     """
-    # If YAML config path provided, use direct command execution
-    if sglang_config_path and os.path.exists(sglang_config_path):
-        logging.info(f"Building command from YAML config: {sglang_config_path}")
-        return build_sglang_command_from_yaml(worker_type, sglang_config_path)
+    if not sglang_config_path or not os.path.exists(sglang_config_path):
+        raise ValueError(f"SGLang config path required but not found: {sglang_config_path}")
 
-    # Otherwise, fall back to legacy bash scripts
-    logging.info(f"Using legacy script variant: {script_variant}")
-    script_base = Path(__file__).parent
-    script_name = f"{script_variant}.sh"
-
-    if worker_type == "aggregated":
-        # Remove any -prefill or -decode suffix if present
-        base_gpu_type = gpu_type.replace("-prefill", "").replace("-decode", "")
-        script_path = script_base / "legacy" / base_gpu_type / "agg" / script_name
-        if not script_path.exists():
-            raise ValueError(f"Aggregated GPU script not found: {script_path}")
-        return f"bash {script_path}"
-    else:
-        # Disaggregated mode: scripts/legacy/{gpu_type}/disagg/{script_variant}.sh {prefill|decode}
-        script_path = script_base / "legacy" / gpu_type / "disagg" / script_name
-        if not script_path.exists():
-            raise ValueError(f"Disaggregated GPU script not found: {script_path}")
-        mode = worker_type  # "prefill" or "decode"
-        return f"bash {script_path} {mode}"
+    logging.info(f"Building command from YAML config: {sglang_config_path}")
+    return build_sglang_command_from_yaml(worker_type, sglang_config_path)
 
 
 def setup_head_prefill_node(prefill_host_ip: str, use_dynamo_whls: bool = False) -> None:
@@ -515,8 +529,11 @@ def setup_prefill_worker(
         worker_type="prefill",
     )
 
-    # Build command from YAML config or use legacy script
-    cmd_to_run = get_gpu_command("prefill", gpu_type, script_variant, sglang_config_path)
+    # Install dynamo wheels if needed
+    install_dynamo_wheels(gpu_type)
+
+    # Build command from YAML config
+    cmd_to_run = get_gpu_command("prefill", sglang_config_path)
     return run_command(cmd_to_run)
 
 
@@ -557,8 +574,11 @@ def setup_decode_worker(
         worker_type="decode",
     )
 
-    # Build command from YAML config or use legacy script
-    cmd_to_run = get_gpu_command("decode", gpu_type, script_variant, sglang_config_path)
+    # Install dynamo wheels if needed
+    install_dynamo_wheels(gpu_type)
+
+    # Build command from YAML config
+    cmd_to_run = get_gpu_command("decode", sglang_config_path)
     return run_command(cmd_to_run)
 
 
@@ -603,8 +623,11 @@ def setup_aggregated_worker(
         worker_type="aggregated",
     )
 
-    # Build command from YAML config or use legacy script
-    cmd_to_run = get_gpu_command("aggregated", gpu_type, script_variant, sglang_config_path)
+    # Install dynamo wheels if needed
+    install_dynamo_wheels(gpu_type)
+
+    # Build command from YAML config
+    cmd_to_run = get_gpu_command("aggregated", sglang_config_path)
     return run_command(cmd_to_run)
 
 
