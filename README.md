@@ -1,4 +1,4 @@
-# InfBench
+# srtctl
 
 Benchmarking toolkit for distributed LLM inference on SLURM clusters with YAML-based configuration and interactive analysis dashboard.
 
@@ -22,10 +22,10 @@ Using the new YAML-based submission:
 
 ```bash
 # Submit from YAML config
-uv run infbench configs/gb200_fp4_max_tpt.yaml
+uv run srtctl configs/gb200_fp4_max_tpt.yaml
 
 # Dry-run mode (validate without submitting)
-uv run infbench configs/gb200_fp4_max_tpt.yaml --dry-run
+uv run srtctl configs/gb200_fp4_max_tpt.yaml --dry-run
 ```
 
 Example YAML config:
@@ -163,7 +163,7 @@ Override cluster defaults in your job config or use CLI flags.
 
 ```
 infbench-yaml-config/
-├── src/infbench/        # Python package (submission logic)
+├── src/srtctl/          # Python package (submission logic)
 │   ├── cli/             # CLI entrypoints (submit.py)
 │   ├── backends/        # Backend implementations (SGLang, etc.)
 │   └── core/            # Config loading and validation

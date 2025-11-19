@@ -1,5 +1,5 @@
 """
-InfBench - Benchmark submission framework for distributed serving workloads.
+srtctl - Benchmark submission framework for distributed serving workloads.
 """
 
 __version__ = "0.1.0"

@@ -12,7 +12,7 @@ lint:
 	uvx pre-commit run --all-files
 
 test:
-	cd /Users/idhanani/Desktop/benchmarks/infbench && uv run python -m tests.test_basic && uv run python -m tests.test_aggregations
+	uv run pytest tests/
 
 dashboard:
 	uv run streamlit run dashboard/app.py

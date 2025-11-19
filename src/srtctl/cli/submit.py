@@ -3,14 +3,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-Unified job submission interface for InfBench.
+Unified job submission interface for srtctl.
 
 This is the main entrypoint for submitting benchmarks via YAML configs.
 
 Usage:
-    infbench submit config.yaml
-    infbench submit config.yaml --dry-run
-    infbench submit sweep.yaml --sweep
+    srtctl config.yaml
+    srtctl config.yaml --dry-run
+    srtctl sweep.yaml --sweep
 """
 
 import argparse
@@ -23,9 +23,9 @@ import yaml
 from datetime import datetime
 from pathlib import Path
 
-# Import from infbench modules
-from infbench.core.config import load_config
-from infbench.backends.sglang import SGLangBackend
+# Import from srtctl modules
+from srtctl.core.config import load_config
+from srtctl.backends.sglang import SGLangBackend
 
 
 def setup_logging(level: int = logging.INFO) -> None:
@@ -328,21 +328,21 @@ def main():
     setup_logging()
 
     parser = argparse.ArgumentParser(
-        description="Unified job submission for InfBench",
+        description="Unified job submission for srtctl",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # Submit from YAML config
-  infbench submit config.yaml
+  srtctl config.yaml
 
   # Submit sweep
-  infbench submit sweep.yaml --sweep
+  srtctl sweep.yaml --sweep
 
   # Dry-run (validate without submitting)
-  infbench submit config.yaml --dry-run
+  srtctl config.yaml --dry-run
 
   # Dry-run sweep (generate all configs without submitting)
-  infbench submit sweep.yaml --sweep --dry-run
+  srtctl sweep.yaml --sweep --dry-run
         """
     )
 
