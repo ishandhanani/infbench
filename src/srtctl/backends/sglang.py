@@ -13,7 +13,6 @@ import yaml
 from datetime import datetime
 from jinja2 import Template
 from pathlib import Path
-from typing import Any
 
 import srtctl
 from srtctl.core.config import get_srtslurm_setting

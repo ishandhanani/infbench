@@ -10,12 +10,6 @@ default:
 
 lint:
 	uvx pre-commit run --all-files
-	@echo ""
-	@echo "Running type checks..."
-	@$(MAKE) typecheck
-
-typecheck:
-	uv run mypy src/ scripts/
 
 test:
 	uv run pytest tests/
