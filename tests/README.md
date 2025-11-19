@@ -1,81 +1,123 @@
 # Tests
 
-Simple tests for the class-based architecture using minimal fixtures.
+Unit tests for srtctl YAML configuration and command generation.
+
+## Test Structure
+
+### `test_command_generation.py`
+
+Tests SGLang command generation from YAML configs. Verifies that the generated `commands.sh` files contain the expected flags and environment variables.
+
+**Test Cases:**
+
+1. **`test_basic_disaggregated_commands()`**
+   - Tests disaggregated mode (1 prefill node + 4 decode nodes)
+   - Verifies prefill and decode commands are generated correctly
+   - Checks environment variables, SGLang flags, and coordination flags
+   - Validates disaggregation-mode flags (prefill/decode)
+   - Ensures max-total-tokens only appears in prefill command
+
+2. **`test_basic_aggregated_commands()`**
+   - Tests aggregated mode (4 combined nodes)
+   - Verifies aggregated command uses `aggregated_environment`
+   - Checks that aggregated config section is used
+   - Validates no disaggregation-mode flag is present
+   - Ensures correct nnodes for aggregated workers
+
+3. **`test_environment_variable_handling()`**
+   - Tests configs with no environment variables
+   - Verifies commands work correctly without env vars
+   - Ensures no spurious env var lines in output
+
+4. **`test_profiling_mode()`**
+   - Tests profiling mode configuration
+   - Verifies `sglang.launch_server` is used instead of `dynamo.sglang`
+   - Checks that disaggregation-mode flag is skipped when profiling
+
+5. **`test_config_from_yaml_file()`**
+   - Tests loading from actual `configs/example.yaml`
+   - End-to-end validation of config loading and command generation
+   - Ensures example configs are valid
 
 ## Running Tests
 
 ```bash
-# Run all tests
-uv run python -m tests.test_basic
-uv run python -m tests.test_aggregations
+# Run all tests with pytest
+uv run pytest tests/
 
-# Or run linting (includes type checking)
-make lint
+# Run specific test file
+uv run pytest tests/test_command_generation.py
+
+# Run tests directly (without pytest)
+uv run python tests/test_command_generation.py
+
+# Verbose output
+uv run pytest tests/ -v
 ```
-
-## Test Structure
-
-### Test Logs (`tests/9999_1P_2D_20251110_120000/`)
-
-Minimal fake benchmark run based on real job structure:
-
-- **`9999.json`** - Job metadata in {jobid}.json format
-- **`test-node-cn01_prefill_w0.err`** - Prefill node logs with DP0, TP0/1/2
-- **`test-node-cn02_decode_w0.err`** - Decode node logs with DP0, TP0/1/2
-- **`test-node-cn03_decode_w1.err`** - Decode node logs with DP1, TP0/1/2
-- **`vllm_isl_512_osl_256/*.json`** - Benchmark result files
-
-**Key features for testing:**
-
-- Different DP ranks (DP0, DP1) - tests DP grouping
-- Different TP ranks (TP0, TP1, TP2) - tests TP averaging
-- Mix of prefill and decode nodes - tests filtering
-- Cached tokens in some batches - tests cache hit rate calculation
-
-### Test Files
-
-**`test_basic.py`** - Core functionality tests:
-
-- `test_run_loader()` - Tests RunLoader can load from JSON
-- `test_node_analyzer()` - Tests NodeAnalyzer can parse logs
-- `test_node_count()` - Tests node counting
-
-**`test_aggregations.py`** - Aggregation/grouping tests:
-
-- `test_group_by_dp()` - Tests DP rank grouping (averages TP0/1/2 within each DP)
-- `test_aggregate_all()` - Tests full aggregation (averages all nodes)
-- `test_batch_metrics_calculations()` - Tests cache hit rate property
 
 ## What's Tested
 
-✅ **RunLoader:**
+### Command Structure
+- Environment variables are rendered before python command
+- Correct python module (`dynamo.sglang` vs `sglang.launch_server`)
+- SGLang flags are properly formatted with `--flag-name value`
+- Coordination flags (--nnodes, --dist-init-addr, --node-rank)
 
-- Loading runs from JSON metadata
-- Parsing profiler benchmark results
-- Run metadata properties (formatted_date, total_gpus, etc.)
+### Configuration Modes
+- **Disaggregated**: Separate prefill/decode workers
+  - `prefill_nodes`, `decode_nodes`, `prefill_workers`, `decode_workers`
+  - `prefill_environment` and `decode_environment`
+  - `sglang_config.prefill` and `sglang_config.decode`
 
-✅ **NodeAnalyzer:**
+- **Aggregated**: Combined workers
+  - `agg_nodes`, `agg_workers`
+  - `aggregated_environment`
+  - `sglang_config.aggregated`
 
-- Parsing .err log files
-- Converting to NodeMetrics objects
-- Filtering prefill/decode nodes
-- Node counting
+### SGLang Flags
+- Required flags: `--model-path`, `--tensor-parallel-size`
+- Mode-specific flags: `--disaggregation-mode` (disagg only)
+- Prefill-only flags: `--max-total-tokens`
+- Memory flags: `--mem-fraction-static`, `--kv-cache-dtype`
+- Quantization flags: `--quantization`
 
-✅ **Models:**
+## Test Philosophy
 
-- BatchMetrics with different DP/TP/EP values
-- Cache hit rate calculation
-- Node properties (is_prefill, is_decode)
+These tests focus on **command generation correctness** rather than end-to-end job execution:
 
-✅ **Aggregations:**
+1. **Config → SGLang Config**: YAML configs are transformed into SGLang config files
+2. **Config → Commands**: Commands are rendered with correct flags and env vars
+3. **Validation**: Generated commands match expected structure
 
-- Group by DP rank (averages TP workers)
-- Aggregate all nodes (single averaged line)
-- Proper averaging across different DP/TP combinations
+Tests use minimal configs to isolate specific functionality and avoid dependencies on external services (SLURM, containers, models).
 
-## Design Philosophy
+## Adding New Tests
 
-- **Minimal fixtures** - Only essential data, no bloat
-- **No test helpers** - Direct testing, easy to understand
-- **Fast execution** - Tests run in < 1 second
-- **Type-safe** - All tests pass type checking
+When adding SGLang flags or changing command generation logic:
+
+1. Add test case to `test_command_generation.py`
+2. Create minimal config with the new feature
+3. Assert expected flags/env vars in generated command
+4. Run tests to verify
+
+Example:
+```python
+def test_new_sglang_flag():
+    config = {
+        "name": "test",
+        # ... minimal config ...
+        "backend": {
+            "sglang_config": {
+                "prefill": {
+                    "my-new-flag": "value"
+                }
+            }
+        }
+    }
+
+    backend = SGLangBackend(config)
+    sglang_config_path = backend.generate_config_file()
+    cmd = backend.render_command(mode="prefill", config_path=sglang_config_path)
+
+    assert "--my-new-flag value" in cmd
+```

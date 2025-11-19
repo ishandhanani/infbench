@@ -44,7 +44,7 @@ class SGLangBackend(Backend):
             logging.info(f"Expanded config with params: {params}")
 
         # Validate that all keys use dashes, not underscores
-        for mode in ["prefill", "decode"]:
+        for mode in ["prefill", "decode", "aggregated"]:
             if mode in sglang_cfg:
                 for key in sglang_cfg[mode].keys():
                     if "_" in key:
@@ -54,14 +54,14 @@ class SGLangBackend(Backend):
                             f"Use '{key.replace('_', '-')}' instead."
                         )
 
-        # Extract prefill and decode configs (no conversion needed - already using dashes)
+        # Extract prefill, decode, and aggregated configs (no conversion needed - already using dashes)
         result = {}
-        for mode in ["prefill", "decode"]:
+        for mode in ["prefill", "decode", "aggregated"]:
             if mode in sglang_cfg:
                 result[mode] = sglang_cfg[mode]
 
         # Add environment variables as top-level keys
-        for mode in ["prefill", "decode"]:
+        for mode in ["prefill", "decode", "aggregated"]:
             env_vars = self.get_environment_vars(mode)
             if env_vars:
                 result[f"{mode}_environment"] = env_vars
