@@ -179,12 +179,6 @@ class SGLangBackend(Backend):
         lines.append(f"    --nnodes {nnodes} \\")
         lines.append("    --node-rank $RANK \\")
 
-        # Parallelism flags
-        gpus_per_node = self.resources.get("gpus_per_node", 4)
-        lines.append(f"    --ep-size {gpus_per_node} \\")
-        lines.append(f"    --tp-size {gpus_per_node} \\")
-        lines.append(f"    --dp-size {gpus_per_node}")
-
         return lines
 
     def generate_slurm_script(self, config_path: Path = None, timestamp: str = None) -> tuple[Path, str]:
