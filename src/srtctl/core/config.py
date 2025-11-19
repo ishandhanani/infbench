@@ -146,7 +146,7 @@ def load_config(path: Path) -> dict:
     try:
         validated = JobConfig(**config)
         logging.info(f"Loaded config: {validated.name}")
-        # Return as dict with enums converted to strings
-        return validated.model_dump(mode="python", by_alias=False, exclude_none=False)
+        # Return as dict with enums converted to strings (mode="json" serializes enums to their values)
+        return validated.model_dump(mode="json", by_alias=False, exclude_none=False)
     except Exception as e:
         raise ValueError(f"Invalid config in {path}: {e}") from e
