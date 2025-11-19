@@ -1,17 +1,18 @@
 # Parameter sweep configuration template
 # Sweeps perform Cartesian product expansion over multiple parameter values
-# This example sweeps over memory fraction (2 values) × concurrency levels (2 values) = 4 jobs
+# This example sweeps over chunked-prefill-size (2 values) × max-total-tokens (2 values) = 4 jobs
 
 name: "example-sweep"
 
 # Define sweep parameters at the top level
 # Each parameter can have multiple values - all combinations will be tested
 sweep:
-  mem_fraction: [0.90, 0.95]                    # 2 values for memory fraction
-  concurrency_levels: [[256], [256, 512]]       # 2 different concurrency configs
+  chunked_prefill_size: [4096, 8192]            # 2 values for chunked prefill size
+  max_total_tokens: [8192, 16384]               # 2 values for max total tokens
   # Add more parameters as needed:
+  # mem_fraction: [0.90, 0.95]
+  # concurrency_levels: [[256], [256, 512]]
   # batch_size: [32, 64, 128]
-  # max_tokens: [4096, 8192]
 
 # Model configuration (same as single job)
 model:
@@ -51,14 +52,14 @@ backend:
       trust-remote-code: true
 
       kv-cache-dtype: "fp8_e4m3"
-      # Template placeholder: {mem_fraction} will be replaced with sweep values
-      mem-fraction-static: "{mem_fraction}"
+      mem-fraction-static: 0.95
 
       quantization: "fp8"
       disaggregation-mode: "prefill"
 
-      max-total-tokens: 8192
-      chunked-prefill-size: 8192
+      # Template placeholders: will be replaced with sweep values
+      max-total-tokens: "{max_total_tokens}"
+      chunked-prefill-size: "{chunked_prefill_size}"
 
       tensor-parallel-size: 4
       data-parallel-size: 1
@@ -69,24 +70,23 @@ backend:
       trust-remote-code: true
 
       kv-cache-dtype: "fp8_e4m3"
-      # Template placeholder: same parameter can be used in multiple places
-      mem-fraction-static: "{mem_fraction}"
+      mem-fraction-static: 0.95
 
       quantization: "fp8"
       disaggregation-mode: "decode"
 
-      chunked-prefill-size: 8192
+      # Template placeholder: same parameter can be used in multiple places
+      chunked-prefill-size: "{chunked_prefill_size}"
 
       tensor-parallel-size: 4
       data-parallel-size: 1
 
-# Benchmark configuration with template placeholder
+# Benchmark configuration
 benchmark:
   type: "sa-bench"
   isl: 1024
   osl: 1024
-  # Template placeholder: {concurrency_levels} will be replaced with sweep values
-  concurrencies: "{concurrency_levels}"
+  concurrencies: [256, 512]
   req_rate: "inf"
 
 # How sweeps work:
@@ -96,10 +96,10 @@ benchmark:
 # 4. Each job gets a unique name with parameter values appended
 #
 # This example generates 4 jobs:
-#   1. example-sweep_mem0.90_conc[256]
-#   2. example-sweep_mem0.90_conc[256, 512]
-#   3. example-sweep_mem0.95_conc[256]
-#   4. example-sweep_mem0.95_conc[256, 512]
+#   1. example-sweep_chunked_prefill_size4096_max_total_tokens8192
+#   2. example-sweep_chunked_prefill_size4096_max_total_tokens16384
+#   3. example-sweep_chunked_prefill_size8192_max_total_tokens8192
+#   4. example-sweep_chunked_prefill_size8192_max_total_tokens16384
 #
 # Usage:
 #   uv run srtctl example-sweep.yaml --sweep --dry-run  # Preview jobs
@@ -108,10 +108,10 @@ benchmark:
 # Dry-run output:
 #   dry-runs/example-sweep_sweep_{TIMESTAMP}/
 #   ├── sweep_config.yaml
-#   ├── job_001_example-sweep_mem0.90_conc[256]/
+#   ├── job_001_example-sweep_chunked_prefill_size4096_max_total_tokens8192/
 #   │   ├── config.yaml
 #   │   ├── sglang_config.yaml
 #   │   └── commands.sh
-#   ├── job_002_example-sweep_mem0.90_conc[256, 512]/
+#   ├── job_002_example-sweep_chunked_prefill_size4096_max_total_tokens16384/
 #   │   └── ...
 #   └── ...
