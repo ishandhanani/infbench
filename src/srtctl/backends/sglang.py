@@ -42,10 +42,10 @@ class SGLangBackend(Backend):
     
     def generate_config_file(self, params: dict = None) -> Path | None:
         """Generate SGLang YAML config file.
-        
+
         Args:
             params: Optional sweep parameters for template expansion
-            
+
         Returns:
             Path to generated config file
         """
@@ -60,10 +60,15 @@ class SGLangBackend(Backend):
             logging.info(f"Expanded config with params: {params}")
 
         # Extract prefill and decode configs (no merging)
+        # Convert underscore keys to dash keys for dynamo.sglang compatibility
         result = {}
         for mode in ['prefill', 'decode']:
             if mode in sglang_cfg:
-                result[mode] = sglang_cfg[mode]
+                # Convert all keys from underscore to dash format
+                result[mode] = {
+                    key.replace('_', '-'): value
+                    for key, value in sglang_cfg[mode].items()
+                }
 
         # Write to temp file
         fd, temp_path = tempfile.mkstemp(suffix='.yaml', prefix='sglang_config_')
