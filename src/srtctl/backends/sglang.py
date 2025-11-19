@@ -275,7 +275,8 @@ class SGLangBackend(Backend):
             "benchmark_type": bench_type,
             "benchmark_arg": parsable_config,
             "timestamp": timestamp,
-            "enable_config_dump": self.config.get("enable_config_dump", True),
+            # Disable config dump when profiling (unless explicitly overridden)
+            "enable_config_dump": self.config.get("enable_config_dump", not self.backend_config.get("enable_profiling", False)),
             "log_dir_prefix": str(log_dir_path),  # Absolute path to logs directory
             "sglang_torch_profiler": self.backend_config.get("enable_profiling", False),
         }
