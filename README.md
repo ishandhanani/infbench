@@ -1,41 +1,78 @@
 # InfBench
 
-Benchmarking toolkit for Dynamo and SGLang on SLURM clusters with interactive analysis dashboard.
+Benchmarking toolkit for distributed LLM inference on SLURM clusters with YAML-based configuration and interactive analysis dashboard.
 
 ## Quick Start
 
 ### 1. Setup (One-Time)
 
 ```bash
-# add ARCH when login node is aarch64 and you are trying to run on GB200
+# Install dependencies and create cluster config
+make setup
+
+# For GB200 clusters (aarch64)
 make setup ARCH=aarch64
 ```
 
-This downloads dependencies (nats, etcd, dynamo wheels) and creates `srtslurm.yaml` with your cluster settings and stores them in a folder called `configs`. This is automatically mounted to the container when you submit a job and all pieces are accessible via the `/config` mount.
+This downloads dependencies (nats, etcd, dynamo wheels) and creates `srtslurm.yaml` with your cluster settings.
 
-### 2. Run E2E Benchmark with SemiAnalysis Benchmarking Script
+### 2. Submit a Benchmark Job
 
-#### Example: Run FP4 Disagg with the `max-tpt.sh` script
-
-In this example we submit a job with 1 prefill worker (taking up 1 node so 4 GPUs) and 1 decode worker (taking up 12 nodes so 48 GPUs) and run the `max-tpt.sh` script (which you can find in `scripts/gb200-fp4/disagg/max-tpt.sh`). After the model is loaded, we will automatically run the benchmarking script.
+Using the new YAML-based submission:
 
 ```bash
-cd scripts
-python3 submit_job_script.py \
-  --model-dir /path/to/model \
-  --gpu-type gb200-fp4 \
-  --gpus-per-node 4 \
-  --prefill-nodes 1 \
-  --decode-nodes 12 \
-  --prefill-workers 1 \
-  --decode-workers 1 \
-  --script-variant max-tpt \
-  --benchmark "type=sa-bench; isl=1024; osl=1024; concurrencies=1024x2048x4096; req-rate=inf"
+# Submit from YAML config
+uv run infbench configs/gb200_fp4_max_tpt.yaml
+
+# Dry-run mode (validate without submitting)
+uv run infbench configs/gb200_fp4_max_tpt.yaml --dry-run
 ```
 
-Logs saved to `logs/{JOB_ID}_{P}P_{D}D_{TIMESTAMP}/`
+Example YAML config:
 
-See [scripts/README.md](scripts/README.md) for detailed options.
+```yaml
+name: "gb200-fp4-max-tpt"
+
+model:
+  path: "/path/to/model"
+  container: "your-container.sqsh"
+
+resources:
+  prefill_nodes: 1
+  decode_nodes: 12
+  prefill_workers: 1
+  decode_workers: 1
+  gpus_per_node: 4
+
+backend:
+  type: "sglang"
+  gpu_type: "gb200-fp4"
+  script_variant: "max-tpt"
+
+  sglang_config:
+    prefill:
+      kv_cache_dtype: "fp8_e4m3"
+      mem_fraction_static: 0.84
+      # ... SGLang flags
+    decode:
+      kv_cache_dtype: "fp8_e4m3"
+      mem_fraction_static: 0.82
+      # ... SGLang flags
+
+benchmark:
+  type: "sa-bench"
+  isl: 1024
+  osl: 1024
+  concurrencies: [1024, 2048, 4096]
+  req_rate: "inf"
+
+slurm:
+  account: "your-account"
+  partition: "batch"
+  time_limit: "4:00:00"
+```
+
+Logs saved to `../infbench/logs/{JOB_ID}_{P}P_{D}D_{TIMESTAMP}/`
 
 ### 3. Analyze Results
 
@@ -55,12 +92,15 @@ Opens interactive dashboard at http://localhost:8501
 - **Config Comparison** - Side-by-side configuration diffs
 - **Run Comparison** - Performance deltas between runs
 
-### 🚀 SLURM Job Submission
+### 🚀 YAML-Based Job Submission
 
-- Disaggregated (prefill/decode) or aggregated mode
-- Multiple frontends with nginx load balancing (default)
-- Automated benchmarking with sa-bench
-- Job metadata tracking
+- Declarative configuration with validation
+- Support for disaggregated (prefill/decode) or aggregated mode
+- SGLang config generation (no more 50+ CLI flags!)
+- Parameter sweeping for grid searches
+- Dry-run mode for validation
+- Multiple frontends with nginx load balancing
+- Template expansion for environment variables
 
 ### ☁️ Cloud Sync (Optional)
 
@@ -82,39 +122,66 @@ cloud:
 # Dashboard auto-pulls missing runs
 ```
 
-See **Cloud Storage Sync** section below for details.
-
 ## Configuration
 
-All defaults in `srtslurm.yaml` (created by `make setup`):
+### Cluster Defaults (`srtslurm.yaml`)
+
+Created by `make setup`:
 
 ```yaml
 cluster:
   account: "your-account"
   partition: "batch"
   network_interface: "enP6p9s0np0"
-  time_limit: "4:00:00"
-  container_image: "/path/to/container.sqsh"
+  gpus_per_node: 4
+  default_time_limit: "4:00:00"
+  default_container: "/path/to/container.sqsh"
+
+# Model path aliases
+model_paths:
+  deepseek-r1: "/models/deepseek-r1"
+  llama-3-70b: "/models/llama-3-70b"
+
+# Container aliases
+containers:
+  latest: "/containers/sglang-latest.sqsh"
+  stable: "/containers/sglang-stable.sqsh"
 
 cloud:
-  endpoint_url: "" # Optional
+  endpoint_url: ""  # Optional
   bucket: ""
   prefix: "benchmark-results/"
 ```
 
-Override any setting via CLI flags.
+### Job Configuration
+
+Each job is defined in a YAML file. See `configs/gb200_fp4_max_tpt.yaml` for a complete example.
+
+Override cluster defaults in your job config or use CLI flags.
 
 ## Repository Structure
 
 ```
-infbench/
+infbench-yaml-config/
+├── src/infbench/        # Python package (submission logic)
+│   ├── cli/             # CLI entrypoints (submit.py)
+│   ├── backends/        # Backend implementations (SGLang, etc.)
+│   └── core/            # Config loading and validation
+├── scripts/             # Runtime scripts for SLURM jobs
+│   ├── templates/       # Jinja2 templates
+│   ├── benchmarks/      # Benchmark scripts (sa-bench, gpqa, mmlu)
+│   ├── profiling/       # Profiling utilities
+│   ├── utils/           # Shared utilities
+│   ├── legacy/          # GPU-specific legacy configs
+│   └── worker_setup.py  # Main worker launcher
+├── configs/             # Job configuration YAML files
 ├── dashboard/           # Streamlit UI (modular tabs)
 ├── srtslurm/           # Core analysis library
-├── scripts/       # SLURM job submission scripts
-├── logs/               # Benchmark results
-├── configs/            # Dynamo dependencies (nats, etcd, wheels)
 ├── tests/              # Unit tests
-└── srtslurm.yaml       # Configuration (gitignored)
+└── srtslurm.yaml       # Cluster config (gitignored)
+
+../infbench/            # Shared with main infbench repo
+└── logs/               # Benchmark results
 ```
 
 ## Key Metrics
@@ -151,8 +218,8 @@ infbench/
 Dashboard auto-syncs missing runs on startup. Or manually:
 
 ```bash
-uv run python scripts/scripts/sync_results.py pull-missing
-uv run python scripts/scripts/sync_results.py list-remote
+uv run python scripts/sync_results.py pull-missing
+uv run python scripts/sync_results.py list-remote
 ```
 
 ## Development
@@ -165,8 +232,33 @@ make dashboard   # Launch dashboard
 
 ## Requirements
 
-- Python 3.10+ (stdlib yaml support)
+- Python 3.10+
+- uv (package manager)
 - SLURM cluster with Pyxis (for container support)
-- GPU nodes (tested on GB200 NVL72)
+- GPU nodes (tested on GB200 NVL72, H100)
 
-For detailed SLURM job submission docs, see [scripts/README.md](scripts/README.md).
+## Documentation
+
+- [scripts/README.md](scripts/README.md) - Runtime scripts and templates
+- [configs/](configs/) - Example job configurations
+
+## Architecture
+
+### Submission Flow
+
+1. Load YAML config → Apply cluster defaults
+2. Validate configuration
+3. Create backend instance (e.g., SGLangBackend)
+4. Generate SGLang config file
+5. Render SLURM job script from Jinja template
+6. Submit to SLURM with `sbatch`
+7. Save artifacts to logs directory
+
+### Backend Protocol
+
+Inspired by ignition's design, backends implement:
+- `generate_config_file()` - Generate backend-specific configs
+- `render_command()` - Render execution commands
+- `generate_slurm_script()` - Create SLURM job scripts from templates
+
+Easy to extend for new backends (vLLM, TensorRT-LLM, etc.).
