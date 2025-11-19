@@ -1,0 +1,117 @@
+# Parameter sweep configuration template
+# Sweeps perform Cartesian product expansion over multiple parameter values
+# This example sweeps over memory fraction (2 values) × concurrency levels (2 values) = 4 jobs
+
+name: "example-sweep"
+
+# Define sweep parameters at the top level
+# Each parameter can have multiple values - all combinations will be tested
+sweep:
+  mem_fraction: [0.90, 0.95]                    # 2 values for memory fraction
+  concurrency_levels: [[256], [256, 512]]       # 2 different concurrency configs
+  # Add more parameters as needed:
+  # batch_size: [32, 64, 128]
+  # max_tokens: [4096, 8192]
+
+# Model configuration (same as single job)
+model:
+  path: "deepseek-r1"
+  container: "lmsysorg+sglang+v0.5.5.post2.sqsh"
+  precision: "fp8"
+
+# Resources (same for all sweep jobs - use templates if you want to vary these)
+resources:
+  gpu_type: "gb200"
+  prefill_nodes: 1
+  decode_nodes: 4
+  prefill_workers: 1
+  decode_workers: 4
+  gpus_per_node: 4
+
+# SLURM configuration
+slurm:
+  account: "your-account"
+  partition: "batch"
+  time_limit: "04:00:00"
+
+# Backend configuration with template placeholders
+backend:
+  prefill_environment:
+    TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
+    PYTHONUNBUFFERED: "1"
+
+  decode_environment:
+    TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
+    PYTHONUNBUFFERED: "1"
+
+  sglang_config:
+    prefill:
+      served-model-name: "deepseek-ai/DeepSeek-R1"
+      model-path: "/model/"
+      trust-remote-code: true
+
+      kv-cache-dtype: "fp8_e4m3"
+      # Template placeholder: {mem_fraction} will be replaced with sweep values
+      mem-fraction-static: "{mem_fraction}"
+
+      quantization: "fp8"
+      disaggregation-mode: "prefill"
+
+      max-total-tokens: 8192
+      chunked-prefill-size: 8192
+
+      tensor-parallel-size: 4
+      data-parallel-size: 1
+
+    decode:
+      served-model-name: "deepseek-ai/DeepSeek-R1"
+      model-path: "/model/"
+      trust-remote-code: true
+
+      kv-cache-dtype: "fp8_e4m3"
+      # Template placeholder: same parameter can be used in multiple places
+      mem-fraction-static: "{mem_fraction}"
+
+      quantization: "fp8"
+      disaggregation-mode: "decode"
+
+      chunked-prefill-size: 8192
+
+      tensor-parallel-size: 4
+      data-parallel-size: 1
+
+# Benchmark configuration with template placeholder
+benchmark:
+  type: "sa-bench"
+  isl: 1024
+  osl: 1024
+  # Template placeholder: {concurrency_levels} will be replaced with sweep values
+  concurrencies: "{concurrency_levels}"
+  req_rate: "inf"
+
+# How sweeps work:
+# 1. Define parameters in the "sweep:" section at the top
+# 2. Use {param_name} placeholders anywhere in the config
+# 3. srtctl generates all combinations (Cartesian product)
+# 4. Each job gets a unique name with parameter values appended
+#
+# This example generates 4 jobs:
+#   1. example-sweep_mem0.90_conc[256]
+#   2. example-sweep_mem0.90_conc[256, 512]
+#   3. example-sweep_mem0.95_conc[256]
+#   4. example-sweep_mem0.95_conc[256, 512]
+#
+# Usage:
+#   uv run srtctl example-sweep.yaml --sweep --dry-run  # Preview jobs
+#   uv run srtctl example-sweep.yaml --sweep            # Submit all jobs
+#
+# Dry-run output:
+#   dry-runs/example-sweep_sweep_{TIMESTAMP}/
+#   ├── sweep_config.yaml
+#   ├── job_001_example-sweep_mem0.90_conc[256]/
+#   │   ├── config.yaml
+#   │   ├── sglang_config.yaml
+#   │   └── commands.sh
+#   ├── job_002_example-sweep_mem0.90_conc[256, 512]/
+#   │   └── ...
+#   └── ...
