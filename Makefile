@@ -1,4 +1,4 @@
-.PHONY: lint test setup-configs dashboard sync-to-cloud sync-run delete-from-cloud cleanup
+.PHONY: lint typecheck test setup-configs dashboard sync-to-cloud sync-run delete-from-cloud cleanup
 
 NATS_VERSION ?= v2.10.28
 ETCD_VERSION ?= v3.5.21
@@ -10,6 +10,12 @@ default:
 
 lint:
 	uvx pre-commit run --all-files
+	@echo ""
+	@echo "Running type checks..."
+	@$(MAKE) typecheck
+
+typecheck:
+	uv run mypy src/ scripts/
 
 test:
 	uv run pytest tests/
