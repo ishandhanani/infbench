@@ -237,6 +237,66 @@ def submit_single(config_path: Path = None, config: dict = None, dry_run: bool =
                 import shutil
                 shutil.copy(sglang_config_path, log_dir / "sglang_config.yaml")
 
+            # Generate jobid.json metadata
+            from datetime import datetime as dt
+            resources = config.get('resources', {})
+            backend_cfg = config.get('backend', {})
+            model = config.get('model', {})
+            slurm_cfg = config.get('slurm', {})
+            benchmark_cfg = config.get('benchmark', {})
+
+            metadata = {
+                "version": "1.0",
+                "generated_at": dt.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "run_metadata": {
+                    "slurm_job_id": job_id,
+                    "run_date": timestamp,
+                    "job_name": config.get('name', 'unnamed'),
+                    "account": slurm_cfg.get('account'),
+                    "partition": slurm_cfg.get('partition'),
+                    "time_limit": slurm_cfg.get('time_limit'),
+                    "container": model.get('container'),
+                    "model_dir": model.get('path'),
+                    "gpus_per_node": resources.get('gpus_per_node'),
+                    "gpu_type": backend_cfg.get('gpu_type'),
+                    "mode": "aggregated" if is_aggregated else "disaggregated",
+                }
+            }
+
+            # Add mode-specific metadata
+            if is_aggregated:
+                metadata["run_metadata"].update({
+                    "agg_nodes": resources.get('agg_nodes'),
+                    "agg_workers": resources.get('agg_workers'),
+                })
+            else:
+                metadata["run_metadata"].update({
+                    "prefill_nodes": resources.get('prefill_nodes'),
+                    "decode_nodes": resources.get('decode_nodes'),
+                    "prefill_workers": resources.get('prefill_workers'),
+                    "decode_workers": resources.get('decode_workers'),
+                })
+
+            # Add benchmark metadata if present
+            if benchmark_cfg:
+                bench_type = benchmark_cfg.get('type', 'manual')
+                profiler_metadata = {"type": bench_type}
+
+                if bench_type == 'sa-bench':
+                    concurrencies = benchmark_cfg.get('concurrencies', [])
+                    concurrency_str = "x".join(str(c) for c in concurrencies) if concurrencies else ""
+                    profiler_metadata.update({
+                        "isl": str(benchmark_cfg.get('isl', '')),
+                        "osl": str(benchmark_cfg.get('osl', '')),
+                        "concurrencies": concurrency_str,
+                        "req-rate": str(benchmark_cfg.get('req_rate', 'inf')),
+                    })
+
+                metadata["profiler_metadata"] = profiler_metadata
+
+            with open(log_dir / "jobid.json", 'w') as f:
+                json.dump(metadata, f, indent=2)
+
             logging.info(f"📁 Logs directory: {log_dir}")
             print(f"\n✅ Job {job_id} submitted!")
             print(f"📁 Logs: {log_dir}\n")
