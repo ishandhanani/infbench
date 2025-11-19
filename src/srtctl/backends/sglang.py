@@ -232,10 +232,6 @@ class SGLangBackend(Backend):
 
         # Get backend settings
         gpu_type = self.backend_config.get("gpu_type", "h100")
-        # script_variant determines which bash script to use in scripts/legacy/{gpu_type}/
-        # For YAML configs, use "max-tpt" as the default (most common case)
-        # Users can override with backend.script_variant if needed
-        script_variant = self.backend_config.get("script_variant", "max-tpt")
 
         # Benchmark config
         benchmark_config = self.config.get("benchmark", {})
@@ -291,17 +287,14 @@ class SGLangBackend(Backend):
             "gpus_per_node": gpus_per_node,
             "network_interface": network_interface,
             "gpu_type": gpu_type,
-            "script_variant": script_variant,
             "partition": partition,
             "enable_multiple_frontends": self.backend_config.get("enable_multiple_frontends", True),
             "num_additional_frontends": self.backend_config.get("num_additional_frontends", 9),
-            "use_init_location": self.config.get("use_init_location", False),
             "do_benchmark": do_benchmark,
             "benchmark_type": bench_type,
             "benchmark_arg": parsable_config,
             "timestamp": timestamp,
             "enable_config_dump": self.config.get("enable_config_dump", True),
-            "use_dynamo_whls": True,
             "log_dir_prefix": str(log_dir_path),  # Absolute path to logs directory
             "sglang_torch_profiler": self.backend_config.get("enable_profiling", False),
         }

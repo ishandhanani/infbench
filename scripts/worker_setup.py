@@ -84,12 +84,6 @@ def _parse_command_line_args(args: list[str] | None = None) -> argparse.Namespac
         help="Type of GPU to use (script will be validated at runtime)",
     )
     parser.add_argument(
-        "--script-variant",
-        type=str,
-        help="Script variant to use (e.g., 'max-tpt', '1p_4d')",
-    )
-
-    parser.add_argument(
         "--nginx_config",
         type=str,
         help="Path to nginx configuration file (required for nginx worker type)",
@@ -102,22 +96,10 @@ def _parse_command_line_args(args: list[str] | None = None) -> argparse.Namespac
     )
 
     parser.add_argument(
-        "--use_init_locations",
-        action="store_true",
-        help="Whether we add --init-expert-locations to launch commands",
-    )
-
-    parser.add_argument(
         "--dump-config-path",
         type=str,
         default=None,
         help="Path to dump config file (e.g., /logs/node_config.json)",
-    )
-
-    parser.add_argument(
-        "--use-dynamo-whls",
-        action="store_true",
-        help="Use dynamo wheels from config-dir and binaries from /configs/ for nats/etcd",
     )
 
     parser.add_argument(
@@ -175,8 +157,6 @@ def main(input_args: list[str] | None = None):
     logging.info(f"Leader IP: {args.leader_ip}")
     logging.info(f"Master IP: {args.master_ip}")
     logging.info(f"Nodes per worker: {args.nodes_per_worker}")
-    logging.info(f"Use dynamo wheels?: {args.use_dynamo_whls}")
-    logging.info(f"Use init locations?: {args.use_init_locations}")
 
     setup_env(args.master_ip)
 
@@ -217,7 +197,6 @@ def main(input_args: list[str] | None = None):
             args.master_ip,
             args.nodes_per_worker,
             args.gpu_type,
-            args.script_variant,
             args.multiple_frontends_enabled,
             args.sglang_torch_profiler,
             args.sglang_config_path,
