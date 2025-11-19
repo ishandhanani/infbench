@@ -1,0 +1,46 @@
+# Example using srtslurm.yaml aliases and defaults
+# This config is much simpler because common values come from srtslurm.yaml
+
+name: "test-aliases"
+
+slurm:
+  # account and partition will be filled from srtslurm.yaml defaults
+  time_limit: "02:00:00"
+
+resources:
+  prefill_nodes: 1
+  decode_nodes: 2
+  prefill_workers: 1
+  decode_workers: 1
+  gpus_per_node: 4
+
+model:
+  path: "deepseek-r1"         # Alias that resolves from srtslurm.yaml
+  container: "sglang-fp4"     # Alias that resolves from srtslurm.yaml
+
+backend:
+  type: "sglang"
+
+  environment:
+    PYTHONUNBUFFERED: "1"
+
+  sglang_config:
+    shared:
+      served_model_name: "deepseek-ai/DeepSeek-R1"
+      model_path: "/model/"
+      kv_cache_dtype: "fp8_e4m3"
+
+    prefill:
+      disaggregation_mode: "prefill"
+      mem_fraction_static: 0.84
+
+    decode:
+      disaggregation_mode: "decode"
+      mem_fraction_static: 0.82
+
+benchmark:
+  type: "sa-bench"
+  isl: 1024
+  osl: 1024
+  concurrencies: [512]
+  req_rate: "inf"

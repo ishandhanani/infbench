@@ -1,26 +1,32 @@
-# SRT SLURM Configuration
-# Copy this to srtslurm.yaml and fill in your values
+# Example cluster configuration (srtslurm.yaml)
+# Copy this to srtslurm.yaml and customize for your cluster
+# This file is gitignored to keep cluster-specific settings private
 
-cluster:
-  # SLURM cluster settings - these are defaults that can be overridden via CLI
-  account: "restricted"
-  partition: "batch"
-  network_interface: "enP6p9s0np0"
-  time_limit: "4:00:00"
-  container_image: ""  # Optional default container image
+# SLURM defaults
+default_account: "your-gpu-account"
+default_partition: "gpu"
+default_time_limit: "04:00:00"
 
-cloud:
-  # S3-compatible cloud storage for syncing benchmark results (optional)
-  endpoint_url: ""     # e.g., "https://s3.us-west-2.amazonaws.com"
-  bucket: ""           # e.g., "my-benchmark-results"
-  prefix: "benchmark-results/"
+# Container registry
+default_container: "/shared/containers/sglang-latest.sqsh"
+containers:
+  sglang-latest: "/shared/containers/sglang-v0.4.sqsh"
+  sglang-dev: "/shared/containers/sglang-dev.sqsh"
+  sglang-fp4: "/shared/containers/sglang-fp4.sqsh"
 
-  # Optional: Credentials can be set here or via environment variables
-  # Since srtslurm.yaml is gitignored, it's safe to put credentials here
-  aws_access_key_id: ""     # Or use env var: AWS_ACCESS_KEY_ID
-  aws_secret_access_key: "" # Or use env var: AWS_SECRET_ACCESS_KEY
-  
-  # If both are empty, boto3 will check:
-  # 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
-  # 2. AWS credentials file (~/.aws/credentials)
-  # 3. IAM role (if running on EC2/ECS)
+# Model path aliases
+model_paths:
+  deepseek-r1: "/shared/models/deepseek/DeepSeek-R1"
+  deepseek-r1-distill: "/shared/models/deepseek/DeepSeek-R1-Distill-Qwen-32B"
+  llama-3-70b: "/shared/models/meta/llama-3-70b"
+  llama-3-405b: "/shared/models/meta/llama-3-405b"
+
+# Usage:
+# In your job config, you can now use:
+#   model:
+#     path: "deepseek-r1"         # Resolves to /shared/models/deepseek/DeepSeek-R1
+#     container: "sglang-fp4"     # Resolves to /shared/containers/sglang-fp4.sqsh
+#
+# And you can omit SLURM fields:
+#   slurm:
+#     time_limit: "02:00:00"      # account and partition filled from defaults

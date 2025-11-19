@@ -46,7 +46,6 @@ from typing import Any
 
 # Import config generation logic
 from submit_yaml import (
-    load_yaml,
     generate_sglang_config_file,
     yaml_to_args,
     generate_sweep_configs,
@@ -61,6 +60,185 @@ def setup_logging(level: int = logging.INFO) -> None:
         format="%(asctime)s | %(levelname)s | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+
+
+def validate_config(config: dict) -> list[str]:
+    """
+    Validate config structure and return list of errors.
+
+    Returns empty list if valid, otherwise list of error messages.
+    """
+    errors = []
+
+    # Required top-level keys
+    required_keys = ['name', 'slurm', 'resources', 'model', 'backend']
+    for key in required_keys:
+        if key not in config:
+            errors.append(f"Missing required top-level key: '{key}'")
+
+    # Validate slurm config
+    if 'slurm' in config:
+        slurm = config['slurm']
+        for key in ['account', 'partition']:
+            if key not in slurm:
+                errors.append(f"Missing required slurm.{key}")
+
+    # Validate resources (either aggregated or disaggregated)
+    if 'resources' in config:
+        resources = config['resources']
+
+        # Check if aggregated or disaggregated
+        is_aggregated = 'agg_nodes' in resources
+
+        if is_aggregated:
+            # Aggregated mode validation
+            for key in ['agg_nodes', 'agg_workers', 'gpus_per_node']:
+                if key not in resources:
+                    errors.append(f"Aggregated mode requires resources.{key}")
+        else:
+            # Disaggregated mode validation
+            for key in ['prefill_nodes', 'decode_nodes', 'prefill_workers', 'decode_workers', 'gpus_per_node']:
+                if key not in resources:
+                    errors.append(f"Disaggregated mode requires resources.{key}")
+
+    # Validate model config
+    if 'model' in config:
+        model = config['model']
+        for key in ['path', 'container']:
+            if key not in model:
+                errors.append(f"Missing required model.{key}")
+
+    # Validate backend config
+    if 'backend' in config:
+        backend = config['backend']
+        if 'type' not in backend:
+            errors.append("Missing required backend.type")
+
+        # If sglang backend, validate sglang_config
+        if backend.get('type') == 'sglang' and 'sglang_config' in backend:
+            sglang_cfg = backend['sglang_config']
+
+            # Check for either aggregated or disaggregated config
+            is_aggregated = 'agg_nodes' in config.get('resources', {})
+
+            if is_aggregated:
+                # Aggregated needs 'shared' or 'aggregated' section
+                if 'shared' not in sglang_cfg and 'aggregated' not in sglang_cfg:
+                    errors.append("Aggregated mode requires backend.sglang_config.shared or backend.sglang_config.aggregated")
+            else:
+                # Disaggregated needs prefill and decode sections
+                for mode in ['prefill', 'decode']:
+                    if mode not in sglang_cfg:
+                        errors.append(f"Disaggregated mode requires backend.sglang_config.{mode}")
+
+    return errors
+
+
+def load_cluster_config() -> dict | None:
+    """
+    Load cluster configuration from srtslurm.yaml if it exists.
+
+    Returns None if file doesn't exist (graceful degradation).
+    """
+    cluster_config_path = Path(__file__).parent.parent / "srtslurm.yaml"
+
+    if not cluster_config_path.exists():
+        logging.debug("No srtslurm.yaml found - using config as-is")
+        return None
+
+    try:
+        with open(cluster_config_path) as f:
+            cluster_config = yaml.safe_load(f)
+        logging.debug(f"Loaded cluster config from {cluster_config_path}")
+        return cluster_config
+    except Exception as e:
+        logging.warning(f"Failed to load srtslurm.yaml: {e}")
+        return None
+
+
+def resolve_config_with_defaults(user_config: dict, cluster_config: dict | None) -> dict:
+    """
+    Resolve user config by applying cluster defaults and aliases.
+
+    Args:
+        user_config: User's YAML config
+        cluster_config: Cluster defaults from srtslurm.yaml (or None)
+
+    Returns:
+        Resolved config with all defaults applied
+    """
+    # Deep copy to avoid mutating original
+    import copy
+    config = copy.deepcopy(user_config)
+
+    if cluster_config is None:
+        return config
+
+    # Apply SLURM defaults
+    slurm = config.setdefault('slurm', {})
+    if 'account' not in slurm and 'default_account' in cluster_config:
+        slurm['account'] = cluster_config['default_account']
+        logging.debug(f"Applied default account: {slurm['account']}")
+
+    if 'partition' not in slurm and 'default_partition' in cluster_config:
+        slurm['partition'] = cluster_config['default_partition']
+        logging.debug(f"Applied default partition: {slurm['partition']}")
+
+    if 'time_limit' not in slurm and 'default_time_limit' in cluster_config:
+        slurm['time_limit'] = cluster_config['default_time_limit']
+        logging.debug(f"Applied default time_limit: {slurm['time_limit']}")
+
+    # Resolve model path alias
+    model = config.get('model', {})
+    model_path = model.get('path', '')
+
+    if 'model_paths' in cluster_config and model_path in cluster_config['model_paths']:
+        resolved_path = cluster_config['model_paths'][model_path]
+        model['path'] = resolved_path
+        logging.debug(f"Resolved model alias '{model_path}' -> '{resolved_path}'")
+
+    # Resolve container alias
+    container = model.get('container', '')
+
+    if 'containers' in cluster_config and container in cluster_config['containers']:
+        resolved_container = cluster_config['containers'][container]
+        model['container'] = resolved_container
+        logging.debug(f"Resolved container alias '{container}' -> '{resolved_container}'")
+    elif 'container' not in model and 'default_container' in cluster_config:
+        model['container'] = cluster_config['default_container']
+        logging.debug(f"Applied default container: {model['container']}")
+
+    return config
+
+
+def load_yaml(path: Path) -> dict:
+    """
+    Load and validate YAML config, applying cluster defaults.
+
+    Returns fully resolved config ready for submission.
+    """
+    if not path.exists():
+        raise FileNotFoundError(f"Config file not found: {path}")
+
+    # Load user config
+    with open(path) as f:
+        user_config = yaml.safe_load(f)
+
+    # Load cluster defaults (optional)
+    cluster_config = load_cluster_config()
+
+    # Resolve with defaults
+    config = resolve_config_with_defaults(user_config, cluster_config)
+
+    # Validate
+    errors = validate_config(config)
+    if errors:
+        raise ValueError(
+            f"Invalid config in {path}:\n  " + "\n  ".join(errors)
+        )
+
+    logging.info(f"Loaded config: {config['name']}")
+    return config
 
 
 class DryRunContext:
@@ -85,11 +263,11 @@ class DryRunContext:
         return self.output_dir
 
     def save_config(self, config: dict) -> Path:
-        """Save user config"""
+        """Save resolved config (with all defaults applied)"""
         config_path = self.output_dir / "config.yaml"
         with open(config_path, 'w') as f:
-            yaml.dump(config, f, default_flow_style=False)
-        logging.info(f"  ✓ Saved config: {config_path.name}")
+            yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+        logging.info(f"  ✓ Saved resolved config: {config_path.name}")
         return config_path
 
     def save_sglang_config(self, sglang_config_path: Path) -> Path:
@@ -150,7 +328,7 @@ class DryRunContext:
         print(f"\nJob Name: {self.job_name}")
         print(f"Output Directory: {self.output_dir}")
         print(f"\nGenerated Files:")
-        print(f"  - config.yaml          (user config)")
+        print(f"  - config.yaml          (resolved config with defaults)")
         if self.sglang_config_path:
             print(f"  - sglang_config.yaml   (SGLang flags)")
         print(f"  - commands.sh          (full bash commands)")
