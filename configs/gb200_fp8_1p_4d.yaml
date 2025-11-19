@@ -22,8 +22,7 @@ model:
 
 backend:
   type: "sglang"
-  gpu_type: "gb200-fp8"
-  script_variant: "1p-4d"
+  gpu_type: "gb200-fp8"  # Used for metadata/logging only
 
   # Prefill-specific environment variables
   prefill_environment:

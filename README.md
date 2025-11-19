@@ -47,7 +47,6 @@ resources:
 backend:
   type: "sglang"
   gpu_type: "gb200-fp4"
-  script_variant: "max-tpt"
 
   sglang_config:
     prefill:

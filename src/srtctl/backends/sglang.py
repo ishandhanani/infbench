@@ -217,7 +217,9 @@ class SGLangBackend(Backend):
 
         # Get backend settings
         gpu_type = self.backend_config.get('gpu_type', 'h100')
-        script_variant = self.backend_config.get('script_variant', 'default')
+        # script_variant is legacy - only used for backwards compat with old bash scripts
+        # YAML configs don't need this since they define everything inline
+        script_variant = self.backend_config.get('script_variant', 'yaml-config')
 
         # Benchmark config
         benchmark_config = self.config.get('benchmark', {})
