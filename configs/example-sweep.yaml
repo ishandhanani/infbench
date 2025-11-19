@@ -9,10 +9,6 @@ name: "example-sweep"
 sweep:
   chunked_prefill_size: [4096, 8192]            # 2 values for chunked prefill size
   max_total_tokens: [8192, 16384]               # 2 values for max total tokens
-  # Add more parameters as needed:
-  # mem_fraction: [0.90, 0.95]
-  # concurrency_levels: [[256], [256, 512]]
-  # batch_size: [32, 64, 128]
 
 # Model configuration (same as single job)
 model:
