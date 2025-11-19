@@ -183,20 +183,70 @@ def submit_single(config_path: Path = None, config: dict = None, dry_run: bool =
     if backend_type == 'sglang':
         backend = SGLangBackend(config)
         sglang_config_path = backend.generate_config_file()
+
+        # Generate SLURM job script using backend
+        import subprocess
+        from datetime import datetime
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        script_path, rendered_script = backend.generate_slurm_script(
+            config_path=sglang_config_path,
+            timestamp=timestamp
+        )
+
+        # Submit to SLURM
+        try:
+            result = subprocess.run(
+                ["sbatch", str(script_path)],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+
+            # Parse job ID from sbatch output
+            job_id = result.stdout.strip().split()[-1]
+            logging.info(f"✅ Job submitted successfully with ID: {job_id}")
+
+            # Create log directory
+            is_aggregated = 'agg_nodes' in config.get('resources', {})
+            if is_aggregated:
+                agg_workers = config['resources']['agg_workers']
+                log_dir_name = f"{job_id}_{agg_workers}A_{timestamp}"
+            else:
+                prefill_workers = config['resources']['prefill_workers']
+                decode_workers = config['resources']['decode_workers']
+                log_dir_name = f"{job_id}_{prefill_workers}P_{decode_workers}D_{timestamp}"
+
+            # Create log directory in infbench repo (parent of infbench-yaml-config)
+            yaml_config_root = Path(__file__).parent.parent.parent.parent
+            infbench_root = yaml_config_root.parent / "infbench"
+            log_dir = infbench_root / "logs" / log_dir_name
+            log_dir.mkdir(parents=True, exist_ok=True)
+
+            # Save rendered script
+            with open(log_dir / "sbatch_script.sh", 'w') as f:
+                f.write(rendered_script)
+
+            # Save config
+            import yaml
+            with open(log_dir / "config.yaml", 'w') as f:
+                yaml.dump(config, f, default_flow_style=False)
+
+            # Save SGLang config if present
+            if sglang_config_path:
+                import shutil
+                shutil.copy(sglang_config_path, log_dir / "sglang_config.yaml")
+
+            logging.info(f"📁 Logs directory: {log_dir}")
+            print(f"\n✅ Job {job_id} submitted!")
+            print(f"📁 Logs: {log_dir}\n")
+
+        except subprocess.CalledProcessError as e:
+            logging.error(f"❌ Error submitting job: {e}")
+            logging.error(f"stderr: {e.stderr}")
+            raise
     else:
-        sglang_config_path = None
-
-    # Convert to legacy args for submit_job_script (backward compatible)
-    from infbench.backends.legacy import yaml_to_args
-    args = yaml_to_args(config, sglang_config_path)
-
-    # Call existing submit_job_script
-    import sys
-    slurm_runner_path = Path(__file__).parent.parent.parent.parent / "slurm_runner"
-    sys.path.insert(0, str(slurm_runner_path))
-
-    from submit_job_script import main as submit_job
-    submit_job(args)
+        raise ValueError(f"Unknown backend type: {backend_type}")
 
 
 def submit_sweep(config_path: Path, dry_run: bool = False):

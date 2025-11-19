@@ -10,6 +10,8 @@ import logging
 import os
 import tempfile
 import yaml
+from datetime import datetime
+from jinja2 import Template
 from pathlib import Path
 from typing import Any
 
@@ -161,5 +163,151 @@ class SGLangBackend(Backend):
         lines.append(f"    --ep-size {gpus_per_node} \\")
         lines.append(f"    --tp-size {gpus_per_node} \\")
         lines.append(f"    --dp-size {gpus_per_node}")
-        
+
         return lines
+
+    def generate_slurm_script(self, config_path: Path = None, timestamp: str = None) -> tuple[Path, str]:
+        """Generate SLURM job script from Jinja template.
+
+        Args:
+            config_path: Path to SGLang config file
+            timestamp: Timestamp for job submission
+
+        Returns:
+            Tuple of (script_path, rendered_script_content)
+        """
+        if timestamp is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # Determine mode and node counts
+        is_aggregated = not self.is_disaggregated()
+
+        if is_aggregated:
+            agg_nodes = self.resources['agg_nodes']
+            agg_workers = self.resources['agg_workers']
+            prefill_nodes = 0
+            decode_nodes = 0
+            prefill_workers = 0
+            decode_workers = 0
+            total_nodes = agg_nodes
+        else:
+            prefill_nodes = self.resources['prefill_nodes']
+            decode_nodes = self.resources['decode_nodes']
+            prefill_workers = self.resources['prefill_workers']
+            decode_workers = self.resources['decode_workers']
+            agg_nodes = 0
+            agg_workers = 0
+            total_nodes = prefill_nodes + decode_nodes
+
+        # Get SLURM settings
+        job_name = self.config.get('name', 'infbench-job')
+        account = self.slurm.get('account')
+        partition = self.slurm.get('partition')
+        time_limit = self.slurm.get('time_limit', '01:00:00')
+
+        # Get resource settings from srtslurm.yaml if available
+        from infbench.core.config import get_srtslurm_setting
+        gpus_per_node = get_srtslurm_setting('gpus_per_node', self.resources.get('gpus_per_node'))
+        network_interface = get_srtslurm_setting('network_interface', None)
+
+        # Get backend settings
+        gpu_type = self.backend_config.get('gpu_type', 'h100')
+        script_variant = self.backend_config.get('script_variant', 'default')
+
+        # Benchmark config
+        benchmark_config = self.config.get('benchmark', {})
+        bench_type = benchmark_config.get('type', 'manual')
+        do_benchmark = bench_type != 'manual'
+
+        # Parse benchmark args if applicable
+        parsable_config = ""
+        if bench_type == 'sa-bench':
+            isl = benchmark_config.get('isl')
+            osl = benchmark_config.get('osl')
+            concurrencies = benchmark_config.get('concurrencies')
+            req_rate = benchmark_config.get('req_rate', 'inf')
+
+            if isinstance(concurrencies, list):
+                concurrency_str = "x".join(str(c) for c in concurrencies)
+            else:
+                concurrency_str = str(concurrencies)
+
+            parsable_config = f"{isl} {osl} {concurrency_str} {req_rate}"
+
+        # Config directory should point to where deepep_config.json lives
+        # This is typically the configs/ directory in the yaml-config repo
+        import infbench
+        yaml_config_root = Path(infbench.__file__).parent.parent.parent
+        config_dir_path = yaml_config_root / "configs"
+
+        # Log directory - relative path from slurm_runner/ to infbench/logs
+        # Template will be run from slurm_runner/, so ../logs points to infbench/logs
+        infbench_root = yaml_config_root.parent / "infbench"
+        log_dir_path = infbench_root / "logs"
+
+        # Template variables
+        template_vars = {
+            "job_name": job_name,
+            "total_nodes": total_nodes,
+            "account": account,
+            "time_limit": time_limit,
+            "prefill_nodes": prefill_nodes,
+            "decode_nodes": decode_nodes,
+            "prefill_workers": prefill_workers,
+            "decode_workers": decode_workers,
+            "agg_nodes": agg_nodes,
+            "agg_workers": agg_workers,
+            "is_aggregated": is_aggregated,
+            "model_dir": self.model.get('path'),
+            "config_dir": str(config_dir_path),
+            "container_image": self.model.get('container'),
+            "gpus_per_node": gpus_per_node,
+            "network_interface": network_interface,
+            "gpu_type": gpu_type,
+            "script_variant": script_variant,
+            "partition": partition,
+            "enable_multiple_frontends": self.backend_config.get('enable_multiple_frontends', True),
+            "num_additional_frontends": self.backend_config.get('num_additional_frontends', 9),
+            "use_init_location": self.config.get('use_init_location', False),
+            "do_benchmark": do_benchmark,
+            "benchmark_type": bench_type,
+            "benchmark_arg": parsable_config,
+            "timestamp": timestamp,
+            "enable_config_dump": self.config.get('enable_config_dump', True),
+            "use_dynamo_whls": True,
+            "log_dir_prefix": "../logs",  # Relative to slurm_runner/
+            "sglang_torch_profiler": False,
+        }
+
+        # Select template based on mode
+        if is_aggregated:
+            template_name = "job_script_template_agg.j2"
+        else:
+            template_name = "job_script_template_disagg.j2"
+
+        # Find template path - templates are in ../infbench/slurm_runner
+        # relative to the infbench-yaml-config directory
+        import infbench
+        yaml_config_root = Path(infbench.__file__).parent.parent.parent
+        template_path = yaml_config_root.parent / "infbench" / "slurm_runner" / template_name
+
+        if not template_path.exists():
+            raise FileNotFoundError(
+                f"Template not found: {template_path}\n"
+                f"Expected template at: {template_path}\n"
+                f"Make sure infbench repo with slurm_runner/ is at: {yaml_config_root.parent / 'infbench'}"
+            )
+
+        # Render template
+        with open(template_path) as f:
+            template = Template(f.read())
+
+        rendered_script = template.render(**template_vars)
+
+        # Write to temporary file
+        fd, temp_path = tempfile.mkstemp(suffix='.sh', prefix='slurm_job_')
+        with os.fdopen(fd, 'w') as f:
+            f.write(rendered_script)
+
+        logging.info(f"Generated SLURM job script: {temp_path}")
+        return Path(temp_path), rendered_script

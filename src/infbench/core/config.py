@@ -89,6 +89,23 @@ def resolve_config_with_defaults(user_config: dict, cluster_config: dict | None)
     return config
 
 
+def get_srtslurm_setting(key: str, default=None):
+    """
+    Get a setting from srtslurm.yaml cluster config.
+
+    Args:
+        key: Setting key (e.g., 'gpus_per_node', 'network_interface')
+        default: Default value if not found
+
+    Returns:
+        Setting value or default if not found
+    """
+    cluster_config = load_cluster_config()
+    if cluster_config and key in cluster_config:
+        return cluster_config[key]
+    return default
+
+
 def load_config(path: Path) -> dict:
     """
     Load and validate YAML config, applying cluster defaults.
