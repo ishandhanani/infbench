@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "srtctl"
@@ -23,8 +23,8 @@ dev = [
 [project.scripts]
 srtctl = "srtctl.cli.submit:main"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/srtctl"]
 
 [tool.ruff]
 line-length = 120
