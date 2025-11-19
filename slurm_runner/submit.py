@@ -102,16 +102,6 @@ class DryRunContext:
             return dest
         return None
 
-    def save_sbatch_script(self, script_content: str) -> Path:
-        """Save generated sbatch script"""
-        script_path = self.output_dir / "job.sh"
-        with open(script_path, 'w') as f:
-            f.write(script_content)
-        script_path.chmod(0o755)
-        logging.info(f"  ✓ Saved sbatch script: {script_path.name}")
-        self.sbatch_script_path = script_path
-        return script_path
-
     def save_rendered_commands(self, config: dict, sglang_config_path: Path) -> Path:
         """Save just the rendered commands (no sbatch headers)"""
         commands_path = self.output_dir / "commands.sh"
@@ -163,12 +153,8 @@ class DryRunContext:
         print(f"  - config.yaml          (user config)")
         if self.sglang_config_path:
             print(f"  - sglang_config.yaml   (SGLang flags)")
-        print(f"  - commands.sh          (rendered worker commands)")
-        print(f"  - job.sh               (sbatch script)")
+        print(f"  - commands.sh          (full bash commands)")
         print(f"  - metadata.json        (submission info)")
-        print(f"\nTo submit this job:")
-        print(f"  cd {self.output_dir}")
-        print(f"  sbatch job.sh")
         print(f"\nTo see what commands would run:")
         print(f"  cat {self.output_dir}/commands.sh")
         print("\n" + "="*60 + "\n")
@@ -176,7 +162,7 @@ class DryRunContext:
 
 def render_sglang_command(config: dict, sglang_config_path: Path, mode: str = "prefill") -> str:
     """
-    Render the full SGLang command that would be executed.
+    Render the full SGLang command that would be executed with all flags inlined.
 
     Args:
         config: User config dict
@@ -184,7 +170,7 @@ def render_sglang_command(config: dict, sglang_config_path: Path, mode: str = "p
         mode: "prefill" or "decode"
 
     Returns:
-        Multi-line string showing the full command with environment variables
+        Multi-line string showing the full command with environment variables and all flags
     """
     backend = config.get('backend', {})
     resources = config.get('resources', {})
@@ -205,18 +191,34 @@ def render_sglang_command(config: dict, sglang_config_path: Path, mode: str = "p
 
     # Environment variables (one per line with backslash continuation)
     if env_vars:
-        for i, env_var in enumerate(env_vars):
-            if i < len(env_vars) - 1:
-                lines.append(f"{env_var} \\")
-            else:
-                lines.append(f"{env_var} \\")
+        for env_var in env_vars:
+            lines.append(f"{env_var} \\")
 
     # Python command
     lines.append("python3 -m dynamo.sglang \\")
 
-    # Config file flags
-    lines.append(f"    --config {sglang_config_path} \\")
-    lines.append(f"    --config-key {mode} \\")
+    # Load the generated SGLang config and inline all flags
+    with open(sglang_config_path) as f:
+        sglang_config = yaml.load(f, Loader=yaml.FullLoader)
+
+    # Get flags for this mode
+    mode_config = sglang_config.get(mode, {})
+
+    # Convert config dict to command-line flags
+    for key, value in sorted(mode_config.items()):
+        # Convert underscores to hyphens for CLI flags
+        flag_name = key.replace('_', '-')
+
+        # Handle different value types
+        if isinstance(value, bool):
+            if value:
+                lines.append(f"    --{flag_name} \\")
+        elif isinstance(value, list):
+            # For lists, pass each value as separate argument
+            values_str = " ".join(str(v) for v in value)
+            lines.append(f"    --{flag_name} {values_str} \\")
+        else:
+            lines.append(f"    --{flag_name} {value} \\")
 
     # Coordination flags (filled by worker_setup.py at runtime)
     lines.append("    --dist-init-addr $HOST_IP_MACHINE:$PORT \\")
@@ -230,95 +232,6 @@ def render_sglang_command(config: dict, sglang_config_path: Path, mode: str = "p
     lines.append(f"    --dp-size {gpus_per_node}")
 
     return "\n".join(lines)
-
-
-def generate_sbatch_script(config: dict, args: list[str], sglang_config_path: Path = None) -> str:
-    """
-    Generate sbatch script content from config.
-
-    For dry-run mode, creates a simplified script showing what would be executed.
-    """
-    # Extract values
-    resources = config['resources']
-    slurm = config['slurm']
-    model = config['model']
-    backend = config.get('backend', {})
-    is_aggregated = 'agg_nodes' in resources
-
-    # Create simplified script (not using Jinja for dry-run to avoid missing vars)
-    if is_aggregated:
-        script = f"""#!/bin/bash
-#SBATCH --job-name={config['name']}
-#SBATCH --nodes={resources['agg_nodes']}
-#SBATCH --ntasks={resources['agg_nodes']}
-#SBATCH --account={slurm['account']}
-#SBATCH --partition={slurm['partition']}
-#SBATCH --time={slurm['time_limit']}
-
-# Aggregated mode: {resources['agg_workers']} workers on {resources['agg_nodes']} nodes
-# {resources['gpus_per_node']} GPUs per node
-
-echo "Model: {model['path']}"
-echo "Container: {model['container']}"
-"""
-    else:
-        total_nodes = resources['prefill_nodes'] + resources['decode_nodes']
-        script = f"""#!/bin/bash
-#SBATCH --job-name={config['name']}
-#SBATCH --nodes={total_nodes}
-#SBATCH --ntasks={total_nodes}
-#SBATCH --account={slurm['account']}
-#SBATCH --partition={slurm['partition']}
-#SBATCH --time={slurm['time_limit']}
-
-# Disaggregated mode
-# Prefill: {resources['prefill_workers']} workers on {resources['prefill_nodes']} nodes
-# Decode:  {resources['decode_workers']} workers on {resources['decode_nodes']} nodes
-# {resources['gpus_per_node']} GPUs per node
-
-echo "Model: {model['path']}"
-echo "Container: {model['container']}"
-"""
-
-    # Add SGLang config info and rendered commands
-    if sglang_config_path:
-        script += f"""
-# ============================================================
-# SGLang Config File Mode
-# ============================================================
-# Config: {sglang_config_path}
-#
-# Prefill worker command:
-# --------------------------------------------------------
-
-{render_sglang_command(config, sglang_config_path, mode="prefill")}
-
-# --------------------------------------------------------
-# Decode worker command:
-# --------------------------------------------------------
-
-{render_sglang_command(config, sglang_config_path, mode="decode")}
-
-# --------------------------------------------------------
-"""
-
-    # Add environment variables
-    if 'environment' in backend:
-        script += "\n# Environment Variables (exported by sbatch):\n"
-        for key, val in backend['environment'].items():
-            script += f"export {key}={val}\n"
-
-    # Add worker launch commands (simplified)
-    script += """
-# ============================================================
-# Worker launch commands would be here
-# (Generated from Jinja template in real submission)
-# ============================================================
-
-echo "This is a dry-run - job was not submitted to SLURM"
-"""
-
-    return script
 
 
 def submit_single(config_path: Path = None, config: dict = None, dry_run: bool = False):
@@ -352,13 +265,9 @@ def submit_single(config_path: Path = None, config: dict = None, dry_run: bool =
         # Convert to args (for metadata)
         args = yaml_to_args(config, sglang_config_path)
 
-        # Save rendered commands (clean view of what will execute)
+        # Save rendered commands (full bash commands with all flags inlined)
         if sglang_config_path:
             ctx.save_rendered_commands(config, sglang_config_path)
-
-        # Generate sbatch script
-        script_content = generate_sbatch_script(config, args, sglang_config_path)
-        ctx.save_sbatch_script(script_content)
 
         # Save metadata
         ctx.save_metadata(config, args)
