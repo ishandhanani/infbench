@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+"""
+Base backend interface for inference frameworks.
+
+Inspired by ignition's backend protocol.
+"""
+
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Any
+
+
+class Backend(ABC):
+    """Base class for inference backend implementations.
+    
+    Each backend is responsible for:
+    1. Generating backend-specific config files
+    2. Rendering commands with proper flags and environment variables
+    3. Converting configs to legacy formats (for backward compatibility)
+    """
+
+    def __init__(self, config: dict):
+        """Initialize backend with user config.
+        
+        Args:
+            config: Full user configuration dict
+        """
+        self.config = config
+        self.backend_config = config.get('backend', {})
+        self.resources = config.get('resources', {})
+        self.model = config.get('model', {})
+    
+    @abstractmethod
+    def generate_config_file(self, params: dict = None) -> Path | None:
+        """Generate backend-specific config file.
+        
+        Args:
+            params: Optional sweep parameters for template expansion
+            
+        Returns:
+            Path to generated config file, or None if not applicable
+        """
+        pass
+    
+    @abstractmethod
+    def render_command(self, mode: str, config_path: Path = None) -> str:
+        """Render full command that would be executed.
+        
+        Args:
+            mode: Worker mode (e.g., "prefill", "decode", "aggregated")
+            config_path: Path to generated config file (if applicable)
+            
+        Returns:
+            Multi-line bash command string with env vars and flags
+        """
+        pass
+    
+    def get_environment_vars(self, mode: str) -> dict[str, str]:
+        """Get environment variables for this mode.
+        
+        Args:
+            mode: Worker mode
+            
+        Returns:
+            Dict of environment variable key-value pairs
+        """
+        env_key = f'{mode}_environment'
+        return self.backend_config.get(env_key, {})
+    
+    def is_disaggregated(self) -> bool:
+        """Check if running in disaggregated mode."""
+        return 'agg_nodes' not in self.resources

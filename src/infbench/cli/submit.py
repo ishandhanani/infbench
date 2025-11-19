@@ -25,11 +25,7 @@ from pathlib import Path
 
 # Import from infbench modules
 from infbench.core.config import load_config
-from infbench.backends.sglang import (
-    generate_sglang_config_file,
-    render_sglang_command,
-    yaml_to_args,
-)
+from infbench.backends.sglang import SGLangBackend
 
 
 def setup_logging(level: int = logging.INFO) -> None:
@@ -78,7 +74,7 @@ class DryRunContext:
             return dest
         return None
 
-    def save_rendered_commands(self, config: dict, sglang_config_path: Path) -> Path:
+    def save_rendered_commands(self, backend, sglang_config_path: Path) -> Path:
         """Save just the rendered commands (no sbatch headers)"""
         commands_path = self.output_dir / "commands.sh"
 
@@ -88,12 +84,12 @@ class DryRunContext:
         content += "# ============================================================\n"
         content += "# PREFILL WORKER COMMAND\n"
         content += "# ============================================================\n\n"
-        content += render_sglang_command(config, sglang_config_path, mode="prefill")
+        content += backend.render_command(mode="prefill", config_path=sglang_config_path)
         content += "\n\n"
         content += "# ============================================================\n"
         content += "# DECODE WORKER COMMAND\n"
         content += "# ============================================================\n\n"
-        content += render_sglang_command(config, sglang_config_path, mode="decode")
+        content += backend.render_command(mode="decode", config_path=sglang_config_path)
         content += "\n"
 
         with open(commands_path, 'w') as f:
@@ -158,21 +154,21 @@ def submit_single(config_path: Path = None, config: dict = None, dry_run: bool =
         # Save user config
         ctx.save_config(config)
 
-        # Generate SGLang config if needed
-        sglang_config_path = None
-        if config.get('backend', {}).get('type') == 'sglang':
-            sglang_config_path = generate_sglang_config_file(config)
+        # Create backend instance
+        backend_type = config.get('backend', {}).get('type')
+        if backend_type == 'sglang':
+            backend = SGLangBackend(config)
+            sglang_config_path = backend.generate_config_file()
             ctx.save_sglang_config(sglang_config_path)
 
-        # Convert to args (for metadata)
-        args = yaml_to_args(config, sglang_config_path)
+            # Save rendered commands
+            if sglang_config_path:
+                ctx.save_rendered_commands(backend, sglang_config_path)
+        else:
+            sglang_config_path = None
 
-        # Save rendered commands (full bash commands with all flags inlined)
-        if sglang_config_path:
-            ctx.save_rendered_commands(config, sglang_config_path)
-
-        # Save metadata
-        ctx.save_metadata(config, args)
+        # Save metadata (no more args conversion needed)
+        ctx.save_metadata(config, [])
 
         # Print summary
         ctx.print_summary()
@@ -182,16 +178,19 @@ def submit_single(config_path: Path = None, config: dict = None, dry_run: bool =
     # Real submission mode
     logging.info(f"🚀 Submitting job: {config['name']}")
 
-    # Generate SGLang config if needed
-    sglang_config_path = None
-    if config.get('backend', {}).get('type') == 'sglang':
-        sglang_config_path = generate_sglang_config_file(config)
+    # Create backend and generate config
+    backend_type = config.get('backend', {}).get('type')
+    if backend_type == 'sglang':
+        backend = SGLangBackend(config)
+        sglang_config_path = backend.generate_config_file()
+    else:
+        sglang_config_path = None
 
-    # Convert to args
+    # Convert to legacy args for submit_job_script (backward compatible)
+    from infbench.backends.legacy import yaml_to_args
     args = yaml_to_args(config, sglang_config_path)
 
-    # Call existing submit_job_script (backward compatible)
-    # Add slurm_runner to path so we can import it
+    # Call existing submit_job_script
     import sys
     slurm_runner_path = Path(__file__).parent.parent.parent.parent / "slurm_runner"
     sys.path.insert(0, str(slurm_runner_path))
