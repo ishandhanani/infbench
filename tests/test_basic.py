@@ -4,7 +4,7 @@ Basic tests for class-based architecture
 
 import os
 
-from srtslurm import NodeAnalyzer, RunLoader
+from srtlog import NodeAnalyzer, RunLoader
 
 
 def test_run_loader():

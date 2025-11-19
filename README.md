@@ -176,7 +176,7 @@ infbench-yaml-config/
 │   └── worker_setup.py  # Main worker launcher
 ├── configs/             # Job configuration YAML files
 ├── dashboard/           # Streamlit UI (modular tabs)
-├── srtslurm/           # Core analysis library
+├── srtlog/             # Core analysis library
 ├── tests/              # Unit tests
 └── srtslurm.yaml       # Cluster config (gitignored)
 
@@ -217,8 +217,8 @@ make sync-run RUN_ID=3667_1P_12D  # Push single run
 Dashboard auto-syncs missing runs on startup. Or manually:
 
 ```bash
-uv run python -m srtslurm.sync_results pull-missing
-uv run python -m srtslurm.sync_results list-remote
+uv run python -m srtlog.sync_results pull-missing
+uv run python -m srtlog.sync_results list-remote
 ```
 
 ## Development

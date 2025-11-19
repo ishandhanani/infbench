@@ -21,7 +21,7 @@ from dashboard import (
     rate_match_tab,
     config_tab,
 )
-from srtslurm import RunLoader
+from srtlog import RunLoader
 
 # Configure logging
 logging.basicConfig(

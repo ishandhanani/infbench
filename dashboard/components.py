@@ -7,8 +7,8 @@ import os
 
 import streamlit as st
 
-from srtslurm import NodeAnalyzer, RunLoader
-from srtslurm.cloud_sync import create_sync_manager_from_config
+from srtlog import NodeAnalyzer, RunLoader
+from srtlog.cloud_sync import create_sync_manager_from_config
 
 
 # Update default config path
@@ -179,7 +179,7 @@ def get_default_logs_dir():
 @st.cache_data(show_spinner=False)
 def create_node_throughput_graph(node_metrics_list, group_by_dp=False, aggregate_all=False):
     """Create input throughput over time graph."""
-    from srtslurm.visualizations import create_node_metric_graph
+    from srtlog.visualizations import create_node_metric_graph
     
     return create_node_metric_graph(
         node_metrics_list,
@@ -195,7 +195,7 @@ def create_node_throughput_graph(node_metrics_list, group_by_dp=False, aggregate
 @st.cache_data(show_spinner=False)
 def create_kv_cache_utilization_graph(node_metrics_list, group_by_dp=False, aggregate_all=False):
     """Create KV cache utilization visualization."""
-    from srtslurm.visualizations import create_node_metric_graph
+    from srtlog.visualizations import create_node_metric_graph
     
     fig = create_node_metric_graph(
         node_metrics_list,
@@ -214,7 +214,7 @@ def create_kv_cache_utilization_graph(node_metrics_list, group_by_dp=False, aggr
 @st.cache_data(show_spinner=False)
 def create_queue_depth_graph(node_metrics_list, group_by_dp=False, aggregate_all=False):
     """Create queued requests visualization."""
-    from srtslurm.visualizations import create_node_metric_graph
+    from srtlog.visualizations import create_node_metric_graph
     
     fig = create_node_metric_graph(
         node_metrics_list,
@@ -232,7 +232,7 @@ def create_queue_depth_graph(node_metrics_list, group_by_dp=False, aggregate_all
 @st.cache_data(show_spinner=False)
 def create_node_inflight_requests_graph(node_metrics_list, group_by_dp=False, aggregate_all=False):
     """Create inflight requests visualization."""
-    from srtslurm.visualizations import create_node_metric_graph
+    from srtlog.visualizations import create_node_metric_graph
     
     fig = create_node_metric_graph(
         node_metrics_list,
@@ -251,7 +251,7 @@ def create_node_inflight_requests_graph(node_metrics_list, group_by_dp=False, ag
 @st.cache_data(show_spinner=False)
 def create_decode_running_requests_graph(node_metrics_list, group_by_dp=False, aggregate_all=False):
     """Create running requests visualization for decode nodes."""
-    from srtslurm.visualizations import create_node_metric_graph
+    from srtlog.visualizations import create_node_metric_graph
     
     fig = create_node_metric_graph(
         node_metrics_list,
@@ -270,7 +270,7 @@ def create_decode_running_requests_graph(node_metrics_list, group_by_dp=False, a
 @st.cache_data(show_spinner=False)
 def create_decode_gen_throughput_graph(node_metrics_list, group_by_dp=False, aggregate_all=False):
     """Create generation throughput visualization for decode nodes."""
-    from srtslurm.visualizations import create_node_metric_graph
+    from srtlog.visualizations import create_node_metric_graph
     
     return create_node_metric_graph(
         node_metrics_list,
@@ -287,7 +287,7 @@ def create_decode_gen_throughput_graph(node_metrics_list, group_by_dp=False, agg
 @st.cache_data(show_spinner=False)
 def create_decode_transfer_req_graph(node_metrics_list, group_by_dp=False, aggregate_all=False):
     """Create transfer requests visualization for decode nodes."""
-    from srtslurm.visualizations import create_node_metric_graph
+    from srtlog.visualizations import create_node_metric_graph
     
     fig = create_node_metric_graph(
         node_metrics_list,
@@ -307,7 +307,7 @@ def create_decode_transfer_req_graph(node_metrics_list, group_by_dp=False, aggre
 @st.cache_data(show_spinner=False)
 def create_decode_prealloc_req_graph(node_metrics_list, group_by_dp=False, aggregate_all=False):
     """Create prealloc requests visualization for decode nodes."""
-    from srtslurm.visualizations import create_node_metric_graph
+    from srtlog.visualizations import create_node_metric_graph
     
     fig = create_node_metric_graph(
         node_metrics_list,
@@ -327,7 +327,7 @@ def create_decode_prealloc_req_graph(node_metrics_list, group_by_dp=False, aggre
 @st.cache_data(show_spinner=False)
 def create_decode_disagg_stacked_graph(node_metrics_list, group_by_dp=False, aggregate_all=False):
     """Create stacked area chart for disaggregation request flow."""
-    from srtslurm.visualizations import create_stacked_metric_graph
+    from srtlog.visualizations import create_stacked_metric_graph
     
     metrics_config = [
         {"key": "prealloc_req", "name": "Prealloc Queue", "color": "rgba(99, 110, 250, 0.3)"},

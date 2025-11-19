@@ -18,7 +18,7 @@ from dashboard.components import (
     create_decode_prealloc_req_graph,
     create_decode_disagg_stacked_graph,
 )
-from srtslurm.visualizations import aggregate_all_nodes, group_nodes_by_dp
+from srtlog.visualizations import aggregate_all_nodes, group_nodes_by_dp
 
 
 def render(filtered_runs: list, logs_dir: str):

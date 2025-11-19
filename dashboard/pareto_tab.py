@@ -5,7 +5,7 @@ Pareto Frontier Analysis Tab
 import pandas as pd
 import streamlit as st
 
-from srtslurm.visualizations import calculate_pareto_frontier, create_pareto_graph
+from srtlog.visualizations import calculate_pareto_frontier, create_pareto_graph
 
 
 def render(df: pd.DataFrame, selected_runs: list[str], run_legend_labels: dict, pareto_options: dict):

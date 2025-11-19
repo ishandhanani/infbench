@@ -20,7 +20,7 @@ dashboard:
 sync-to-cloud:
 	@echo "☁️  Syncing benchmark results to cloud storage..."
 	@echo "📁 Logs directory: $(LOGS_DIR)"
-	@uv run python -m srtslurm.sync_results --logs-dir $(LOGS_DIR) push-all
+	@uv run python -m srtlog.sync_results --logs-dir $(LOGS_DIR) push-all
 	@echo "✅ Sync complete!"
 
 sync-run:
@@ -30,7 +30,7 @@ sync-run:
 		exit 1; \
 	fi
 	@echo "☁️  Syncing run $(RUN_ID) to cloud storage..."
-	@uv run python -m srtslurm.sync_results --logs-dir $(LOGS_DIR) push $(LOGS_DIR)/$(RUN_ID)
+	@uv run python -m srtlog.sync_results --logs-dir $(LOGS_DIR) push $(LOGS_DIR)/$(RUN_ID)
 	@echo "✅ Sync complete!"
 
 delete-from-cloud:
@@ -39,7 +39,7 @@ delete-from-cloud:
 		echo "Usage: make delete-from-cloud RUN_ID=3667_1P_1D_20251110_192145"; \
 		exit 1; \
 	fi
-	@uv run python -m srtslurm.sync_results delete $(RUN_ID)
+	@uv run python -m srtlog.sync_results delete $(RUN_ID)
 
 setup:
 	@echo "📦 Setting up configs and logs directories..."

@@ -5,7 +5,7 @@ Latency Analysis Tab
 import pandas as pd
 import streamlit as st
 
-from srtslurm.visualizations import create_latency_vs_concurrency_graph
+from srtlog.visualizations import create_latency_vs_concurrency_graph
 
 
 def render(df: pd.DataFrame, selected_runs: list[str]):

@@ -6,11 +6,11 @@ import os
 
 import streamlit as st
 
-from srtslurm import (
+from srtlog import (
     format_config_for_display,
     parse_command_line_from_err,
 )
-from srtslurm.config_reader import (
+from srtlog.config_reader import (
     get_all_configs,
     get_command_line_args,
     get_environment_variables,
