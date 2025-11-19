@@ -72,6 +72,14 @@ if [ -z "$USE_INIT_LOCATIONS" ]; then
     exit 1
 fi
 
+
+# Check whether the override env vars are set. If not, we just use the alternate values.
+CONTEXT_LENGTH=2176
+if [ -n "SERVER_CONTEXT_LENGTH" ]; then
+    echo "Warning: SERVER_CONTEXT_LENGTH ($SERVER_CONTEXT_LENGTH) is set, overrideing default $CONTEXT_LENGTH"
+    CONTEXT_LENGTH=$SERVER_CONTEXT_LENGTH
+fi
+
 # Construct command based on mode
 if [ "$mode" = "prefill" ]; then
     set -x
@@ -117,7 +125,7 @@ if [ "$mode" = "prefill" ]; then
         $DISAGG_MODE_FLAG \
         --decode-log-interval 1000 \
         --max-running-requests 30000 \
-        --context-length 2176 \
+        --context-length $CONTEXT_LENGTH \
         --disable-radix-cache \
         --disable-shared-experts-fusion \
         --watchdog-timeout 1000000 \
@@ -202,7 +210,7 @@ elif [ "$mode" = "decode" ]; then
         --host 0.0.0.0 \
         --decode-log-interval 1000 \
         --max-running-requests 67584 \
-        --context-length 2176 \
+        --context-length $CONTEXT_LENGTH \
         --disable-radix-cache \
         --disable-shared-experts-fusion \
         --watchdog-timeout 1000000 \
