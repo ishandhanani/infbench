@@ -192,7 +192,8 @@ backend:
 ```
 
 **Should validate:**
-- `tensor-parallel-size * data-parallel-size <= nodes * gpus_per_node`
+- `tensor-parallel-size * workers <= nodes * gpus_per_node`
+- Note: We only check TP size, not DP/EP (those don't affect GPU requirements per worker)
 
 ### Missing Validation #2: Worker Count vs Nodes
 

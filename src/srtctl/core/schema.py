@@ -358,9 +358,8 @@ class JobConfig(BaseModel):
         if not config or not nodes or not workers:
             return
 
-        # Get TP and DP sizes from config
+        # Get TP size from config (we only care about tensor parallelism, not DP/EP)
         tp_size = None
-        dp_size = None
 
         # Config can be a Pydantic model or dict - handle both
         if hasattr(config, "model_dump"):
@@ -372,7 +371,6 @@ class JobConfig(BaseModel):
 
         if isinstance(config_dict, dict):
             tp_size = config_dict.get("tensor-parallel-size") or config_dict.get("tensor_parallel_size")
-            dp_size = config_dict.get("data-parallel-size") or config_dict.get("data_parallel_size")
 
         if not tp_size:
             # No TP size specified, can't validate
@@ -385,11 +383,10 @@ class JobConfig(BaseModel):
             # Template placeholder like "{tp_size}" - skip validation
             return
 
-        dp_size = int(dp_size) if dp_size else 1
-
-        # Calculate total GPUs needed
+        # Calculate resources needed
+        # Each worker needs tp_size GPUs (DP/EP don't affect GPU requirements per worker)
         total_gpus_available = nodes * gpus_per_node
-        gpus_per_worker = tp_size * dp_size
+        gpus_per_worker = tp_size
         total_gpus_needed = gpus_per_worker * workers
 
         # Validate: Total GPUs needed <= Total GPUs available
@@ -397,7 +394,7 @@ class JobConfig(BaseModel):
             raise ValueError(
                 f"{mode.capitalize()} resource mismatch:\n"
                 f"  Workers: {workers}\n"
-                f"  TP size: {tp_size}, DP size: {dp_size}\n"
+                f"  TP size: {tp_size}\n"
                 f"  GPUs per worker: {gpus_per_worker}\n"
                 f"  Total GPUs needed: {total_gpus_needed}\n"
                 f"  Total GPUs available: {total_gpus_available} ({nodes} nodes × {gpus_per_node} GPUs/node)\n"
@@ -405,7 +402,7 @@ class JobConfig(BaseModel):
             )
 
         # Validate: Each worker's GPUs fit on the allocated nodes
-        # For multi-node workers, TP size should divide evenly across nodes per worker
+        # For multi-node workers, TP size should span across nodes per worker
         nodes_per_worker = nodes // workers if workers > 0 else nodes
 
         if nodes_per_worker == 0:
@@ -423,7 +420,7 @@ class JobConfig(BaseModel):
                 f"{mode.capitalize()} resource mismatch:\n"
                 f"  Workers: {workers}\n"
                 f"  Nodes per worker: {nodes_per_worker}\n"
-                f"  GPUs per worker (from TP×DP): {gpus_per_worker}\n"
+                f"  GPUs per worker (from TP): {gpus_per_worker}\n"
                 f"  GPUs available per worker: {gpus_per_worker_from_nodes} ({nodes_per_worker} nodes × {gpus_per_node} GPUs/node)\n"
                 f"  → Each worker needs {gpus_per_worker - gpus_per_worker_from_nodes} more GPUs!"
             )

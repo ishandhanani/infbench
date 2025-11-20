@@ -35,12 +35,10 @@ def test_valid_disaggregated_config():
         "backend": {
             "sglang_config": {
                 "prefill": {
-                    "tensor-parallel-size": 4,
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 4
                 },
                 "decode": {
-                    "tensor-parallel-size": 4,
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 4
                 }
             }
         }
@@ -75,12 +73,10 @@ def test_invalid_tp_size_too_large():
         "backend": {
             "sglang_config": {
                 "prefill": {
-                    "tensor-parallel-size": 8,  # ERROR: Need 8 GPUs but only have 4!
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 8  # ERROR: Need 8 GPUs but only have 4!
                 },
                 "decode": {
-                    "tensor-parallel-size": 4,
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 4
                 }
             }
         }
@@ -114,12 +110,10 @@ def test_invalid_too_many_workers():
         "backend": {
             "sglang_config": {
                 "prefill": {
-                    "tensor-parallel-size": 4,
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 4
                 },
                 "decode": {
-                    "tensor-parallel-size": 4,
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 4
                 }
             }
         }
@@ -228,8 +222,7 @@ def test_valid_aggregated_config():
         "backend": {
             "sglang_config": {
                 "aggregated": {
-                    "tensor-parallel-size": 4,
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 4
                 }
             }
         }
@@ -297,12 +290,10 @@ def test_valid_multi_node_tp():
         "backend": {
             "sglang_config": {
                 "prefill": {
-                    "tensor-parallel-size": 8,  # Valid: 1 worker × 8 GPUs = 8 total, matches 2 nodes × 4 GPUs
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 8  # Valid: 1 worker × 8 GPUs = 8 total, matches 2 nodes × 4 GPUs
                 },
                 "decode": {
-                    "tensor-parallel-size": 4,
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 4
                 }
             }
         }
@@ -337,12 +328,10 @@ def test_template_placeholder_skips_validation():
         "backend": {
             "sglang_config": {
                 "prefill": {
-                    "tensor-parallel-size": "{tp_size}",  # Template placeholder - should skip validation
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": "{tp_size}"  # Template placeholder - should skip validation
                 },
                 "decode": {
-                    "tensor-parallel-size": 4,
-                    "data-parallel-size": 1
+                    "tensor-parallel-size": 4
                 }
             }
         }
