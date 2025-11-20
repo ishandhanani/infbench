@@ -90,6 +90,16 @@ if [ "$mode" = "prefill" ]; then
         DISAGG_MODE_FLAG=""
     fi
 
+    # cd /sgl-workspace/
+    # rm -rf sglang
+    # git clone https://github.com/sgl-project/sglang.git
+    # cd sglang
+    # git checkout origin/cheng/refactor/sbo
+    # git config --global --add safe.directory "*"    
+    # pip install -e "python"                                                                   
+    # nvidia-smi
+    # pip list  
+
     # we have to install pre-release cutedsl for a integer overflow fix
     python3 -m pip install --no-cache-dir --upgrade --pre nvidia-cutlass-dsl
 
@@ -127,7 +137,7 @@ if [ "$mode" = "prefill" ]; then
         --attention-backend trtllm_mla \
         --kv-cache-dtype fp8_e4m3 \
         --enable-single-batch-overlap \
-        --chunked-prefill-size 524288 \
+        --chunked-prefill-size 131072 \
         --eplb-algorithm deepseek \
         --trust-remote-code \
         --disable-cuda-graph \
@@ -137,7 +147,7 @@ if [ "$mode" = "prefill" ]; then
         --load-balance-method round_robin \
         --quantization modelopt_fp4 \
         --moe-runner-backend flashinfer_cutlass \
-        --dist-init-addr "$HOST_IP_MACfHINE:$PORT" \
+        --dist-init-addr "$HOST_IP_MACHINE:$PORT" \
         --disaggregation-bootstrap-port 30001 \
         --nnodes "$TOTAL_NODES" \
         --node-rank "$RANK" \
@@ -178,6 +188,16 @@ elif [ "$mode" = "decode" ]; then
     export TORCH_DISTRIBUTED_DEFAULT_TIMEOUT=1800
     export FLASHINFER_WORKSPACE_BASE="/configs"
     export SGLANG_DG_CACHE_DIR="/configs/deepgemm_cache"
+
+    # cd /sgl-workspace/
+    # rm -rf sglang
+    # git clone https://github.com/sgl-project/sglang.git
+    # cd sglang
+    # git checkout origin/cheng/refactor/sbo
+    # git config --global --add safe.directory "*"    
+    # pip install -e "python"                                                                   
+    # nvidia-smi
+    # pip list  
 
     # we have to install pre-release cutedsl for a integer overflow fix
     python3 -m pip install --no-cache-dir --upgrade --pre nvidia-cutlass-dsl
@@ -238,5 +258,6 @@ elif [ "$mode" = "decode" ]; then
         --dp-size "$TOTAL_GPUS" \
         --enable-dp-attention \
         --stream-interval 50 \
-        --mem-fraction-static 0.82 ${command_suffix}  # --enable-single-batch-overlap 
+        --mem-fraction-static 0.82 \
+        --enable-single-batch-overlap ${command_suffix} 
 fi
