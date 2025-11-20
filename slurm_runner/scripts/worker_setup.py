@@ -239,6 +239,12 @@ def _parse_command_line_args(args: list[str] | None = None) -> argparse.Namespac
         help="Enable torch profiling mode: use sglang.launch_server and skip --disaggregation-mode",
     )
 
+    parser.add_argument(
+        "--bench-type",
+        type=str,
+        help="The benchmark type (e.g., 'gpqa', 'sa-bench')",
+    )
+
     return parser.parse_args(args)
 
 
@@ -281,6 +287,7 @@ def setup_env_vars_for_gpu_script(
     use_dynamo_whls: bool = False,
     sglang_torch_profiler: bool = False,
     worker_type: str = "aggregated",
+    bench_type: str | None = None,
 ):
     """Setup environment variables required by GPU scripts (gb200-fp8.sh)"""
     os.environ["HOST_IP_MACHINE"] = host_ip
@@ -298,6 +305,8 @@ def setup_env_vars_for_gpu_script(
         os.environ["DUMP_CONFIG_PATH"] = dump_config_path
     else:
         os.environ.pop("DUMP_CONFIG_PATH", None)
+    if bench_type == "gpqa":
+        os.environ["SERVER_CONTEXT_LENGTH"] = str(40000)
 
     logging.info(f"Set HOST_IP: {host_ip}")
     logging.info(f"Set PORT: {port}")
@@ -426,6 +435,7 @@ def setup_prefill_worker(
     dump_config_path: str | None = None,
     use_dynamo_whls: bool = False,
     sglang_torch_profiler: bool = False,
+    bench_type: str | None = None,
 ) -> int:
     """
     Setup the prefill worker.
@@ -450,6 +460,7 @@ def setup_prefill_worker(
         use_dynamo_whls=use_dynamo_whls,
         sglang_torch_profiler=sglang_torch_profiler,
         worker_type="prefill",
+        bench_type=bench_type,
     )
 
     # Use appropriate GPU script instead of generating command directly
@@ -470,6 +481,7 @@ def setup_decode_worker(
     dump_config_path: str | None = None,
     use_dynamo_whls: bool = False,
     sglang_torch_profiler: bool = False,
+    bench_type: str | None = None,
 ) -> int:
     """
     Setup the decode worker.
@@ -491,6 +503,7 @@ def setup_decode_worker(
         use_dynamo_whls=use_dynamo_whls,
         sglang_torch_profiler=sglang_torch_profiler,
         worker_type="decode",
+        bench_type=bench_type,
     )
 
     # Use appropriate GPU script instead of generating command directly
@@ -598,6 +611,7 @@ def main(input_args: list[str] | None = None):
             args.dump_config_path,
             args.use_dynamo_whls,
             args.sglang_torch_profiler,
+            args.bench_type,
         )
     elif args.worker_type == "decode":
         setup_decode_worker(
@@ -613,6 +627,7 @@ def main(input_args: list[str] | None = None):
             args.dump_config_path,
             args.use_dynamo_whls,
             args.sglang_torch_profiler,
+            args.bench_type,
         )
     elif args.worker_type == "aggregated":
         setup_aggregated_worker(

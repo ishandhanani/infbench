@@ -34,6 +34,10 @@ CONFIG_DIR="{{ config_dir }}"
 CONTAINER_IMAGE="{{ container_image }}"
 NETWORK_INTERFACE="{{ network_interface }}"
 GPU_TYPE="{{ gpu_type | default('h100') }}"
+
+BENCHMARK_TYPE={{ benchmark_type }}
+BENCHMARK_ARGS="{{ benchmark_arg }}"
+
 set +x
 
 {% raw %}
@@ -180,7 +184,7 @@ ENROOT_ARGS="\
 {% endraw %}
 SCRIPT_VARIANT="{{ script_variant }}"
 {% raw %}
-WORKER_ARGS="--gpu_type ${GPU_TYPE} --script-variant ${SCRIPT_VARIANT} --gpus_per_node ${GPUS_PER_NODE} --master_ip ${MASTER_IP}"
+WORKER_ARGS="--gpu_type ${GPU_TYPE} --script-variant ${SCRIPT_VARIANT} --gpus_per_node ${GPUS_PER_NODE} --master_ip ${MASTER_IP} --bench-type ${BENCHMARK_TYPE}"
 {% endraw %}
 {% if enable_multiple_frontends %}
 {% raw %}
@@ -336,9 +340,6 @@ echo "scancel $SLURM_JOB_ID"
 # Instead of waiting for all tasks to complete, wait for benchmark to complete and then exit.
 
 {% endraw %}
-
-BENCHMARK_TYPE={{ benchmark_type }}
-BENCHMARK_ARGS="{{ benchmark_arg }}"
 
 {% if do_benchmark %}
 {% raw %}
