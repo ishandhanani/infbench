@@ -102,6 +102,7 @@ backend:
       max-running-requests: 30000
       load-balance-method: "round_robin"
 
+
       # Performance optimizations
       disable-cuda-graph: true
       enable-dp-attention: true
@@ -130,7 +131,7 @@ backend:
       disable-chunked-prefix-cache: true
 
       # Other flags
-      host: "0.0.0.0"
+      host: 0.0.0.0
       stream-interval: 50
       decode-log-interval: 1000
       watchdog-timeout: 1000000
