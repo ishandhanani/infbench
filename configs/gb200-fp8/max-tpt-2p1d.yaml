@@ -5,7 +5,7 @@ name: "gb200-fp8-max-tpt"
 
 model:
   path: "dsfp8"
-  container: "0.5.3.post4"
+  container: "0.5.5.post2"
   precision: "fp8"
 
 resources:
