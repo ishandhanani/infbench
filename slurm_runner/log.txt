@@ -1,0 +1,1241 @@
+2025-11-20 04:37:02| root: Running command (background=True, shell=True): bash /scripts/monitor_gpu_utilization.sh
+2025-11-20 04:37:02| root: Started GPU utilization monitoring in the background
+2025-11-20 04:37:02| root: Prefill worker setup started
+2025-11-20 04:37:02| root: Hostname: inkwell-copper-cn03
+2025-11-20 04:37:02| root: Worker type: prefill
+2025-11-20 04:37:02| root: Worker index: 0
+2025-11-20 04:37:02| root: Local rank: 0
+2025-11-20 04:37:02| root: Leader IP: 10.40.1.145
+2025-11-20 04:37:02| root: Master IP: 10.40.1.10
+2025-11-20 04:37:02| root: Nodes per worker: 1
+2025-11-20 04:37:02| root: Use dynamo wheels?: True
+2025-11-20 04:37:02| root: Use init locations?: False
+2025-11-20 04:37:02| root: set NATS_SERVER: nats://10.40.1.10:4222
+2025-11-20 04:37:02| root: set ETCD_ENDPOINTS: http://10.40.1.10:2379
+2025-11-20 04:37:02| root: Setting up prefill worker 0, local rank 0
+2025-11-20 04:37:02| root: Waiting for etcd to be ready on http://10.40.1.10:2379...
+2025-11-20 04:37:02| root: Etcd is ready!
+2025-11-20 04:37:02| root: Set HOST_IP: 10.40.1.145
+2025-11-20 04:37:02| root: Set PORT: 29500
+2025-11-20 04:37:02| root: Set TOTAL_GPUS: 4
+2025-11-20 04:37:02| root: Set RANK: 0
+2025-11-20 04:37:02| root: Set TOTAL_NODES: 1
+2025-11-20 04:37:02| root: Set USE_INIT_LOCATIONS: False
+2025-11-20 04:37:02| root: Set USE_DYNAMO_WHLS: True
+2025-11-20 04:37:02| root: Set USE_SGLANG_LAUNCH_SERVER: False
+2025-11-20 04:37:02| root: Set DUMP_CONFIG_PATH: /logs/inkwell-copper-cn03_config.json
+2025-11-20 04:37:02| root: Running command (background=False, shell=True): bash /scripts/gb200-fp4/disagg/max-tpt.sh prefill
++ [[ true == \t\r\u\e ]]
++ python3 -m pip install /configs/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_aarch64.whl
+WARNING: Error parsing dependencies of devscripts: Invalid version: '2.22.1ubuntu1'
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+sglang 0.5.5.post2 requires nvidia-cutlass-dsl==4.2.1, but you have nvidia-cutlass-dsl 4.3.0.dev0 which is incompatible.
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
++ python3 -m pip install /configs/ai_dynamo-0.6.1-py3-none-any.whl
+WARNING: Error parsing dependencies of devscripts: Invalid version: '2.22.1ubuntu1'
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+sglang 0.5.5.post2 requires nvidia-cutlass-dsl==4.2.1, but you have nvidia-cutlass-dsl 4.3.0.dev0 which is incompatible.
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
++ command_suffix=
++ [[ false == \t\r\u\e ]]
++ [[ -n /logs/inkwell-copper-cn03_config.json ]]
++ command_suffix=' --dump-config-to /logs/inkwell-copper-cn03_config.json'
++ [[ false != \t\r\u\e ]]
++ DISAGG_MODE_FLAG='--disaggregation-mode prefill'
++ cd /sgl-workspace/
++ rm -rf sglang
++ git clone https://github.com/sgl-project/sglang.git
+Cloning into 'sglang'...
++ cd sglang
++ git checkout origin/cheng/refactor/sbo
+Note: switching to 'origin/cheng/refactor/sbo'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at 95c5c4751 squash
++ git config --global --add safe.directory '*'
++ pip install -e python
+WARNING: Error parsing dependencies of devscripts: Invalid version: '2.22.1ubuntu1'
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
++ nvidia-smi
++ pip list
++ python3 -m pip install --no-cache-dir --upgrade --pre nvidia-cutlass-dsl
+WARNING: Error parsing dependencies of devscripts: Invalid version: '2.22.1ubuntu1'
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+sglang 0.5.5.post3 requires nvidia-cutlass-dsl==4.2.1, but you have nvidia-cutlass-dsl 4.3.0.dev0 which is incompatible.
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
++ export TORCH_DISTRIBUTED_DEFAULT_TIMEOUT=1800
++ TORCH_DISTRIBUTED_DEFAULT_TIMEOUT=1800
++ export FLASHINFER_WORKSPACE_BASE=/configs
++ FLASHINFER_WORKSPACE_BASE=/configs
++ export SGLANG_DG_CACHE_DIR=/configs/deepgemm_cache
++ SGLANG_DG_CACHE_DIR=/configs/deepgemm_cache
++ DYN_SKIP_SGLANG_LOG_FORMATTING=1
++ SGLANG_NVFP4_CKPT_FP8_GEMM_IN_ATTN=1
++ SGLANG_PER_TOKEN_GROUP_QUANT_8BIT_V2=1
++ SGLANG_DISAGGREGATION_HEARTBEAT_MAX_FAILURE=100000
++ SGLANG_DISAGGREGATION_BOOTSTRAP_TIMEOUT=100000
++ SGLANG_DISAGGREGATION_WAITING_TIMEOUT=100000
++ SGLANG_HACK_SEQ_BOOTSTRAP_ROOM=1
++ MC_TE_METRIC=true
++ MC_FORCE_MNNVL=1
++ NCCL_MNNVL_ENABLE=1
++ NCCL_CUMEM_ENABLE=1
++ SGLANG_MOONCAKE_CUSTOM_MEM_POOL=True
++ SGLANG_USE_MESSAGE_QUEUE_BROADCASTER=0
++ SGLANG_DISABLE_TP_MEMORY_INBALANCE_CHECK=1
++ PYTHONUNBUFFERED=1
++ python3 -m dynamo.sglang --served-model-name deepseek-ai/DeepSeek-R1 --model-path /model/ --disaggregation-mode prefill --decode-log-interval 1000 --max-running-requests 30000 --context-length 2176 --disable-radix-cache --disable-shared-experts-fusion --watchdog-timeout 1000000 --disable-chunked-prefix-cache --attention-backend trtllm_mla --kv-cache-dtype fp8_e4m3 --enable-single-batch-overlap --chunked-prefill-size 65536 --eplb-algorithm deepseek --trust-remote-code --disable-cuda-graph --mem-fraction-static 0.84 --max-total-tokens 131072 --max-prefill-tokens 32768 --load-balance-method round_robin --quantization modelopt_fp4 --moe-runner-backend flashinfer_cutlass --dist-init-addr 10.40.1.145:29500 --disaggregation-bootstrap-port 30001 --nnodes 1 --node-rank 0 --ep-size 4 --tp-size 4 --dp-size 4 --enable-dp-attention --host 0.0.0.0 --stream-interval 50 --log-level debug --dump-config-to /logs/inkwell-copper-cn03_config.json
+[2m2025-11-20T04:38:04.172692Z[0m [33m WARN[0m [2m__init__[0m[2m:[0m dynamo.nixl_connect: Failed to load CuPy for GPU acceleration, utilizing numpy to provide CPU based operations.   
+[2m2025-11-20T04:38:04.182172Z[0m [33m WARN[0m [2mencode_worker_handler[0m[2m:[0m Failed to import cupy, falling back to numpy: No module named 'cupy'.   
+[2m2025-11-20T04:38:04.182617Z[0m [33m WARN[0m [2mworker_handler[0m[2m:[0m Failed to import cupy, falling back to numpy: No module named 'cupy'.   
+[2m2025-11-20T04:38:04.194673Z[0m [32m INFO[0m [2mmain.worker[0m[2m:[0m Signal handlers will trigger a graceful shutdown of the runtime   
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+[2m2025-11-20T04:38:04.256458Z[0m [33m WARN[0m [2mserver_args._handle_attention_backend_compatibility[0m[2m:[0m TensorRT-LLM MLA only supports page_size of 32 or 64, changing page_size from None to 64.   
+[2m2025-11-20T04:38:04.256505Z[0m [33m WARN[0m [2mserver_args._handle_data_parallelism[0m[2m:[0m DP attention is enabled. The chunked prefill size is adjusted to 16384 to avoid MoE kernel issues.    
+[2m2025-11-20T04:38:04.256585Z[0m [33m WARN[0m [2mserver_args._handle_disaggregation[0m[2m:[0m Cuda graph is disabled for prefill server   
+[2m2025-11-20T04:38:04.256647Z[0m [32m INFO[0m [2margs.parse_args[0m[2m:[0m Using dynamo's built in tokenizer. Setting skip_tokenizer_init to True   
+[2m2025-11-20T04:38:04.401522Z[0m [32m INFO[0m [2mconfig_dumper.dump_config[0m[2m:[0m Dumped config to /logs/inkwell-copper-cn03_config.json   
+[2m2025-11-20T04:38:04.401634Z[0m [32m INFO[0m [2mengine.__init__[0m[2m:[0m server_args=ServerArgs(model_path='/model/', tokenizer_path='/model/', tokenizer_mode='auto', tokenizer_worker_num=1, skip_tokenizer_init=True, load_format='auto', model_loader_extra_config='{}', trust_remote_code=True, context_length=2176, is_embedding=False, enable_multimodal=None, revision=None, model_impl='auto', host='0.0.0.0', port=30000, fastapi_root_path='', grpc_mode=False, skip_server_warmup=False, warmups=None, nccl_port=None, checkpoint_engine_wait_weights_before_ready=False, dtype='auto', quantization='modelopt_fp4', quantization_param_path=None, kv_cache_dtype='fp8_e4m3', enable_fp32_lm_head=False, modelopt_quant=None, modelopt_checkpoint_restore_path=None, modelopt_checkpoint_save_path=None, modelopt_export_path=None, quantize_and_serve=False, mem_fraction_static=0.84, max_running_requests=30000, max_queued_requests=None, max_total_tokens=131072, chunked_prefill_size=16384, max_prefill_tokens=32768, schedule_policy='fcfs', enable_priority_scheduling=False, abort_on_priority_when_disabled=False, schedule_low_priority_values_first=False, priority_scheduling_preemption_threshold=10, schedule_conservativeness=0.3, page_size=64, hybrid_kvcache_ratio=None, swa_full_tokens_ratio=0.8, disable_hybrid_swa_memory=False, radix_eviction_policy='lru', device='cuda', tp_size=4, pp_size=1, pp_max_micro_batch_size=None, stream_interval=50, stream_output=False, random_seed=406592327, constrained_json_whitespace_pattern=None, constrained_json_disable_any_whitespace=False, watchdog_timeout=1000000.0, dist_timeout=None, download_dir=None, base_gpu_id=0, gpu_id_step=1, sleep_on_idle=False, mm_process_config={}, log_level='debug', log_level_http=None, log_requests=False, log_requests_level=2, crash_dump_folder=None, show_time_cost=False, enable_metrics=False, enable_metrics_for_all_schedulers=False, tokenizer_metrics_custom_labels_header='x-custom-labels', tokenizer_metrics_allowed_custom_labels=None, bucket_time_to_first_token=None, bucket_inter_token_latency=None, bucket_e2e_request_latency=None, collect_tokens_histogram=False, prompt_tokens_buckets=None, generation_tokens_buckets=None, gc_warning_threshold_secs=0.0, decode_log_interval=1000, enable_request_time_stats_logging=False, kv_events_config=None, enable_trace=False, otlp_traces_endpoint='localhost:4317', export_metrics_to_file=False, export_metrics_to_file_dir=None, api_key=None, served_model_name='deepseek-ai/DeepSeek-R1', weight_version='default', chat_template=None, completion_template=None, file_storage_path='sglang_storage', enable_cache_report=False, reasoning_parser=None, tool_call_parser=None, tool_server=None, sampling_defaults='model', dp_size=4, load_balance_method='round_robin', load_watch_interval=0.1, prefill_round_robin_balance=False, dist_init_addr='10.40.1.145:29500', nnodes=1, node_rank=0, json_model_override_args='{}', preferred_sampling_params=None, enable_lora=None, max_lora_rank=None, lora_target_modules=None, lora_paths=None, max_loaded_loras=None, max_loras_per_batch=8, lora_eviction_policy='lru', lora_backend='csgmv', max_lora_chunk_size=16, attention_backend='trtllm_mla', decode_attention_backend=None, prefill_attention_backend=None, sampling_backend='flashinfer', grammar_backend='xgrammar', mm_attention_backend=None, nsa_prefill_backend='flashmla_sparse', nsa_decode_backend='fa3', speculative_algorithm=None, speculative_draft_model_path=None, speculative_draft_model_revision=None, speculative_draft_load_format=None, speculative_num_steps=None, speculative_eagle_topk=None, speculative_num_draft_tokens=None, speculative_accept_threshold_single=1.0, speculative_accept_threshold_acc=1.0, speculative_token_map=None, speculative_attention_mode='prefill', speculative_moe_runner_backend=None, speculative_ngram_min_match_window_size=1, speculative_ngram_max_match_window_size=12, speculative_ngram_min_bfs_breadth=1, speculative_ngram_max_bfs_breadth=10, speculative_ngram_match_type='BFS', speculative_ngram_branch_length=18, speculative_ngram_capacity=10000000, ep_size=4, moe_a2a_backend='none', moe_runner_backend='flashinfer_cutlass', flashinfer_mxfp4_moe_precision='default', enable_flashinfer_allreduce_fusion=False, deepep_mode='auto', ep_num_redundant_experts=0, ep_dispatch_algorithm='static', init_expert_location='trivial', enable_eplb=False, eplb_algorithm='deepseek', eplb_rebalance_num_iterations=1000, eplb_rebalance_layers_per_chunk=None, eplb_min_rebalancing_utilization_threshold=1.0, expert_distribution_recorder_mode=None, expert_distribution_recorder_buffer_size=1000, enable_expert_distribution_metrics=False, deepep_config=None, moe_dense_tp_size=None, elastic_ep_backend=None, mooncake_ib_device=None, max_mamba_cache_size=None, mamba_ssm_dtype='float32', mamba_full_memory_ratio=0.9, enable_hierarchical_cache=False, hicache_ratio=2.0, hicache_size=0, hicache_write_policy='write_through', hicache_io_backend='kernel', hicache_mem_layout='layer_first', hicache_storage_backend=None, hicache_storage_prefetch_policy='best_effort', hicache_storage_backend_extra_config=None, enable_lmcache=False, kt_weight_path=None, kt_method='AMXINT4', kt_cpuinfer=None, kt_threadpool_count=2, kt_num_gpu_experts=None, kt_max_deferred_experts_per_token=None, enable_double_sparsity=False, ds_channel_config_path=None, ds_heavy_channel_num=32, ds_heavy_token_num=256, ds_heavy_channel_type='qk', ds_sparse_decode_threshold=4096, cpu_offload_gb=0, offload_group_size=-1, offload_num_in_group=1, offload_prefetch_step=1, offload_mode='cpu', multi_item_scoring_delimiter=None, disable_radix_cache=True, cuda_graph_max_bs=512, cuda_graph_bs=[1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512], disable_cuda_graph=True, disable_cuda_graph_padding=False, enable_profile_cuda_graph=False, enable_cudagraph_gc=False, enable_layerwise_nvtx_marker=False, enable_nccl_nvls=False, enable_symm_mem=False, disable_flashinfer_cutlass_moe_fp4_allgather=False, enable_tokenizer_batch_encode=False, disable_tokenizer_batch_decode=False, disable_outlines_disk_cache=False, disable_custom_all_reduce=False, enable_mscclpp=False, enable_torch_symm_mem=False, disable_overlap_schedule=False, enable_mixed_chunk=False, enable_dp_attention=True, enable_dp_lm_head=False, enable_two_batch_overlap=False, enable_single_batch_overlap=True, tbo_token_distribution_threshold=0.48, enable_torch_compile=False, enable_piecewise_cuda_graph=False, torch_compile_max_bs=32, piecewise_cuda_graph_max_tokens=4096, piecewise_cuda_graph_tokens=[4, 8, 12, 16, 20, 24, 28, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256, 288, 320, 352, 384, 416, 448, 480, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920, 2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072, 3200, 3328, 3456, 3584, 3712, 3840, 3968, 4096], piecewise_cuda_graph_compiler='eager', torchao_config='', enable_nan_detection=False, enable_p2p_check=False, triton_attention_reduce_in_fp32=False, triton_attention_num_kv_splits=8, triton_attention_split_tile_size=None, num_continuous_decode_steps=1, delete_ckpt_after_loading=False, enable_memory_saver=False, enable_weights_cpu_backup=False, enable_draft_weights_cpu_backup=False, allow_auto_truncate=False, enable_custom_logit_processor=False, flashinfer_mla_disable_ragged=False, disable_shared_experts_fusion=True, disable_chunked_prefix_cache=True, disable_fast_image_processor=False, keep_mm_feature_on_device=False, enable_return_hidden_states=False, scheduler_recv_interval=1, numa_node=None, enable_deterministic_inference=False, rl_on_policy_target=None, enable_attn_tp_input_scattered=False, enable_nsa_prefill_context_parallel=False, enable_dynamic_batch_tokenizer=False, dynamic_batch_tokenizer_batch_size=32, dynamic_batch_tokenizer_batch_timeout=0.002, debug_tensor_dump_output_folder=None, debug_tensor_dump_layers=None, debug_tensor_dump_input_file=None, debug_tensor_dump_inject=False, disaggregation_mode='prefill', disaggregation_transfer_backend='mooncake', disaggregation_bootstrap_port=30001, disaggregation_decode_tp=4, disaggregation_decode_dp=4, disaggregation_prefill_pp=1, disaggregation_ib_device=None, disaggregation_decode_enable_offload_kvcache=False, num_reserved_decode_tokens=512, disaggregation_decode_polling_interval=1, custom_weight_loader=[], weight_loader_disable_mmap=False, remote_instance_weight_loader_seed_instance_ip=None, remote_instance_weight_loader_seed_instance_service_port=None, remote_instance_weight_loader_send_weights_group_ports=None, enable_pdmux=False, pdmux_config_path=None, sm_group_num=8, mm_max_concurrent_calls=32, mm_per_request_timeout=10.0, enable_broadcast_mm_inputs_process=False, decrypted_config_file=None, decrypted_draft_config_file=None, mm_enable_dp_encoder=False, hooks=None)   
+[2025-11-20 04:38:04] server_args=ServerArgs(model_path='/model/', tokenizer_path='/model/', tokenizer_mode='auto', tokenizer_worker_num=1, skip_tokenizer_init=True, load_format='auto', model_loader_extra_config='{}', trust_remote_code=True, context_length=2176, is_embedding=False, enable_multimodal=None, revision=None, model_impl='auto', host='0.0.0.0', port=30000, fastapi_root_path='', grpc_mode=False, skip_server_warmup=False, warmups=None, nccl_port=None, checkpoint_engine_wait_weights_before_ready=False, dtype='auto', quantization='modelopt_fp4', quantization_param_path=None, kv_cache_dtype='fp8_e4m3', enable_fp32_lm_head=False, modelopt_quant=None, modelopt_checkpoint_restore_path=None, modelopt_checkpoint_save_path=None, modelopt_export_path=None, quantize_and_serve=False, mem_fraction_static=0.84, max_running_requests=30000, max_queued_requests=None, max_total_tokens=131072, chunked_prefill_size=16384, max_prefill_tokens=32768, schedule_policy='fcfs', enable_priority_scheduling=False, abort_on_priority_when_disabled=False, schedule_low_priority_values_first=False, priority_scheduling_preemption_threshold=10, schedule_conservativeness=0.3, page_size=64, hybrid_kvcache_ratio=None, swa_full_tokens_ratio=0.8, disable_hybrid_swa_memory=False, radix_eviction_policy='lru', device='cuda', tp_size=4, pp_size=1, pp_max_micro_batch_size=None, stream_interval=50, stream_output=False, random_seed=406592327, constrained_json_whitespace_pattern=None, constrained_json_disable_any_whitespace=False, watchdog_timeout=1000000.0, dist_timeout=None, download_dir=None, base_gpu_id=0, gpu_id_step=1, sleep_on_idle=False, mm_process_config={}, log_level='debug', log_level_http=None, log_requests=False, log_requests_level=2, crash_dump_folder=None, show_time_cost=False, enable_metrics=False, enable_metrics_for_all_schedulers=False, tokenizer_metrics_custom_labels_header='x-custom-labels', tokenizer_metrics_allowed_custom_labels=None, bucket_time_to_first_token=None, bucket_inter_token_latency=None, bucket_e2e_request_latency=None, collect_tokens_histogram=False, prompt_tokens_buckets=None, generation_tokens_buckets=None, gc_warning_threshold_secs=0.0, decode_log_interval=1000, enable_request_time_stats_logging=False, kv_events_config=None, enable_trace=False, otlp_traces_endpoint='localhost:4317', export_metrics_to_file=False, export_metrics_to_file_dir=None, api_key=None, served_model_name='deepseek-ai/DeepSeek-R1', weight_version='default', chat_template=None, completion_template=None, file_storage_path='sglang_storage', enable_cache_report=False, reasoning_parser=None, tool_call_parser=None, tool_server=None, sampling_defaults='model', dp_size=4, load_balance_method='round_robin', load_watch_interval=0.1, prefill_round_robin_balance=False, dist_init_addr='10.40.1.145:29500', nnodes=1, node_rank=0, json_model_override_args='{}', preferred_sampling_params=None, enable_lora=None, max_lora_rank=None, lora_target_modules=None, lora_paths=None, max_loaded_loras=None, max_loras_per_batch=8, lora_eviction_policy='lru', lora_backend='csgmv', max_lora_chunk_size=16, attention_backend='trtllm_mla', decode_attention_backend=None, prefill_attention_backend=None, sampling_backend='flashinfer', grammar_backend='xgrammar', mm_attention_backend=None, nsa_prefill_backend='flashmla_sparse', nsa_decode_backend='fa3', speculative_algorithm=None, speculative_draft_model_path=None, speculative_draft_model_revision=None, speculative_draft_load_format=None, speculative_num_steps=None, speculative_eagle_topk=None, speculative_num_draft_tokens=None, speculative_accept_threshold_single=1.0, speculative_accept_threshold_acc=1.0, speculative_token_map=None, speculative_attention_mode='prefill', speculative_moe_runner_backend=None, speculative_ngram_min_match_window_size=1, speculative_ngram_max_match_window_size=12, speculative_ngram_min_bfs_breadth=1, speculative_ngram_max_bfs_breadth=10, speculative_ngram_match_type='BFS', speculative_ngram_branch_length=18, speculative_ngram_capacity=10000000, ep_size=4, moe_a2a_backend='none', moe_runner_backend='flashinfer_cutlass', flashinfer_mxfp4_moe_precision='default', enable_flashinfer_allreduce_fusion=False, deepep_mode='auto', ep_num_redundant_experts=0, ep_dispatch_algorithm='static', init_expert_location='trivial', enable_eplb=False, eplb_algorithm='deepseek', eplb_rebalance_num_iterations=1000, eplb_rebalance_layers_per_chunk=None, eplb_min_rebalancing_utilization_threshold=1.0, expert_distribution_recorder_mode=None, expert_distribution_recorder_buffer_size=1000, enable_expert_distribution_metrics=False, deepep_config=None, moe_dense_tp_size=None, elastic_ep_backend=None, mooncake_ib_device=None, max_mamba_cache_size=None, mamba_ssm_dtype='float32', mamba_full_memory_ratio=0.9, enable_hierarchical_cache=False, hicache_ratio=2.0, hicache_size=0, hicache_write_policy='write_through', hicache_io_backend='kernel', hicache_mem_layout='layer_first', hicache_storage_backend=None, hicache_storage_prefetch_policy='best_effort', hicache_storage_backend_extra_config=None, enable_lmcache=False, kt_weight_path=None, kt_method='AMXINT4', kt_cpuinfer=None, kt_threadpool_count=2, kt_num_gpu_experts=None, kt_max_deferred_experts_per_token=None, enable_double_sparsity=False, ds_channel_config_path=None, ds_heavy_channel_num=32, ds_heavy_token_num=256, ds_heavy_channel_type='qk', ds_sparse_decode_threshold=4096, cpu_offload_gb=0, offload_group_size=-1, offload_num_in_group=1, offload_prefetch_step=1, offload_mode='cpu', multi_item_scoring_delimiter=None, disable_radix_cache=True, cuda_graph_max_bs=512, cuda_graph_bs=[1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512], disable_cuda_graph=True, disable_cuda_graph_padding=False, enable_profile_cuda_graph=False, enable_cudagraph_gc=False, enable_layerwise_nvtx_marker=False, enable_nccl_nvls=False, enable_symm_mem=False, disable_flashinfer_cutlass_moe_fp4_allgather=False, enable_tokenizer_batch_encode=False, disable_tokenizer_batch_decode=False, disable_outlines_disk_cache=False, disable_custom_all_reduce=False, enable_mscclpp=False, enable_torch_symm_mem=False, disable_overlap_schedule=False, enable_mixed_chunk=False, enable_dp_attention=True, enable_dp_lm_head=False, enable_two_batch_overlap=False, enable_single_batch_overlap=True, tbo_token_distribution_threshold=0.48, enable_torch_compile=False, enable_piecewise_cuda_graph=False, torch_compile_max_bs=32, piecewise_cuda_graph_max_tokens=4096, piecewise_cuda_graph_tokens=[4, 8, 12, 16, 20, 24, 28, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256, 288, 320, 352, 384, 416, 448, 480, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920, 2048, 2176, 2304, 2432, 2560, 2688, 2816, 2944, 3072, 3200, 3328, 3456, 3584, 3712, 3840, 3968, 4096], piecewise_cuda_graph_compiler='eager', torchao_config='', enable_nan_detection=False, enable_p2p_check=False, triton_attention_reduce_in_fp32=False, triton_attention_num_kv_splits=8, triton_attention_split_tile_size=None, num_continuous_decode_steps=1, delete_ckpt_after_loading=False, enable_memory_saver=False, enable_weights_cpu_backup=False, enable_draft_weights_cpu_backup=False, allow_auto_truncate=False, enable_custom_logit_processor=False, flashinfer_mla_disable_ragged=False, disable_shared_experts_fusion=True, disable_chunked_prefix_cache=True, disable_fast_image_processor=False, keep_mm_feature_on_device=False, enable_return_hidden_states=False, scheduler_recv_interval=1, numa_node=None, enable_deterministic_inference=False, rl_on_policy_target=None, enable_attn_tp_input_scattered=False, enable_nsa_prefill_context_parallel=False, enable_dynamic_batch_tokenizer=False, dynamic_batch_tokenizer_batch_size=32, dynamic_batch_tokenizer_batch_timeout=0.002, debug_tensor_dump_output_folder=None, debug_tensor_dump_layers=None, debug_tensor_dump_input_file=None, debug_tensor_dump_inject=False, disaggregation_mode='prefill', disaggregation_transfer_backend='mooncake', disaggregation_bootstrap_port=30001, disaggregation_decode_tp=4, disaggregation_decode_dp=4, disaggregation_prefill_pp=1, disaggregation_ib_device=None, disaggregation_decode_enable_offload_kvcache=False, num_reserved_decode_tokens=512, disaggregation_decode_polling_interval=1, custom_weight_loader=[], weight_loader_disable_mmap=False, remote_instance_weight_loader_seed_instance_ip=None, remote_instance_weight_loader_seed_instance_service_port=None, remote_instance_weight_loader_send_weights_group_ports=None, enable_pdmux=False, pdmux_config_path=None, sm_group_num=8, mm_max_concurrent_calls=32, mm_per_request_timeout=10.0, enable_broadcast_mm_inputs_process=False, decrypted_config_file=None, decrypted_draft_config_file=None, mm_enable_dp_encoder=False, hooks=None)
+[2025-11-20 04:38:04] No HuggingFace chat template found
+[2025-11-20 04:38:04] No chat template found, defaulting to 'string' content format
+[2025-11-20 04:38:09] Assigned port 33789 to worker 0
+[2025-11-20 04:38:09] Assigned port 37859 to worker 1
+[2025-11-20 04:38:09] Assigned port 44571 to worker 2
+[2025-11-20 04:38:09] Assigned port 36729 to worker 3
+[2025-11-20 04:38:09] Broadcasting worker ports to 0 client nodes
+[2025-11-20 04:38:09] Worker ports: [33789, 37859, 44571, 36729]
+[2025-11-20 04:38:09] Worker port broadcast completed
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+[2025-11-20 04:38:15 DP2 TP2 EP2] Init torch distributed begin.
+[2025-11-20 04:38:15 DP2 TP2 EP2] world_size=4 rank=2 local_rank=2 distributed_init_method=tcp://10.40.1.145:29500 backend=nccl
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+[2025-11-20 04:38:15 DP1 TP1 EP1] Init torch distributed begin.
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+[2025-11-20 04:38:15 DP3 TP3 EP3] Init torch distributed begin.
+[2025-11-20 04:38:15 DP1 TP1 EP1] world_size=4 rank=1 local_rank=1 distributed_init_method=tcp://10.40.1.145:29500 backend=nccl
+[2025-11-20 04:38:15 DP3 TP3 EP3] world_size=4 rank=3 local_rank=3 distributed_init_method=tcp://10.40.1.145:29500 backend=nccl
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+The module name  (originally ) is not a valid Python identifier. Please rename the original module to avoid import issues.
+[2025-11-20 04:38:16 DP0 TP0 EP0] Init torch distributed begin.
+[2025-11-20 04:38:16 DP0 TP0 EP0] world_size=4 rank=0 local_rank=0 distributed_init_method=tcp://10.40.1.145:29500 backend=nccl
+[2025-11-20 04:38:16 DP2 TP2 EP2] Found nccl from library libnccl.so.2
+[2025-11-20 04:38:16 DP1 TP1 EP1] Found nccl from library libnccl.so.2
+[2025-11-20 04:38:16 DP3 TP3 EP3] Found nccl from library libnccl.so.2
+[2025-11-20 04:38:16 DP0 TP0 EP0] Found nccl from library libnccl.so.2
+[2025-11-20 04:38:16 DP0 TP0 EP0] sglang is using nccl==2.27.3
+[2025-11-20 04:38:18 DP0 TP0 EP0] Init torch distributed ends. mem usage=1.11 GB
+[2025-11-20 04:38:18 DP1 TP1 EP1] Init torch distributed ends. mem usage=1.11 GB
+[2025-11-20 04:38:18 DP3 TP3 EP3] Init torch distributed ends. mem usage=1.11 GB
+[2025-11-20 04:38:18 DP2 TP2 EP2] Init torch distributed ends. mem usage=1.11 GB
+[2025-11-20 04:38:18 DP1 TP1 EP1] Initializing MLIR with module: _site_initialize_0
+[2025-11-20 04:38:18 DP1 TP1 EP1] Registering dialects from initializer <module 'cutlass._mlir._mlir_libs._site_initialize_0' from '/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/_mlir/_mlir_libs/_site_initialize_0.cpython-312-aarch64-linux-gnu.so'>
+[2025-11-20 04:38:18 DP0 TP0 EP0] Initializing MLIR with module: _site_initialize_0
+[2025-11-20 04:38:18 DP0 TP0 EP0] Registering dialects from initializer <module 'cutlass._mlir._mlir_libs._site_initialize_0' from '/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/_mlir/_mlir_libs/_site_initialize_0.cpython-312-aarch64-linux-gnu.so'>
+[2025-11-20 04:38:18 DP3 TP3 EP3] Initializing MLIR with module: _site_initialize_0
+[2025-11-20 04:38:18 DP3 TP3 EP3] Registering dialects from initializer <module 'cutlass._mlir._mlir_libs._site_initialize_0' from '/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/_mlir/_mlir_libs/_site_initialize_0.cpython-312-aarch64-linux-gnu.so'>
+[2025-11-20 04:38:18 DP2 TP2 EP2] Initializing MLIR with module: _site_initialize_0
+[2025-11-20 04:38:18 DP2 TP2 EP2] Registering dialects from initializer <module 'cutlass._mlir._mlir_libs._site_initialize_0' from '/usr/local/lib/python3.12/dist-packages/nvidia_cutlass_dsl/python_packages/cutlass/_mlir/_mlir_libs/_site_initialize_0.cpython-312-aarch64-linux-gnu.so'>
+[2025-11-20 04:38:19 DP1 TP1 EP1] Ignore import error when loading sglang.srt.models.mindspore: name 'ms' is not defined
+[2025-11-20 04:38:19 DP2 TP2 EP2] Ignore import error when loading sglang.srt.models.mindspore: name 'ms' is not defined
+[2025-11-20 04:38:19 DP0 TP0 EP0] Ignore import error when loading sglang.srt.models.mindspore: name 'ms' is not defined
+[2025-11-20 04:38:19 DP3 TP3 EP3] Ignore import error when loading sglang.srt.models.mindspore: name 'ms' is not defined
+[2025-11-20 04:38:20 DP0 TP0 EP0] Load weight begin. avail mem=182.15 GB
+[2025-11-20 04:38:20 DP0 TP0 EP0] Using ModelOptModelLoader due to ModelOpt quantization config.
+[2025-11-20 04:38:20 DP0 TP0 EP0] ModelOptModelLoader: Loading base model...
+[2025-11-20 04:38:20 DP0 TP0 EP0] Model is already quantized, loading directly...
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected nvfp4 checkpoint. Please note that the format is experimental and subject to change.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP2 TP2 EP2] Load weight begin. avail mem=182.16 GB
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP2 TP2 EP2] Using ModelOptModelLoader due to ModelOpt quantization config.
+[2025-11-20 04:38:20 DP2 TP2 EP2] ModelOptModelLoader: Loading base model...
+[2025-11-20 04:38:20 DP2 TP2 EP2] Model is already quantized, loading directly...
+[2025-11-20 04:38:20 DP2 TP2 EP2] Detected nvfp4 checkpoint. Please note that the format is experimental and subject to change.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP3 TP3 EP3] Load weight begin. avail mem=182.16 GB
+[2025-11-20 04:38:20 DP3 TP3 EP3] Using ModelOptModelLoader due to ModelOpt quantization config.
+[2025-11-20 04:38:20 DP3 TP3 EP3] ModelOptModelLoader: Loading base model...
+[2025-11-20 04:38:20 DP3 TP3 EP3] Model is already quantized, loading directly...
+[2025-11-20 04:38:20 DP3 TP3 EP3] Detected nvfp4 checkpoint. Please note that the format is experimental and subject to change.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP1 TP1 EP1] Load weight begin. avail mem=182.15 GB
+[2025-11-20 04:38:20 DP1 TP1 EP1] Using ModelOptModelLoader due to ModelOpt quantization config.
+[2025-11-20 04:38:20 DP1 TP1 EP1] ModelOptModelLoader: Loading base model...
+[2025-11-20 04:38:20 DP1 TP1 EP1] Model is already quantized, loading directly...
+[2025-11-20 04:38:20 DP1 TP1 EP1] Detected nvfp4 checkpoint. Please note that the format is experimental and subject to change.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:20 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:21 DP0 TP0 EP0] Detected fp8 checkpoint.
+[2025-11-20 04:38:22 DP0 TP0 EP0] Detected fp8 checkpoint.
+
+Loading safetensors checkpoint shards:   0% Completed | 0/163 [00:00<?, ?it/s]
+
+Loading safetensors checkpoint shards:   1% Completed | 1/163 [00:00<00:32,  4.91it/s]
+
+Loading safetensors checkpoint shards:   1% Completed | 2/163 [00:00<00:26,  6.18it/s]
+
+Loading safetensors checkpoint shards:   2% Completed | 3/163 [00:00<00:56,  2.81it/s]
+
+Loading safetensors checkpoint shards:   2% Completed | 4/163 [00:01<01:12,  2.20it/s]
+
+Loading safetensors checkpoint shards:   3% Completed | 5/163 [00:02<01:18,  2.02it/s]
+
+Loading safetensors checkpoint shards:   4% Completed | 6/163 [00:02<01:31,  1.71it/s]
+
+Loading safetensors checkpoint shards:   4% Completed | 7/163 [00:03<01:12,  2.15it/s]
+
+Loading safetensors checkpoint shards:   5% Completed | 8/163 [00:03<01:16,  2.02it/s]
+
+Loading safetensors checkpoint shards:   6% Completed | 9/163 [00:04<01:18,  1.96it/s]
+
+Loading safetensors checkpoint shards:   6% Completed | 10/163 [00:04<01:19,  1.92it/s]
+
+Loading safetensors checkpoint shards:   7% Completed | 11/163 [00:05<01:28,  1.72it/s]
+
+Loading safetensors checkpoint shards:   8% Completed | 13/163 [00:06<01:08,  2.18it/s]
+
+Loading safetensors checkpoint shards:   9% Completed | 14/163 [00:06<01:03,  2.35it/s]
+
+Loading safetensors checkpoint shards:   9% Completed | 15/163 [00:06<01:08,  2.15it/s]
+
+Loading safetensors checkpoint shards:  10% Completed | 16/163 [00:07<01:14,  1.96it/s]
+
+Loading safetensors checkpoint shards:  10% Completed | 17/163 [00:08<01:14,  1.95it/s]
+
+Loading safetensors checkpoint shards:  11% Completed | 18/163 [00:08<01:15,  1.91it/s]
+
+Loading safetensors checkpoint shards:  12% Completed | 19/163 [00:09<01:13,  1.97it/s]
+
+Loading safetensors checkpoint shards:  12% Completed | 20/163 [00:09<01:09,  2.05it/s]
+
+Loading safetensors checkpoint shards:  13% Completed | 21/163 [00:10<01:10,  2.02it/s]
+
+Loading safetensors checkpoint shards:  13% Completed | 22/163 [00:10<00:58,  2.41it/s]
+
+Loading safetensors checkpoint shards:  14% Completed | 23/163 [00:10<01:05,  2.15it/s]
+
+Loading safetensors checkpoint shards:  15% Completed | 24/163 [00:11<01:12,  1.91it/s]
+
+Loading safetensors checkpoint shards:  15% Completed | 25/163 [00:12<01:13,  1.88it/s]
+
+Loading safetensors checkpoint shards:  16% Completed | 26/163 [00:12<01:14,  1.84it/s]
+
+Loading safetensors checkpoint shards:  17% Completed | 27/163 [00:13<01:15,  1.80it/s]
+
+Loading safetensors checkpoint shards:  17% Completed | 28/163 [00:13<01:15,  1.78it/s]
+
+Loading safetensors checkpoint shards:  18% Completed | 29/163 [00:14<01:14,  1.81it/s]
+
+Loading safetensors checkpoint shards:  18% Completed | 30/163 [00:14<01:14,  1.79it/s]
+
+Loading safetensors checkpoint shards:  19% Completed | 31/163 [00:15<01:15,  1.75it/s]
+
+Loading safetensors checkpoint shards:  20% Completed | 32/163 [00:16<01:14,  1.76it/s]
+
+Loading safetensors checkpoint shards:  20% Completed | 33/163 [00:16<01:15,  1.72it/s]
+
+Loading safetensors checkpoint shards:  21% Completed | 34/163 [00:17<01:17,  1.67it/s]
+
+Loading safetensors checkpoint shards:  21% Completed | 35/163 [00:17<01:16,  1.68it/s]
+
+Loading safetensors checkpoint shards:  22% Completed | 36/163 [00:18<01:07,  1.89it/s]
+
+Loading safetensors checkpoint shards:  23% Completed | 37/163 [00:18<00:57,  2.21it/s]
+
+Loading safetensors checkpoint shards:  23% Completed | 38/163 [00:19<01:04,  1.95it/s]
+
+Loading safetensors checkpoint shards:  24% Completed | 39/163 [00:19<01:04,  1.92it/s]
+
+Loading safetensors checkpoint shards:  25% Completed | 40/163 [00:20<01:07,  1.81it/s]
+
+Loading safetensors checkpoint shards:  25% Completed | 41/163 [00:21<01:09,  1.74it/s]
+
+Loading safetensors checkpoint shards:  26% Completed | 42/163 [00:21<01:10,  1.72it/s]
+
+Loading safetensors checkpoint shards:  26% Completed | 43/163 [00:22<01:07,  1.79it/s]
+
+Loading safetensors checkpoint shards:  27% Completed | 44/163 [00:22<01:09,  1.70it/s]
+
+Loading safetensors checkpoint shards:  28% Completed | 45/163 [00:23<01:10,  1.68it/s]
+
+Loading safetensors checkpoint shards:  28% Completed | 46/163 [00:23<01:01,  1.89it/s]
+
+Loading safetensors checkpoint shards:  29% Completed | 47/163 [00:24<01:03,  1.83it/s]
+
+Loading safetensors checkpoint shards:  29% Completed | 48/163 [00:25<01:08,  1.69it/s]
+
+Loading safetensors checkpoint shards:  30% Completed | 49/163 [00:25<01:10,  1.63it/s]
+
+Loading safetensors checkpoint shards:  31% Completed | 50/163 [00:26<01:11,  1.58it/s]
+
+Loading safetensors checkpoint shards:  31% Completed | 51/163 [00:26<00:57,  1.93it/s]
+
+Loading safetensors checkpoint shards:  32% Completed | 52/163 [00:27<00:53,  2.09it/s]
+
+Loading safetensors checkpoint shards:  33% Completed | 53/163 [00:27<00:54,  2.01it/s]
+
+Loading safetensors checkpoint shards:  33% Completed | 54/163 [00:28<00:52,  2.06it/s]
+
+Loading safetensors checkpoint shards:  34% Completed | 55/163 [00:28<00:57,  1.89it/s]
+
+Loading safetensors checkpoint shards:  34% Completed | 56/163 [00:29<00:58,  1.82it/s]
+
+Loading safetensors checkpoint shards:  35% Completed | 57/163 [00:29<00:58,  1.82it/s]
+
+Loading safetensors checkpoint shards:  36% Completed | 58/163 [00:30<01:01,  1.71it/s]
+
+Loading safetensors checkpoint shards:  36% Completed | 59/163 [00:31<01:00,  1.71it/s]
+
+Loading safetensors checkpoint shards:  37% Completed | 60/163 [00:31<00:51,  2.02it/s]
+
+Loading safetensors checkpoint shards:  37% Completed | 61/163 [00:31<00:53,  1.89it/s]
+
+Loading safetensors checkpoint shards:  38% Completed | 62/163 [00:32<00:53,  1.89it/s]
+
+Loading safetensors checkpoint shards:  39% Completed | 63/163 [00:33<00:53,  1.88it/s]
+
+Loading safetensors checkpoint shards:  39% Completed | 64/163 [00:33<00:55,  1.77it/s]
+
+Loading safetensors checkpoint shards:  40% Completed | 65/163 [00:34<00:57,  1.69it/s]
+
+Loading safetensors checkpoint shards:  40% Completed | 66/163 [00:34<00:48,  2.01it/s]
+
+Loading safetensors checkpoint shards:  41% Completed | 67/163 [00:35<00:49,  1.95it/s]
+
+Loading safetensors checkpoint shards:  42% Completed | 68/163 [00:35<00:47,  1.98it/s]
+
+Loading safetensors checkpoint shards:  42% Completed | 69/163 [00:36<00:50,  1.87it/s]
+
+Loading safetensors checkpoint shards:  43% Completed | 70/163 [00:36<00:51,  1.80it/s]
+
+Loading safetensors checkpoint shards:  44% Completed | 71/163 [00:37<00:51,  1.78it/s]
+
+Loading safetensors checkpoint shards:  45% Completed | 73/163 [00:37<00:38,  2.31it/s]
+
+Loading safetensors checkpoint shards:  45% Completed | 74/163 [00:38<00:40,  2.19it/s]
+
+Loading safetensors checkpoint shards:  46% Completed | 75/163 [00:39<00:43,  2.01it/s]
+
+Loading safetensors checkpoint shards:  47% Completed | 76/163 [00:39<00:46,  1.89it/s]
+
+Loading safetensors checkpoint shards:  47% Completed | 77/163 [00:40<00:46,  1.86it/s]
+
+Loading safetensors checkpoint shards:  48% Completed | 78/163 [00:40<00:47,  1.79it/s]
+
+Loading safetensors checkpoint shards:  48% Completed | 79/163 [00:41<00:47,  1.76it/s]
+
+Loading safetensors checkpoint shards:  49% Completed | 80/163 [00:41<00:45,  1.84it/s]
+
+Loading safetensors checkpoint shards:  50% Completed | 81/163 [00:42<00:44,  1.83it/s]
+
+Loading safetensors checkpoint shards:  50% Completed | 82/163 [00:43<00:44,  1.83it/s]
+
+Loading safetensors checkpoint shards:  51% Completed | 83/163 [00:43<00:44,  1.81it/s]
+
+Loading safetensors checkpoint shards:  52% Completed | 84/163 [00:43<00:36,  2.16it/s]
+
+Loading safetensors checkpoint shards:  52% Completed | 85/163 [00:44<00:39,  1.96it/s]
+
+Loading safetensors checkpoint shards:  53% Completed | 86/163 [00:45<00:41,  1.85it/s]
+
+Loading safetensors checkpoint shards:  53% Completed | 87/163 [00:45<00:40,  1.86it/s]
+
+Loading safetensors checkpoint shards:  54% Completed | 88/163 [00:46<00:39,  1.90it/s]
+
+Loading safetensors checkpoint shards:  55% Completed | 89/163 [00:46<00:40,  1.83it/s]
+
+Loading safetensors checkpoint shards:  55% Completed | 90/163 [00:47<00:40,  1.82it/s]
+
+Loading safetensors checkpoint shards:  56% Completed | 91/163 [00:47<00:39,  1.84it/s]
+
+Loading safetensors checkpoint shards:  56% Completed | 92/163 [00:48<00:40,  1.74it/s]
+
+Loading safetensors checkpoint shards:  57% Completed | 93/163 [00:49<00:39,  1.75it/s]
+
+Loading safetensors checkpoint shards:  58% Completed | 94/163 [00:49<00:31,  2.19it/s]
+
+Loading safetensors checkpoint shards:  58% Completed | 95/163 [00:49<00:25,  2.62it/s]
+
+Loading safetensors checkpoint shards:  59% Completed | 96/163 [00:50<00:29,  2.27it/s]
+
+Loading safetensors checkpoint shards:  60% Completed | 97/163 [00:50<00:33,  1.99it/s]
+
+Loading safetensors checkpoint shards:  60% Completed | 98/163 [00:51<00:35,  1.86it/s]
+
+Loading safetensors checkpoint shards:  61% Completed | 99/163 [00:51<00:34,  1.85it/s]
+
+Loading safetensors checkpoint shards:  61% Completed | 100/163 [00:52<00:34,  1.81it/s]
+
+Loading safetensors checkpoint shards:  62% Completed | 101/163 [00:52<00:33,  1.88it/s]
+
+Loading safetensors checkpoint shards:  63% Completed | 102/163 [00:53<00:33,  1.81it/s]
+
+Loading safetensors checkpoint shards:  63% Completed | 103/163 [00:54<00:33,  1.78it/s]
+
+Loading safetensors checkpoint shards:  64% Completed | 104/163 [00:54<00:33,  1.75it/s]
+
+Loading safetensors checkpoint shards:  64% Completed | 105/163 [00:55<00:30,  1.88it/s]
+
+Loading safetensors checkpoint shards:  65% Completed | 106/163 [00:55<00:28,  1.97it/s]
+
+Loading safetensors checkpoint shards:  66% Completed | 107/163 [00:56<00:29,  1.88it/s]
+
+Loading safetensors checkpoint shards:  66% Completed | 108/163 [00:56<00:30,  1.78it/s]
+
+Loading safetensors checkpoint shards:  67% Completed | 109/163 [00:57<00:30,  1.79it/s]
+
+Loading safetensors checkpoint shards:  67% Completed | 110/163 [00:57<00:29,  1.77it/s]
+
+Loading safetensors checkpoint shards:  68% Completed | 111/163 [00:58<00:26,  2.00it/s]
+
+Loading safetensors checkpoint shards:  69% Completed | 112/163 [00:58<00:25,  1.97it/s]
+
+Loading safetensors checkpoint shards:  69% Completed | 113/163 [00:58<00:19,  2.58it/s]
+
+Loading safetensors checkpoint shards:  70% Completed | 114/163 [00:59<00:17,  2.80it/s]
+
+Loading safetensors checkpoint shards:  71% Completed | 115/163 [00:59<00:20,  2.35it/s]
+
+Loading safetensors checkpoint shards:  71% Completed | 116/163 [01:00<00:18,  2.52it/s]
+
+Loading safetensors checkpoint shards:  72% Completed | 117/163 [01:00<00:17,  2.58it/s]
+
+Loading safetensors checkpoint shards:  72% Completed | 118/163 [01:00<00:14,  3.14it/s]
+
+Loading safetensors checkpoint shards:  74% Completed | 120/163 [01:01<00:12,  3.56it/s]
+
+Loading safetensors checkpoint shards:  75% Completed | 122/163 [01:01<00:08,  4.81it/s]
+
+Loading safetensors checkpoint shards:  75% Completed | 123/163 [01:01<00:09,  4.41it/s]
+
+Loading safetensors checkpoint shards:  76% Completed | 124/163 [01:01<00:10,  3.88it/s]
+
+Loading safetensors checkpoint shards:  77% Completed | 125/163 [01:02<00:10,  3.59it/s]
+
+Loading safetensors checkpoint shards:  77% Completed | 126/163 [01:02<00:09,  3.73it/s]
+
+Loading safetensors checkpoint shards:  78% Completed | 127/163 [01:02<00:09,  3.69it/s]
+
+Loading safetensors checkpoint shards:  79% Completed | 128/163 [01:03<00:10,  3.20it/s]
+
+Loading safetensors checkpoint shards:  79% Completed | 129/163 [01:03<00:10,  3.13it/s]
+
+Loading safetensors checkpoint shards:  80% Completed | 130/163 [01:03<00:10,  3.18it/s]
+
+Loading safetensors checkpoint shards:  80% Completed | 131/163 [01:04<00:10,  3.12it/s]
+
+Loading safetensors checkpoint shards:  81% Completed | 132/163 [01:04<00:11,  2.73it/s]
+
+Loading safetensors checkpoint shards:  82% Completed | 133/163 [01:05<00:11,  2.70it/s]
+
+Loading safetensors checkpoint shards:  82% Completed | 134/163 [01:05<00:11,  2.60it/s]
+
+Loading safetensors checkpoint shards:  83% Completed | 135/163 [01:06<00:12,  2.22it/s]
+
+Loading safetensors checkpoint shards:  83% Completed | 136/163 [01:06<00:11,  2.36it/s]
+
+Loading safetensors checkpoint shards:  84% Completed | 137/163 [01:06<00:09,  2.80it/s]
+
+Loading safetensors checkpoint shards:  85% Completed | 138/163 [01:06<00:08,  2.96it/s]
+
+Loading safetensors checkpoint shards:  85% Completed | 139/163 [01:07<00:07,  3.05it/s]
+
+Loading safetensors checkpoint shards:  86% Completed | 140/163 [01:07<00:09,  2.52it/s]
+
+Loading safetensors checkpoint shards:  87% Completed | 141/163 [01:08<00:09,  2.30it/s]
+
+Loading safetensors checkpoint shards:  87% Completed | 142/163 [01:08<00:08,  2.62it/s]
+
+Loading safetensors checkpoint shards:  88% Completed | 143/163 [01:09<00:09,  2.19it/s]
+
+Loading safetensors checkpoint shards:  88% Completed | 144/163 [01:09<00:07,  2.55it/s]
+
+Loading safetensors checkpoint shards:  89% Completed | 145/163 [01:09<00:07,  2.48it/s]
+
+Loading safetensors checkpoint shards:  90% Completed | 146/163 [01:10<00:07,  2.25it/s]
+
+Loading safetensors checkpoint shards:  90% Completed | 147/163 [01:10<00:07,  2.09it/s]
+
+Loading safetensors checkpoint shards:  91% Completed | 148/163 [01:11<00:06,  2.49it/s]
+
+Loading safetensors checkpoint shards:  91% Completed | 149/163 [01:11<00:06,  2.20it/s]
+
+Loading safetensors checkpoint shards:  92% Completed | 150/163 [01:12<00:06,  2.06it/s]
+
+Loading safetensors checkpoint shards:  93% Completed | 151/163 [01:12<00:06,  1.91it/s]
+
+Loading safetensors checkpoint shards:  93% Completed | 152/163 [01:13<00:06,  1.81it/s]
+
+Loading safetensors checkpoint shards:  94% Completed | 153/163 [01:14<00:05,  1.78it/s]
+
+Loading safetensors checkpoint shards:  94% Completed | 154/163 [01:14<00:05,  1.76it/s]
+
+Loading safetensors checkpoint shards:  95% Completed | 155/163 [01:15<00:04,  1.71it/s]
+
+Loading safetensors checkpoint shards:  96% Completed | 157/163 [01:16<00:02,  2.17it/s]
+
+Loading safetensors checkpoint shards:  97% Completed | 158/163 [01:16<00:02,  2.08it/s]
+
+Loading safetensors checkpoint shards:  98% Completed | 159/163 [01:17<00:01,  2.09it/s]
+
+Loading safetensors checkpoint shards:  98% Completed | 160/163 [01:17<00:01,  1.94it/s]
+
+Loading safetensors checkpoint shards:  99% Completed | 161/163 [01:18<00:01,  1.82it/s]
+
+Loading safetensors checkpoint shards:  99% Completed | 162/163 [01:18<00:00,  1.77it/s]
+
+Loading safetensors checkpoint shards: 100% Completed | 163/163 [01:19<00:00,  1.76it/s]
+
+Loading safetensors checkpoint shards: 100% Completed | 163/163 [01:19<00:00,  2.05it/s]
+
+
+quant attn to fp8 ue8m0:   0%|          | 0/61 [00:00<?, ?it/s]
+quant attn to fp8 ue8m0:   0%|          | 0/61 [00:00<?, ?it/s]
+quant attn to fp8 ue8m0:   0%|          | 0/61 [00:00<?, ?it/s]
+quant attn to fp8 ue8m0:   0%|          | 0/61 [00:00<?, ?it/s]
+quant attn to fp8 ue8m0:   2%|▏         | 1/61 [00:00<00:11,  5.23it/s]
+quant attn to fp8 ue8m0:   2%|▏         | 1/61 [00:00<00:11,  5.21it/s]
+quant attn to fp8 ue8m0:   2%|▏         | 1/61 [00:00<00:11,  5.20it/s]
+quant attn to fp8 ue8m0:   2%|▏         | 1/61 [00:00<00:11,  5.20it/s]
+quant attn to fp8 ue8m0:   3%|▎         | 2/61 [00:00<00:12,  4.83it/s]
+quant attn to fp8 ue8m0:   3%|▎         | 2/61 [00:00<00:12,  4.82it/s]
+quant attn to fp8 ue8m0:   3%|▎         | 2/61 [00:00<00:12,  4.82it/s]
+quant attn to fp8 ue8m0:   3%|▎         | 2/61 [00:00<00:12,  4.82it/s]
+quant attn to fp8 ue8m0:   5%|▍         | 3/61 [00:00<00:11,  5.20it/s]
+quant attn to fp8 ue8m0:   5%|▍         | 3/61 [00:00<00:11,  5.20it/s]
+quant attn to fp8 ue8m0:   5%|▍         | 3/61 [00:00<00:11,  5.19it/s]
+quant attn to fp8 ue8m0:   5%|▍         | 3/61 [00:00<00:11,  5.19it/s]
+quant attn to fp8 ue8m0:   7%|▋         | 4/61 [00:00<00:10,  5.30it/s]
+quant attn to fp8 ue8m0:   7%|▋         | 4/61 [00:00<00:10,  5.29it/s]
+quant attn to fp8 ue8m0:   7%|▋         | 4/61 [00:00<00:10,  5.28it/s]
+quant attn to fp8 ue8m0:   7%|▋         | 4/61 [00:00<00:10,  5.28it/s]
+quant attn to fp8 ue8m0:   8%|▊         | 5/61 [00:00<00:10,  5.49it/s]
+quant attn to fp8 ue8m0:   8%|▊         | 5/61 [00:00<00:10,  5.48it/s]
+quant attn to fp8 ue8m0:   8%|▊         | 5/61 [00:00<00:10,  5.48it/s]
+quant attn to fp8 ue8m0:   8%|▊         | 5/61 [00:00<00:10,  5.48it/s]
+quant attn to fp8 ue8m0:  10%|▉         | 6/61 [00:01<00:13,  4.16it/s]
+quant attn to fp8 ue8m0:  10%|▉         | 6/61 [00:01<00:13,  4.16it/s]
+quant attn to fp8 ue8m0:  10%|▉         | 6/61 [00:01<00:13,  4.16it/s]
+quant attn to fp8 ue8m0:  10%|▉         | 6/61 [00:01<00:13,  4.16it/s]
+quant attn to fp8 ue8m0:  11%|█▏        | 7/61 [00:01<00:13,  3.87it/s]
+quant attn to fp8 ue8m0:  11%|█▏        | 7/61 [00:01<00:13,  3.87it/s]
+quant attn to fp8 ue8m0:  11%|█▏        | 7/61 [00:01<00:13,  3.87it/s]
+quant attn to fp8 ue8m0:  11%|█▏        | 7/61 [00:01<00:13,  3.87it/s]
+quant attn to fp8 ue8m0:  13%|█▎        | 8/61 [00:01<00:15,  3.51it/s]
+quant attn to fp8 ue8m0:  13%|█▎        | 8/61 [00:01<00:15,  3.51it/s]
+quant attn to fp8 ue8m0:  13%|█▎        | 8/61 [00:01<00:15,  3.51it/s]
+quant attn to fp8 ue8m0:  13%|█▎        | 8/61 [00:01<00:15,  3.50it/s]
+quant attn to fp8 ue8m0:  15%|█▍        | 9/61 [00:02<00:12,  4.07it/s]
+quant attn to fp8 ue8m0:  15%|█▍        | 9/61 [00:02<00:12,  4.06it/s]
+quant attn to fp8 ue8m0:  15%|█▍        | 9/61 [00:02<00:12,  4.06it/s]
+quant attn to fp8 ue8m0:  15%|█▍        | 9/61 [00:02<00:12,  4.07it/s]
+quant attn to fp8 ue8m0:  16%|█▋        | 10/61 [00:02<00:14,  3.55it/s]
+quant attn to fp8 ue8m0:  16%|█▋        | 10/61 [00:02<00:14,  3.56it/s]
+quant attn to fp8 ue8m0:  16%|█▋        | 10/61 [00:02<00:14,  3.56it/s]
+quant attn to fp8 ue8m0:  16%|█▋        | 10/61 [00:02<00:14,  3.56it/s]
+quant attn to fp8 ue8m0:  18%|█▊        | 11/61 [00:02<00:14,  3.35it/s]
+quant attn to fp8 ue8m0:  18%|█▊        | 11/61 [00:02<00:14,  3.35it/s]
+quant attn to fp8 ue8m0:  18%|█▊        | 11/61 [00:02<00:14,  3.35it/s]
+quant attn to fp8 ue8m0:  18%|█▊        | 11/61 [00:02<00:14,  3.35it/s]
+quant attn to fp8 ue8m0:  20%|█▉        | 12/61 [00:02<00:13,  3.69it/s]
+quant attn to fp8 ue8m0:  20%|█▉        | 12/61 [00:02<00:13,  3.69it/s]
+quant attn to fp8 ue8m0:  20%|█▉        | 12/61 [00:02<00:13,  3.68it/s]
+quant attn to fp8 ue8m0:  20%|█▉        | 12/61 [00:02<00:13,  3.69it/s]
+quant attn to fp8 ue8m0:  21%|██▏       | 13/61 [00:03<00:12,  3.88it/s]
+quant attn to fp8 ue8m0:  21%|██▏       | 13/61 [00:03<00:12,  3.88it/s]
+quant attn to fp8 ue8m0:  21%|██▏       | 13/61 [00:03<00:12,  3.88it/s]
+quant attn to fp8 ue8m0:  21%|██▏       | 13/61 [00:03<00:12,  3.87it/s]
+quant attn to fp8 ue8m0:  23%|██▎       | 14/61 [00:03<00:10,  4.51it/s]
+quant attn to fp8 ue8m0:  23%|██▎       | 14/61 [00:03<00:10,  4.51it/s]
+quant attn to fp8 ue8m0:  23%|██▎       | 14/61 [00:03<00:10,  4.51it/s]
+quant attn to fp8 ue8m0:  23%|██▎       | 14/61 [00:03<00:10,  4.50it/s]
+quant attn to fp8 ue8m0:  25%|██▍       | 15/61 [00:03<00:12,  3.78it/s]
+quant attn to fp8 ue8m0:  25%|██▍       | 15/61 [00:03<00:12,  3.78it/s]
+quant attn to fp8 ue8m0:  25%|██▍       | 15/61 [00:03<00:12,  3.78it/s]
+quant attn to fp8 ue8m0:  25%|██▍       | 15/61 [00:03<00:12,  3.78it/s]
+quant attn to fp8 ue8m0:  26%|██▌       | 16/61 [00:03<00:11,  4.03it/s]
+quant attn to fp8 ue8m0:  26%|██▌       | 16/61 [00:03<00:11,  4.02it/s]
+quant attn to fp8 ue8m0:  26%|██▌       | 16/61 [00:03<00:11,  4.02it/s]
+quant attn to fp8 ue8m0:  26%|██▌       | 16/61 [00:03<00:11,  4.02it/s]
+quant attn to fp8 ue8m0:  28%|██▊       | 17/61 [00:04<00:11,  3.94it/s]
+quant attn to fp8 ue8m0:  28%|██▊       | 17/61 [00:04<00:11,  3.94it/s]
+quant attn to fp8 ue8m0:  28%|██▊       | 17/61 [00:04<00:11,  3.94it/s]
+quant attn to fp8 ue8m0:  28%|██▊       | 17/61 [00:04<00:11,  3.94it/s]
+quant attn to fp8 ue8m0:  30%|██▉       | 18/61 [00:04<00:09,  4.39it/s]
+quant attn to fp8 ue8m0:  30%|██▉       | 18/61 [00:04<00:09,  4.39it/s]
+quant attn to fp8 ue8m0:  30%|██▉       | 18/61 [00:04<00:09,  4.38it/s]
+quant attn to fp8 ue8m0:  30%|██▉       | 18/61 [00:04<00:09,  4.38it/s]
+quant attn to fp8 ue8m0:  31%|███       | 19/61 [00:04<00:11,  3.65it/s]
+quant attn to fp8 ue8m0:  31%|███       | 19/61 [00:04<00:11,  3.65it/s]
+quant attn to fp8 ue8m0:  31%|███       | 19/61 [00:04<00:11,  3.65it/s]
+quant attn to fp8 ue8m0:  31%|███       | 19/61 [00:04<00:11,  3.65it/s]
+quant attn to fp8 ue8m0:  33%|███▎      | 20/61 [00:05<00:11,  3.43it/s]
+quant attn to fp8 ue8m0:  33%|███▎      | 20/61 [00:05<00:11,  3.43it/s]
+quant attn to fp8 ue8m0:  33%|███▎      | 20/61 [00:05<00:11,  3.43it/s]
+quant attn to fp8 ue8m0:  33%|███▎      | 20/61 [00:05<00:11,  3.43it/s]
+quant attn to fp8 ue8m0:  34%|███▍      | 21/61 [00:05<00:11,  3.34it/s]
+quant attn to fp8 ue8m0:  34%|███▍      | 21/61 [00:05<00:11,  3.34it/s]
+quant attn to fp8 ue8m0:  34%|███▍      | 21/61 [00:05<00:11,  3.34it/s]
+quant attn to fp8 ue8m0:  34%|███▍      | 21/61 [00:05<00:11,  3.34it/s]
+quant attn to fp8 ue8m0:  36%|███▌      | 22/61 [00:05<00:11,  3.51it/s]
+quant attn to fp8 ue8m0:  36%|███▌      | 22/61 [00:05<00:11,  3.51it/s]
+quant attn to fp8 ue8m0:  36%|███▌      | 22/61 [00:05<00:11,  3.51it/s]
+quant attn to fp8 ue8m0:  36%|███▌      | 22/61 [00:05<00:11,  3.51it/s]
+quant attn to fp8 ue8m0:  38%|███▊      | 23/61 [00:05<00:09,  3.95it/s]
+quant attn to fp8 ue8m0:  38%|███▊      | 23/61 [00:05<00:09,  3.95it/s]
+quant attn to fp8 ue8m0:  38%|███▊      | 23/61 [00:05<00:09,  3.95it/s]
+quant attn to fp8 ue8m0:  38%|███▊      | 23/61 [00:05<00:09,  3.95it/s]
+quant attn to fp8 ue8m0:  39%|███▉      | 24/61 [00:06<00:10,  3.67it/s]
+quant attn to fp8 ue8m0:  39%|███▉      | 24/61 [00:06<00:10,  3.67it/s]
+quant attn to fp8 ue8m0:  39%|███▉      | 24/61 [00:06<00:10,  3.67it/s]
+quant attn to fp8 ue8m0:  39%|███▉      | 24/61 [00:06<00:10,  3.67it/s]
+quant attn to fp8 ue8m0:  41%|████      | 25/61 [00:06<00:09,  3.93it/s]
+quant attn to fp8 ue8m0:  41%|████      | 25/61 [00:06<00:09,  3.93it/s]
+quant attn to fp8 ue8m0:  41%|████      | 25/61 [00:06<00:09,  3.93it/s]
+quant attn to fp8 ue8m0:  41%|████      | 25/61 [00:06<00:09,  3.93it/s]
+quant attn to fp8 ue8m0:  43%|████▎     | 26/61 [00:06<00:09,  3.89it/s]
+quant attn to fp8 ue8m0:  43%|████▎     | 26/61 [00:06<00:09,  3.88it/s]
+quant attn to fp8 ue8m0:  43%|████▎     | 26/61 [00:06<00:09,  3.88it/s]
+quant attn to fp8 ue8m0:  43%|████▎     | 26/61 [00:06<00:09,  3.88it/s]
+quant attn to fp8 ue8m0:  44%|████▍     | 27/61 [00:06<00:08,  4.09it/s]
+quant attn to fp8 ue8m0:  44%|████▍     | 27/61 [00:06<00:08,  4.09it/s]
+quant attn to fp8 ue8m0:  44%|████▍     | 27/61 [00:06<00:08,  4.09it/s]
+quant attn to fp8 ue8m0:  44%|████▍     | 27/61 [00:06<00:08,  4.09it/s]
+quant attn to fp8 ue8m0:  46%|████▌     | 28/61 [00:07<00:09,  3.60it/s]
+quant attn to fp8 ue8m0:  46%|████▌     | 28/61 [00:07<00:09,  3.60it/s]
+quant attn to fp8 ue8m0:  46%|████▌     | 28/61 [00:07<00:09,  3.60it/s]
+quant attn to fp8 ue8m0:  46%|████▌     | 28/61 [00:07<00:09,  3.60it/s]
+quant attn to fp8 ue8m0:  48%|████▊     | 29/61 [00:07<00:09,  3.29it/s]
+quant attn to fp8 ue8m0:  48%|████▊     | 29/61 [00:07<00:09,  3.29it/s]
+quant attn to fp8 ue8m0:  48%|████▊     | 29/61 [00:07<00:09,  3.29it/s]
+quant attn to fp8 ue8m0:  48%|████▊     | 29/61 [00:07<00:09,  3.29it/s]
+quant attn to fp8 ue8m0:  49%|████▉     | 30/61 [00:07<00:10,  3.04it/s]
+quant attn to fp8 ue8m0:  49%|████▉     | 30/61 [00:07<00:10,  3.04it/s]
+quant attn to fp8 ue8m0:  49%|████▉     | 30/61 [00:07<00:10,  3.04it/s]
+quant attn to fp8 ue8m0:  49%|████▉     | 30/61 [00:07<00:10,  3.04it/s]
+quant attn to fp8 ue8m0:  51%|█████     | 31/61 [00:08<00:08,  3.44it/s]
+quant attn to fp8 ue8m0:  51%|█████     | 31/61 [00:08<00:08,  3.44it/s]
+quant attn to fp8 ue8m0:  51%|█████     | 31/61 [00:08<00:08,  3.44it/s]
+quant attn to fp8 ue8m0:  51%|█████     | 31/61 [00:08<00:08,  3.44it/s]
+quant attn to fp8 ue8m0:  52%|█████▏    | 32/61 [00:08<00:08,  3.22it/s]
+quant attn to fp8 ue8m0:  52%|█████▏    | 32/61 [00:08<00:08,  3.23it/s]
+quant attn to fp8 ue8m0:  52%|█████▏    | 32/61 [00:08<00:08,  3.23it/s]
+quant attn to fp8 ue8m0:  52%|█████▏    | 32/61 [00:08<00:08,  3.22it/s]
+quant attn to fp8 ue8m0:  54%|█████▍    | 33/61 [00:08<00:08,  3.19it/s]
+quant attn to fp8 ue8m0:  54%|█████▍    | 33/61 [00:08<00:08,  3.19it/s]
+quant attn to fp8 ue8m0:  54%|█████▍    | 33/61 [00:08<00:08,  3.19it/s]
+quant attn to fp8 ue8m0:  54%|█████▍    | 33/61 [00:08<00:08,  3.19it/s]
+quant attn to fp8 ue8m0:  56%|█████▌    | 34/61 [00:09<00:09,  2.85it/s]
+quant attn to fp8 ue8m0:  56%|█████▌    | 34/61 [00:09<00:09,  2.85it/s]
+quant attn to fp8 ue8m0:  56%|█████▌    | 34/61 [00:09<00:09,  2.85it/s]
+quant attn to fp8 ue8m0:  56%|█████▌    | 34/61 [00:09<00:09,  2.85it/s]
+quant attn to fp8 ue8m0:  57%|█████▋    | 35/61 [00:09<00:08,  3.12it/s]
+quant attn to fp8 ue8m0:  57%|█████▋    | 35/61 [00:09<00:08,  3.12it/s]
+quant attn to fp8 ue8m0:  57%|█████▋    | 35/61 [00:09<00:08,  3.12it/s]
+quant attn to fp8 ue8m0:  57%|█████▋    | 35/61 [00:09<00:08,  3.12it/s]
+quant attn to fp8 ue8m0:  59%|█████▉    | 36/61 [00:09<00:07,  3.47it/s]
+quant attn to fp8 ue8m0:  59%|█████▉    | 36/61 [00:09<00:07,  3.47it/s]
+quant attn to fp8 ue8m0:  59%|█████▉    | 36/61 [00:09<00:07,  3.47it/s]
+quant attn to fp8 ue8m0:  59%|█████▉    | 36/61 [00:09<00:07,  3.47it/s]
+quant attn to fp8 ue8m0:  61%|██████    | 37/61 [00:09<00:06,  3.72it/s]
+quant attn to fp8 ue8m0:  61%|██████    | 37/61 [00:09<00:06,  3.71it/s]
+quant attn to fp8 ue8m0:  61%|██████    | 37/61 [00:09<00:06,  3.71it/s]
+quant attn to fp8 ue8m0:  61%|██████    | 37/61 [00:09<00:06,  3.71it/s]
+quant attn to fp8 ue8m0:  62%|██████▏   | 38/61 [00:10<00:06,  3.38it/s]
+quant attn to fp8 ue8m0:  62%|██████▏   | 38/61 [00:10<00:06,  3.38it/s]
+quant attn to fp8 ue8m0:  62%|██████▏   | 38/61 [00:10<00:06,  3.38it/s]
+quant attn to fp8 ue8m0:  62%|██████▏   | 38/61 [00:10<00:06,  3.38it/s]
+quant attn to fp8 ue8m0:  64%|██████▍   | 39/61 [00:10<00:06,  3.19it/s]
+quant attn to fp8 ue8m0:  64%|██████▍   | 39/61 [00:10<00:06,  3.19it/s]
+quant attn to fp8 ue8m0:  64%|██████▍   | 39/61 [00:10<00:06,  3.19it/s]
+quant attn to fp8 ue8m0:  64%|██████▍   | 39/61 [00:10<00:06,  3.19it/s]
+quant attn to fp8 ue8m0:  66%|██████▌   | 40/61 [00:10<00:06,  3.32it/s]
+quant attn to fp8 ue8m0:  66%|██████▌   | 40/61 [00:10<00:06,  3.32it/s]
+quant attn to fp8 ue8m0:  66%|██████▌   | 40/61 [00:10<00:06,  3.32it/s]
+quant attn to fp8 ue8m0:  66%|██████▌   | 40/61 [00:10<00:06,  3.32it/s]
+quant attn to fp8 ue8m0:  67%|██████▋   | 41/61 [00:11<00:06,  3.11it/s]
+quant attn to fp8 ue8m0:  67%|██████▋   | 41/61 [00:11<00:06,  3.11it/s]
+quant attn to fp8 ue8m0:  67%|██████▋   | 41/61 [00:11<00:06,  3.11it/s]
+quant attn to fp8 ue8m0:  67%|██████▋   | 41/61 [00:11<00:06,  3.11it/s]
+quant attn to fp8 ue8m0:  69%|██████▉   | 42/61 [00:11<00:06,  3.00it/s]
+quant attn to fp8 ue8m0:  69%|██████▉   | 42/61 [00:11<00:06,  3.00it/s]
+quant attn to fp8 ue8m0:  69%|██████▉   | 42/61 [00:11<00:06,  3.00it/s]
+quant attn to fp8 ue8m0:  69%|██████▉   | 42/61 [00:11<00:06,  3.00it/s]
+quant attn to fp8 ue8m0:  70%|███████   | 43/61 [00:12<00:06,  2.86it/s]
+quant attn to fp8 ue8m0:  70%|███████   | 43/61 [00:12<00:06,  2.86it/s]
+quant attn to fp8 ue8m0:  70%|███████   | 43/61 [00:12<00:06,  2.86it/s]
+quant attn to fp8 ue8m0:  70%|███████   | 43/61 [00:12<00:06,  2.86it/s]
+quant attn to fp8 ue8m0:  72%|███████▏  | 44/61 [00:12<00:05,  2.92it/s]
+quant attn to fp8 ue8m0:  72%|███████▏  | 44/61 [00:12<00:05,  2.92it/s]
+quant attn to fp8 ue8m0:  72%|███████▏  | 44/61 [00:12<00:05,  2.92it/s]
+quant attn to fp8 ue8m0:  72%|███████▏  | 44/61 [00:12<00:05,  2.92it/s]
+quant attn to fp8 ue8m0:  74%|███████▍  | 45/61 [00:12<00:05,  2.95it/s]
+quant attn to fp8 ue8m0:  74%|███████▍  | 45/61 [00:12<00:05,  2.95it/s]
+quant attn to fp8 ue8m0:  74%|███████▍  | 45/61 [00:12<00:05,  2.95it/s]
+quant attn to fp8 ue8m0:  74%|███████▍  | 45/61 [00:12<00:05,  2.95it/s]
+quant attn to fp8 ue8m0:  75%|███████▌  | 46/61 [00:13<00:05,  2.84it/s]
+quant attn to fp8 ue8m0:  75%|███████▌  | 46/61 [00:13<00:05,  2.84it/s]
+quant attn to fp8 ue8m0:  75%|███████▌  | 46/61 [00:13<00:05,  2.84it/s]
+quant attn to fp8 ue8m0:  75%|███████▌  | 46/61 [00:13<00:05,  2.84it/s]
+quant attn to fp8 ue8m0:  77%|███████▋  | 47/61 [00:13<00:04,  3.08it/s]
+quant attn to fp8 ue8m0:  77%|███████▋  | 47/61 [00:13<00:04,  3.08it/s]
+quant attn to fp8 ue8m0:  77%|███████▋  | 47/61 [00:13<00:04,  3.08it/s]
+quant attn to fp8 ue8m0:  77%|███████▋  | 47/61 [00:13<00:04,  3.08it/s]
+quant attn to fp8 ue8m0:  79%|███████▊  | 48/61 [00:13<00:03,  3.71it/s]
+quant attn to fp8 ue8m0:  79%|███████▊  | 48/61 [00:13<00:03,  3.71it/s]
+quant attn to fp8 ue8m0:  79%|███████▊  | 48/61 [00:13<00:03,  3.71it/s]
+quant attn to fp8 ue8m0:  79%|███████▊  | 48/61 [00:13<00:03,  3.71it/s]
+quant attn to fp8 ue8m0:  80%|████████  | 49/61 [00:13<00:03,  3.75it/s]
+quant attn to fp8 ue8m0:  80%|████████  | 49/61 [00:13<00:03,  3.74it/s]
+quant attn to fp8 ue8m0:  80%|████████  | 49/61 [00:13<00:03,  3.74it/s]
+quant attn to fp8 ue8m0:  80%|████████  | 49/61 [00:13<00:03,  3.74it/s]
+quant attn to fp8 ue8m0:  82%|████████▏ | 50/61 [00:14<00:02,  3.72it/s]
+quant attn to fp8 ue8m0:  82%|████████▏ | 50/61 [00:14<00:02,  3.72it/s]
+quant attn to fp8 ue8m0:  82%|████████▏ | 50/61 [00:14<00:02,  3.71it/s]
+quant attn to fp8 ue8m0:  82%|████████▏ | 50/61 [00:14<00:02,  3.71it/s]
+quant attn to fp8 ue8m0:  84%|████████▎ | 51/61 [00:14<00:02,  3.89it/s]
+quant attn to fp8 ue8m0:  84%|████████▎ | 51/61 [00:14<00:02,  3.88it/s]
+quant attn to fp8 ue8m0:  84%|████████▎ | 51/61 [00:14<00:02,  3.88it/s]
+quant attn to fp8 ue8m0:  84%|████████▎ | 51/61 [00:14<00:02,  3.88it/s]
+quant attn to fp8 ue8m0:  85%|████████▌ | 52/61 [00:14<00:02,  4.35it/s]
+quant attn to fp8 ue8m0:  85%|████████▌ | 52/61 [00:14<00:02,  4.35it/s]
+quant attn to fp8 ue8m0:  85%|████████▌ | 52/61 [00:14<00:02,  4.35it/s]
+quant attn to fp8 ue8m0:  85%|████████▌ | 52/61 [00:14<00:02,  4.35it/s]
+quant attn to fp8 ue8m0:  87%|████████▋ | 53/61 [00:15<00:04,  1.68it/s]
+quant attn to fp8 ue8m0:  87%|████████▋ | 53/61 [00:15<00:04,  1.68it/s]
+quant attn to fp8 ue8m0:  87%|████████▋ | 53/61 [00:15<00:04,  1.68it/s]
+quant attn to fp8 ue8m0:  87%|████████▋ | 53/61 [00:15<00:04,  1.68it/s]
+quant attn to fp8 ue8m0:  89%|████████▊ | 54/61 [00:16<00:03,  2.01it/s]
+quant attn to fp8 ue8m0:  89%|████████▊ | 54/61 [00:16<00:03,  2.01it/s]
+quant attn to fp8 ue8m0:  89%|████████▊ | 54/61 [00:16<00:03,  2.01it/s]
+quant attn to fp8 ue8m0:  89%|████████▊ | 54/61 [00:16<00:03,  2.01it/s]
+quant attn to fp8 ue8m0:  90%|█████████ | 55/61 [00:16<00:02,  2.13it/s]
+quant attn to fp8 ue8m0:  90%|█████████ | 55/61 [00:16<00:02,  2.13it/s]
+quant attn to fp8 ue8m0:  90%|█████████ | 55/61 [00:16<00:02,  2.13it/s]
+quant attn to fp8 ue8m0:  90%|█████████ | 55/61 [00:16<00:02,  2.13it/s]
+quant attn to fp8 ue8m0:  92%|█████████▏| 56/61 [00:16<00:02,  2.21it/s]
+quant attn to fp8 ue8m0:  92%|█████████▏| 56/61 [00:16<00:02,  2.21it/s]
+quant attn to fp8 ue8m0:  92%|█████████▏| 56/61 [00:16<00:02,  2.21it/s]
+quant attn to fp8 ue8m0:  92%|█████████▏| 56/61 [00:16<00:02,  2.21it/s]
+quant attn to fp8 ue8m0:  93%|█████████▎| 57/61 [00:17<00:01,  2.65it/s]
+quant attn to fp8 ue8m0:  93%|█████████▎| 57/61 [00:17<00:01,  2.64it/s]
+quant attn to fp8 ue8m0:  93%|█████████▎| 57/61 [00:17<00:01,  2.64it/s]
+quant attn to fp8 ue8m0:  93%|█████████▎| 57/61 [00:17<00:01,  2.64it/s]
+quant attn to fp8 ue8m0:  95%|█████████▌| 58/61 [00:17<00:01,  2.69it/s]
+quant attn to fp8 ue8m0:  95%|█████████▌| 58/61 [00:17<00:01,  2.69it/s]
+quant attn to fp8 ue8m0:  95%|█████████▌| 58/61 [00:17<00:01,  2.69it/s]
+quant attn to fp8 ue8m0:  95%|█████████▌| 58/61 [00:17<00:01,  2.69it/s]
+quant attn to fp8 ue8m0:  97%|█████████▋| 59/61 [00:17<00:00,  3.15it/s]
+quant attn to fp8 ue8m0:  97%|█████████▋| 59/61 [00:17<00:00,  3.14it/s]
+quant attn to fp8 ue8m0:  97%|█████████▋| 59/61 [00:17<00:00,  3.14it/s]
+quant attn to fp8 ue8m0:  97%|█████████▋| 59/61 [00:17<00:00,  3.14it/s]
+quant attn to fp8 ue8m0:  98%|█████████▊| 60/61 [00:17<00:00,  3.65it/s]
+quant attn to fp8 ue8m0:  98%|█████████▊| 60/61 [00:17<00:00,  3.65it/s]
+quant attn to fp8 ue8m0:  98%|█████████▊| 60/61 [00:17<00:00,  3.65it/s]
+quant attn to fp8 ue8m0:  98%|█████████▊| 60/61 [00:17<00:00,  3.65it/s]
+quant attn to fp8 ue8m0: 100%|██████████| 61/61 [00:18<00:00,  3.63it/s]
+quant attn to fp8 ue8m0: 100%|██████████| 61/61 [00:18<00:00,  3.36it/s]
+
+quant attn to fp8 ue8m0: 100%|██████████| 61/61 [00:18<00:00,  3.63it/s]
+quant attn to fp8 ue8m0: 100%|██████████| 61/61 [00:18<00:00,  3.36it/s]
+
+quant attn to fp8 ue8m0: 100%|██████████| 61/61 [00:18<00:00,  3.63it/s]
+quant attn to fp8 ue8m0: 100%|██████████| 61/61 [00:18<00:00,  3.36it/s]
+
+quant attn to fp8 ue8m0: 100%|██████████| 61/61 [00:18<00:00,  3.63it/s]
+quant attn to fp8 ue8m0: 100%|██████████| 61/61 [00:18<00:00,  3.36it/s]
+[2025-11-20 04:42:38 DP3 TP3 EP3] Using FP8 KV cache but no scaling factors provided. Defaulting to scaling factors of 1.0. This may lead to less accurate results!
+[2025-11-20 04:42:38 DP3 TP3 EP3] Load weight end. type=DeepseekV3ForCausalLM, dtype=torch.bfloat16, avail mem=77.66 GB, mem usage=104.50 GB.
+[2025-11-20 04:42:39 DP0 TP0 EP0] Using FP8 KV cache but no scaling factors provided. Defaulting to scaling factors of 1.0. This may lead to less accurate results!
+[2025-11-20 04:42:39 DP0 TP0 EP0] Load weight end. type=DeepseekV3ForCausalLM, dtype=torch.bfloat16, avail mem=77.65 GB, mem usage=104.50 GB.
+[2025-11-20 04:42:40 DP2 TP2 EP2] Using FP8 KV cache but no scaling factors provided. Defaulting to scaling factors of 1.0. This may lead to less accurate results!
+[2025-11-20 04:42:40 DP2 TP2 EP2] Load weight end. type=DeepseekV3ForCausalLM, dtype=torch.bfloat16, avail mem=77.66 GB, mem usage=104.50 GB.
+[2025-11-20 04:42:48 DP1 TP1 EP1] Using FP8 KV cache but no scaling factors provided. Defaulting to scaling factors of 1.0. This may lead to less accurate results!
+[2025-11-20 04:42:48 DP1 TP1 EP1] Load weight end. type=DeepseekV3ForCausalLM, dtype=torch.bfloat16, avail mem=77.66 GB, mem usage=104.49 GB.
+[2025-11-20 04:42:48 DP0 TP0 EP0] Using KV cache dtype: torch.float8_e4m3fn
+[2025-11-20 04:42:48 DP2 TP2 EP2] Initialized custom memory pool: NVLINK on device cuda
+[2025-11-20 04:42:48 DP3 TP3 EP3] Initialized custom memory pool: NVLINK on device cuda
+[2025-11-20 04:42:48 DP0 TP0 EP0] Initialized custom memory pool: NVLINK on device cuda
+[2025-11-20 04:42:48 DP1 TP1 EP1] Initialized custom memory pool: NVLINK on device cuda
+[2025-11-20 04:42:48 DP2 TP2 EP2] KV Cache is allocated. #tokens: 131072, KV size: 4.29 GB
+[2025-11-20 04:42:48 DP2 TP2 EP2] Memory pool end. avail mem=73.00 GB
+[2025-11-20 04:42:48 DP3 TP3 EP3] KV Cache is allocated. #tokens: 131072, KV size: 4.29 GB
+[2025-11-20 04:42:48 DP3 TP3 EP3] Memory pool end. avail mem=73.00 GB
+[2025-11-20 04:42:48 DP0 TP0 EP0] KV Cache is allocated. #tokens: 131072, KV size: 4.29 GB
+[2025-11-20 04:42:48 DP0 TP0 EP0] Memory pool end. avail mem=73.00 GB
+[2025-11-20 04:42:48 DP1 TP1 EP1] KV Cache is allocated. #tokens: 131072, KV size: 4.29 GB
+[2025-11-20 04:42:48 DP1 TP1 EP1] Memory pool end. avail mem=73.00 GB
+[2025-11-20 04:42:49 DP2 TP2 EP2] SGLANG_USE_CUSTOM_TRITON_KERNEL_CACHE = False. Using native triton kernel cache.
+[2025-11-20 04:42:49 DP2 TP2 EP2] SGLANG_USE_CUSTOM_TRITON_KERNEL_CACHE = False. Using native triton kernel cache.
+[2025-11-20 04:42:49 DP0 TP0 EP0] SGLANG_USE_CUSTOM_TRITON_KERNEL_CACHE = False. Using native triton kernel cache.
+[2025-11-20 04:42:49 DP1 TP1 EP1] SGLANG_USE_CUSTOM_TRITON_KERNEL_CACHE = False. Using native triton kernel cache.
+[2025-11-20 04:42:49 DP0 TP0 EP0] SGLANG_USE_CUSTOM_TRITON_KERNEL_CACHE = False. Using native triton kernel cache.
+[2025-11-20 04:42:49 DP1 TP1 EP1] SGLANG_USE_CUSTOM_TRITON_KERNEL_CACHE = False. Using native triton kernel cache.
+[2025-11-20 04:42:49 DP3 TP3 EP3] SGLANG_USE_CUSTOM_TRITON_KERNEL_CACHE = False. Using native triton kernel cache.
+[2025-11-20 04:42:49 DP3 TP3 EP3] SGLANG_USE_CUSTOM_TRITON_KERNEL_CACHE = False. Using native triton kernel cache.
+[2025-11-20 04:42:49 DP0 TP0 EP0] max_total_num_tokens=131072, chunked_prefill_size=16384, max_prefill_tokens=32768, max_running_requests=7500, context_len=2176, available_gpu_mem=72.44 GB
+[2025-11-20 04:42:49 DP1 TP1 EP1] get_ip failed
+[2025-11-20 04:42:49 DP1 TP1 EP1] get_local_ip_by_nic failed
+[2025-11-20 04:42:49 DP2 TP2 EP2] get_ip failed
+[2025-11-20 04:42:49 DP2 TP2 EP2] get_local_ip_by_nic failed
+[2025-11-20 04:42:49 DP3 TP3 EP3] get_ip failed
+[2025-11-20 04:42:49 DP3 TP3 EP3] get_local_ip_by_nic failed
+[2025-11-20 04:42:49 DP0 TP0 EP0] get_ip failed
+[2025-11-20 04:42:49 DP0 TP0 EP0] get_local_ip_by_nic failed
+[2025-11-20 04:42:49 DP3 TP3 EP3] kv manager bind to 10.40.1.145:46393
+[2025-11-20 04:42:49 DP2 TP2 EP2] kv manager bind to 10.40.1.145:34369
+[2025-11-20 04:42:49 DP1 TP1 EP1] kv manager bind to 10.40.1.145:40027
+[2025-11-20 04:42:49 DP0 TP0 EP0] kv manager bind to 10.40.1.145:33175
+[2025-11-20 04:42:49 DP2 TP2 EP2] Starting new HTTP connection (1): 10.40.1.145:30001
+[2025-11-20 04:42:49 DP1 TP1 EP1] Starting new HTTP connection (1): 10.40.1.145:30001
+[2025-11-20 04:42:49 DP0 TP0 EP0] Starting new HTTP connection (1): 10.40.1.145:30001
+[2025-11-20 04:42:49 DP3 TP3 EP3] Starting new HTTP connection (1): 10.40.1.145:30001
+[2025-11-20 04:42:49] Register prefill bootstrap: DP2 TP0 PP0 with rank_ip: 10.40.1.145 and rank_port: 34369
+[2025-11-20 04:42:49] 10.40.1.145 [20/Nov/2025:04:42:49 +0000] "PUT /route HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:42:49] Register prefill bootstrap: DP1 TP0 PP0 with rank_ip: 10.40.1.145 and rank_port: 40027
+[2025-11-20 04:42:49 DP2 TP2 EP2] http://10.40.1.145:30001 "PUT /route HTTP/1.1" 200 2
+[2025-11-20 04:42:49] 10.40.1.145 [20/Nov/2025:04:42:49 +0000] "PUT /route HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:42:49 DP2 TP2 EP2] Prefill successfully registered to bootstrap server.
+[2025-11-20 04:42:49] Register prefill bootstrap: DP0 TP0 PP0 with rank_ip: 10.40.1.145 and rank_port: 33175
+[2025-11-20 04:42:49] 10.40.1.145 [20/Nov/2025:04:42:49 +0000] "PUT /route HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:42:49 DP1 TP1 EP1] http://10.40.1.145:30001 "PUT /route HTTP/1.1" 200 2
+[2025-11-20 04:42:49] Register prefill bootstrap: DP3 TP0 PP0 with rank_ip: 10.40.1.145 and rank_port: 46393
+[2025-11-20 04:42:49] 10.40.1.145 [20/Nov/2025:04:42:49 +0000] "PUT /route HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:42:49 DP1 TP1 EP1] Prefill successfully registered to bootstrap server.
+[2025-11-20 04:42:49 DP0 TP0 EP0] http://10.40.1.145:30001 "PUT /route HTTP/1.1" 200 2
+[2025-11-20 04:42:49 DP3 TP3 EP3] http://10.40.1.145:30001 "PUT /route HTTP/1.1" 200 2
+[2025-11-20 04:42:49 DP0 TP0 EP0] Prefill successfully registered to bootstrap server.
+[2025-11-20 04:42:49 DP3 TP3 EP3] Prefill successfully registered to bootstrap server.
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I1120 04:42:49.056574 166903 transfer_engine.cpp:91] Transfer Engine parseHostNameWithPort. server_name: 10.40.1.145 port: 12001
+I1120 04:42:49.056587 170488 transfer_engine.cpp:493] Metrics reporting thread started (interval: 5s)
+I1120 04:42:49.056612 166903 transfer_engine.cpp:146] Transfer Engine RPC using P2P handshake, listening on 10.40.1.145:16391
+I1120 04:42:49.056664 166903 transfer_engine.cpp:185] Auto-discovering topology...
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I1120 04:42:49.056830 166901 transfer_engine.cpp:91] Transfer Engine parseHostNameWithPort. server_name: 10.40.1.145 port: 12001
+I1120 04:42:49.056841 170490 transfer_engine.cpp:493] Metrics reporting thread started (interval: 5s)
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I1120 04:42:49.056846 166902 transfer_engine.cpp:91] Transfer Engine parseHostNameWithPort. server_name: 10.40.1.145 port: 12001
+I1120 04:42:49.056864 166901 transfer_engine.cpp:146] Transfer Engine RPC using P2P handshake, listening on 10.40.1.145:15339
+I1120 04:42:49.056864 170491 transfer_engine.cpp:493] Metrics reporting thread started (interval: 5s)
+I1120 04:42:49.056875 166902 transfer_engine.cpp:146] Transfer Engine RPC using P2P handshake, listening on 10.40.1.145:16019
+I1120 04:42:49.056912 166901 transfer_engine.cpp:185] Auto-discovering topology...
+I1120 04:42:49.056931 166902 transfer_engine.cpp:185] Auto-discovering topology...
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I1120 04:42:49.057215 166905 transfer_engine.cpp:91] Transfer Engine parseHostNameWithPort. server_name: 10.40.1.145 port: 12001
+I1120 04:42:49.057229 170494 transfer_engine.cpp:493] Metrics reporting thread started (interval: 5s)
+I1120 04:42:49.057248 166905 transfer_engine.cpp:146] Transfer Engine RPC using P2P handshake, listening on 10.40.1.145:16769
+I1120 04:42:49.057300 166905 transfer_engine.cpp:185] Auto-discovering topology...
+I1120 04:42:49.058740 166903 transfer_engine.cpp:200] Topology discovery complete. Found 6 HCAs.
+I1120 04:42:49.058916 166901 transfer_engine.cpp:200] Topology discovery complete. Found 6 HCAs.
+I1120 04:42:49.058955 166902 transfer_engine.cpp:200] Topology discovery complete. Found 6 HCAs.
+I1120 04:42:49.059095 166905 transfer_engine.cpp:200] Topology discovery complete. Found 6 HCAs.
+W1120 04:42:49.074366 166902 nvlink_transport.cpp:385] Memory region 0x503a8d40 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074381 166902 nvlink_transport.cpp:385] Memory region 0x4cfe9140 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074384 166902 nvlink_transport.cpp:385] Memory region 0x4e63bd40 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074388 166902 nvlink_transport.cpp:385] Memory region 0x4c260640 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074390 166902 nvlink_transport.cpp:385] Memory region 0x9547d480 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074393 166902 nvlink_transport.cpp:385] Memory region 0x95bd04c0 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074395 166902 nvlink_transport.cpp:385] Memory region 0x4b495a40 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074399 166902 nvlink_transport.cpp:385] Memory region 0x903b68c0 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074402 166902 nvlink_transport.cpp:385] Memory region 0xed69c2ac0040 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074528 166901 nvlink_transport.cpp:385] Memory region 0x72807b80 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074540 166901 nvlink_transport.cpp:385] Memory region 0x4f3fb9c0 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074543 166901 nvlink_transport.cpp:385] Memory region 0x5163c500 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074546 166901 nvlink_transport.cpp:385] Memory region 0x4c929e00 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074549 166901 nvlink_transport.cpp:385] Memory region 0x6c90af00 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074551 166901 nvlink_transport.cpp:385] Memory region 0x6d05df80 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074553 166901 nvlink_transport.cpp:385] Memory region 0x4aea0240 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074556 166901 nvlink_transport.cpp:385] Memory region 0x7e3becc0 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074559 166901 nvlink_transport.cpp:385] Memory region 0xe885132e0040 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074558 166903 nvlink_transport.cpp:385] Memory region 0x32fc3c40 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074566 166903 nvlink_transport.cpp:385] Memory region 0x32bef700 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074569 166903 nvlink_transport.cpp:385] Memory region 0x305e4180 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074572 166903 nvlink_transport.cpp:385] Memory region 0x2daebf40 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074574 166903 nvlink_transport.cpp:385] Memory region 0x3e57fb00 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074577 166903 nvlink_transport.cpp:385] Memory region 0x47e892c0 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074580 166903 nvlink_transport.cpp:385] Memory region 0x2e9e9fc0 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074582 166903 nvlink_transport.cpp:385] Memory region 0x80bbce40 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074585 166903 nvlink_transport.cpp:385] Memory region 0xe7540b2e0040 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074595 166905 nvlink_transport.cpp:385] Memory region 0x52a6f700 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074606 166905 nvlink_transport.cpp:385] Memory region 0x4e8ccd80 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074609 166905 nvlink_transport.cpp:385] Memory region 0xa33a6300 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074613 166905 nvlink_transport.cpp:385] Memory region 0x51da1480 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074616 166905 nvlink_transport.cpp:385] Memory region 0x92dec900 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074620 166905 nvlink_transport.cpp:385] Memory region 0x9353f980 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074621 166905 nvlink_transport.cpp:385] Memory region 0x4cf7fcc0 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074625 166905 nvlink_transport.cpp:385] Memory region 0x5e2b32c0 is not allocated by cuMemCreate, but it can be used as local buffer
+W1120 04:42:49.074627 166905 nvlink_transport.cpp:385] Memory region 0xfe79c2ac0040 is not allocated by cuMemCreate, but it can be used as local buffer
+[2m2025-11-20T04:42:49.079965Z[0m [32m INFO[0m [2mdynamo_llm::kv_router::publisher[0m[2m:[0m Registered KvStats Prometheus metrics
+[2025-11-20 04:42:49] Sending dummy metrics to initialize
+[2025-11-20 04:42:49] SGLang metrics loop started
+[2025-11-20 04:42:49] Prefill worker handler initialized - bootstrap host: 10.40.1.145, bootstrap port: 30001
+[2025-11-20 04:42:49] Using default BOS token ID (1) for health check
+[2025-11-20 04:44:19] New Request ID: 6cbdb8d9-8e0b-4808-9e9f-0cae91eb3325
+[2025-11-20 04:44:19] data_parallel_rank not provided, using default dispatch
+[2025-11-20 04:44:19] data_parallel_rank: None
+[2025-11-20 04:44:19] Creating cancellation monitor task for Context: 6cbdb8d9-8e0b-4808-9e9f-0cae91eb3325
+[2025-11-20 04:44:19] Cancellation monitor started for Context: 6cbdb8d9-8e0b-4808-9e9f-0cae91eb3325
+[2025-11-20 04:44:19] 10.40.1.10 [20/Nov/2025:04:44:19 +0000] "GET /route?engine_rank=-1&target_dp_group=-1&target_pp_rank=-1 HTTP/1.1" 200 230 "-" "python-requests/2.32.5"
+[2025-11-20 04:44:19] 10.40.1.10 [20/Nov/2025:04:44:19 +0000] "GET /route?engine_rank=0&target_dp_group=1&target_pp_rank=0 HTTP/1.1" 200 205 "-" "python-requests/2.32.5"
+[2025-11-20 04:44:19 DP1 TP1 EP1] Register KVArgs from 10.40.1.10:15524 successfully
+[2025-11-20 04:44:19 DP1 TP1 EP1] Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 0, token usage: 0.00, #running-req: 0, #queue-req: 0, #prealloc-req: 0, #inflight-req: 0, input throughput (token/s): 0.00, 
+[2025-11-20 04:44:21 DP1 TP1 EP1] Attempting to acquire lock 261182869248848 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fmha_gen.lock
+[2025-11-20 04:44:21 DP1 TP1 EP1] Lock 261182869248848 acquired on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fmha_gen.lock
+[2025-11-20 04:44:21 DP1 TP1 EP1] Attempting to release lock 261182869248848 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fmha_gen.lock
+[2025-11-20 04:44:21 DP1 TP1 EP1] Lock 261182869248848 released on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fmha_gen.lock
+[2025-11-20 04:44:21 DP1 TP1 EP1] Attempting to acquire lock 261182871914592 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP1 TP1 EP1] Lock 261182871914592 acquired on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP1 TP1 EP1] Attempting to release lock 261182871914592 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP1 TP1 EP1] Lock 261182871914592 released on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP3 TP3 EP3] Attempting to acquire lock 279942427694896 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP2 TP2 EP2] Attempting to acquire lock 254475949764448 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP0 TP0 EP0] Attempting to acquire lock 255802298099968 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP3 TP3 EP3] Lock 279942427694896 acquired on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP0 TP0 EP0] Lock 255802298099968 not acquired on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock, waiting 0.05 seconds ...
+[2025-11-20 04:44:21 DP2 TP2 EP2] Lock 254475949764448 not acquired on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock, waiting 0.05 seconds ...
+[2025-11-20 04:44:21 DP3 TP3 EP3] Attempting to release lock 279942427694896 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP3 TP3 EP3] Lock 279942427694896 released on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP3 TP3 EP3] Scheduler hit an exception: Traceback (most recent call last):
+  File "/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py", line 2741, in run_scheduler_process
+    scheduler.event_loop_overlap_disagg_prefill()
+  File "/usr/local/lib/python3.12/dist-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/disaggregation/prefill.py", line 369, in event_loop_overlap_disagg_prefill
+    batch_result = self.run_batch(batch)
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py", line 2032, in run_batch
+    batch_result = self.model_worker.forward_batch_generation(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/managers/tp_worker.py", line 371, in forward_batch_generation
+    logits_output, can_run_cuda_graph = self.model_runner.forward(
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py", line 2213, in forward
+    output = self._forward_raw(
+             ^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py", line 2278, in _forward_raw
+    ret = self.forward_idle(forward_batch, pp_proxy_tensors=pp_proxy_tensors)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py", line 2171, in forward_idle
+    return self.model.forward(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 3429, in forward
+    hidden_states = self.model(
+                    ^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 3239, in forward
+    hidden_states, residual = layer(
+                              ^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 2977, in forward
+    hidden_states = self.mlp(
+                    ^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 802, in forward
+    return self.forward_normal(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 893, in forward_normal
+    pre_combine_hook_handle = self.experts.dispatcher.register_pre_combine_hook(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/layers/moe/token_dispatcher/base.py", line 327, in register_pre_combine_hook
+    if self._pre_combine_hooks is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'StandardDispatcher' object has no attribute '_pre_combine_hooks'
+
+[2025-11-20 04:44:21 DP0 TP0 EP0] Attempting to acquire lock 255802298099968 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP2 TP2 EP2] Attempting to acquire lock 254475949764448 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP0 TP0 EP0] Lock 255802298099968 acquired on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP2 TP2 EP2] Lock 254475949764448 not acquired on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock, waiting 0.05 seconds ...
+[2025-11-20 04:44:21 DP0 TP0 EP0] Attempting to release lock 255802298099968 on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP0 TP0 EP0] Lock 255802298099968 released on /configs/.cache/flashinfer/0.5.2/100a/cached_ops/tmp/fp4_gemm_cutlass.lock
+[2025-11-20 04:44:21 DP0 TP0 EP0] Scheduler hit an exception: Traceback (most recent call last):
+  File "/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py", line 2741, in run_scheduler_process
+    scheduler.event_loop_overlap_disagg_prefill()
+  File "/usr/local/lib/python3.12/dist-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/disaggregation/prefill.py", line 369, in event_loop_overlap_disagg_prefill
+    batch_result = self.run_batch(batch)
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py", line 2032, in run_batch
+    batch_result = self.model_worker.forward_batch_generation(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/managers/tp_worker.py", line 371, in forward_batch_generation
+    logits_output, can_run_cuda_graph = self.model_runner.forward(
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py", line 2213, in forward
+    output = self._forward_raw(
+             ^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py", line 2278, in _forward_raw
+    ret = self.forward_idle(forward_batch, pp_proxy_tensors=pp_proxy_tensors)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py", line 2171, in forward_idle
+    return self.model.forward(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 3429, in forward
+    hidden_states = self.model(
+                    ^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 3239, in forward
+    hidden_states, residual = layer(
+                              ^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 2977, in forward
+    hidden_states = self.mlp(
+                    ^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 802, in forward
+    return self.forward_normal(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v2.py", line 893, in forward_normal
+    pre_combine_hook_handle = self.experts.dispatcher.register_pre_combine_hook(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/sgl-workspace/sglang/python/sglang/srt/layers/moe/token_dispatcher/base.py", line 327, in register_pre_combine_hook
+    if self._pre_combine_hooks is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'StandardDispatcher' object has no attribute '_pre_combine_hooks'
+
+[2025-11-20 04:44:23] 10.40.1.10 [20/Nov/2025:04:44:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:44:28] 10.40.1.10 [20/Nov/2025:04:44:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:44:33] 10.40.1.10 [20/Nov/2025:04:44:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:44:38] 10.40.1.10 [20/Nov/2025:04:44:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:44:43] 10.40.1.10 [20/Nov/2025:04:44:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:44:48] 10.40.1.10 [20/Nov/2025:04:44:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:44:53] 10.40.1.10 [20/Nov/2025:04:44:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:44:58] 10.40.1.10 [20/Nov/2025:04:44:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:03] 10.40.1.10 [20/Nov/2025:04:45:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:08] 10.40.1.10 [20/Nov/2025:04:45:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:13] 10.40.1.10 [20/Nov/2025:04:45:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:18] 10.40.1.10 [20/Nov/2025:04:45:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:23] 10.40.1.10 [20/Nov/2025:04:45:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:28] 10.40.1.10 [20/Nov/2025:04:45:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:33] 10.40.1.10 [20/Nov/2025:04:45:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:38] 10.40.1.10 [20/Nov/2025:04:45:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:43] 10.40.1.10 [20/Nov/2025:04:45:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:48] 10.40.1.10 [20/Nov/2025:04:45:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:53] 10.40.1.10 [20/Nov/2025:04:45:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:45:58] 10.40.1.10 [20/Nov/2025:04:45:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:03] 10.40.1.10 [20/Nov/2025:04:46:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:08] 10.40.1.10 [20/Nov/2025:04:46:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:13] 10.40.1.10 [20/Nov/2025:04:46:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:18] 10.40.1.10 [20/Nov/2025:04:46:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:23] 10.40.1.10 [20/Nov/2025:04:46:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:28] 10.40.1.10 [20/Nov/2025:04:46:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:33] 10.40.1.10 [20/Nov/2025:04:46:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:38] 10.40.1.10 [20/Nov/2025:04:46:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:43] 10.40.1.10 [20/Nov/2025:04:46:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:48] 10.40.1.10 [20/Nov/2025:04:46:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:53] 10.40.1.10 [20/Nov/2025:04:46:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:46:58] 10.40.1.10 [20/Nov/2025:04:46:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:03] 10.40.1.10 [20/Nov/2025:04:47:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:08] 10.40.1.10 [20/Nov/2025:04:47:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:13] 10.40.1.10 [20/Nov/2025:04:47:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:18] 10.40.1.10 [20/Nov/2025:04:47:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:23] 10.40.1.10 [20/Nov/2025:04:47:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:28] 10.40.1.10 [20/Nov/2025:04:47:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:33] 10.40.1.10 [20/Nov/2025:04:47:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:38] 10.40.1.10 [20/Nov/2025:04:47:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:43] 10.40.1.10 [20/Nov/2025:04:47:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:48] 10.40.1.10 [20/Nov/2025:04:47:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:53] 10.40.1.10 [20/Nov/2025:04:47:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:47:58] 10.40.1.10 [20/Nov/2025:04:47:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:03] 10.40.1.10 [20/Nov/2025:04:48:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:08] 10.40.1.10 [20/Nov/2025:04:48:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:13] 10.40.1.10 [20/Nov/2025:04:48:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:18] 10.40.1.10 [20/Nov/2025:04:48:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:23] 10.40.1.10 [20/Nov/2025:04:48:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:28] 10.40.1.10 [20/Nov/2025:04:48:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:33] 10.40.1.10 [20/Nov/2025:04:48:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:38] 10.40.1.10 [20/Nov/2025:04:48:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:43] 10.40.1.10 [20/Nov/2025:04:48:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:48] 10.40.1.10 [20/Nov/2025:04:48:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:53] 10.40.1.10 [20/Nov/2025:04:48:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:48:58] 10.40.1.10 [20/Nov/2025:04:48:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:03] 10.40.1.10 [20/Nov/2025:04:49:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:08] 10.40.1.10 [20/Nov/2025:04:49:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:13] 10.40.1.10 [20/Nov/2025:04:49:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:18] 10.40.1.10 [20/Nov/2025:04:49:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:23] 10.40.1.10 [20/Nov/2025:04:49:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:28] 10.40.1.10 [20/Nov/2025:04:49:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:33] 10.40.1.10 [20/Nov/2025:04:49:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:38] 10.40.1.10 [20/Nov/2025:04:49:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:43] 10.40.1.10 [20/Nov/2025:04:49:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:48] 10.40.1.10 [20/Nov/2025:04:49:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:53] 10.40.1.10 [20/Nov/2025:04:49:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:49:58] 10.40.1.10 [20/Nov/2025:04:49:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:03] 10.40.1.10 [20/Nov/2025:04:50:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:08] 10.40.1.10 [20/Nov/2025:04:50:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:13] 10.40.1.10 [20/Nov/2025:04:50:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:18] 10.40.1.10 [20/Nov/2025:04:50:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:23] 10.40.1.10 [20/Nov/2025:04:50:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:28] 10.40.1.10 [20/Nov/2025:04:50:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:33] 10.40.1.10 [20/Nov/2025:04:50:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:38] 10.40.1.10 [20/Nov/2025:04:50:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:43] 10.40.1.10 [20/Nov/2025:04:50:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:48] 10.40.1.10 [20/Nov/2025:04:50:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:53] 10.40.1.10 [20/Nov/2025:04:50:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:50:58] 10.40.1.10 [20/Nov/2025:04:50:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:03] 10.40.1.10 [20/Nov/2025:04:51:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:08] 10.40.1.10 [20/Nov/2025:04:51:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:13] 10.40.1.10 [20/Nov/2025:04:51:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:18] 10.40.1.10 [20/Nov/2025:04:51:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:23] 10.40.1.10 [20/Nov/2025:04:51:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:28] 10.40.1.10 [20/Nov/2025:04:51:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:33] 10.40.1.10 [20/Nov/2025:04:51:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:38] 10.40.1.10 [20/Nov/2025:04:51:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:43] 10.40.1.10 [20/Nov/2025:04:51:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:48] 10.40.1.10 [20/Nov/2025:04:51:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:53] 10.40.1.10 [20/Nov/2025:04:51:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:51:58] 10.40.1.10 [20/Nov/2025:04:51:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:03] 10.40.1.10 [20/Nov/2025:04:52:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:08] 10.40.1.10 [20/Nov/2025:04:52:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:13] 10.40.1.10 [20/Nov/2025:04:52:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:18] 10.40.1.10 [20/Nov/2025:04:52:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:23] 10.40.1.10 [20/Nov/2025:04:52:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:28] 10.40.1.10 [20/Nov/2025:04:52:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:33] 10.40.1.10 [20/Nov/2025:04:52:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:38] 10.40.1.10 [20/Nov/2025:04:52:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:43] 10.40.1.10 [20/Nov/2025:04:52:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:48] 10.40.1.10 [20/Nov/2025:04:52:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:53] 10.40.1.10 [20/Nov/2025:04:52:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:52:58] 10.40.1.10 [20/Nov/2025:04:52:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:03] 10.40.1.10 [20/Nov/2025:04:53:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:08] 10.40.1.10 [20/Nov/2025:04:53:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:13] 10.40.1.10 [20/Nov/2025:04:53:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:18] 10.40.1.10 [20/Nov/2025:04:53:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:23] 10.40.1.10 [20/Nov/2025:04:53:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:28] 10.40.1.10 [20/Nov/2025:04:53:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:33] 10.40.1.10 [20/Nov/2025:04:53:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:38] 10.40.1.10 [20/Nov/2025:04:53:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:43] 10.40.1.10 [20/Nov/2025:04:53:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:48] 10.40.1.10 [20/Nov/2025:04:53:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:53] 10.40.1.10 [20/Nov/2025:04:53:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:53:58] 10.40.1.10 [20/Nov/2025:04:53:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:03] 10.40.1.10 [20/Nov/2025:04:54:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:08] 10.40.1.10 [20/Nov/2025:04:54:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:13] 10.40.1.10 [20/Nov/2025:04:54:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:18] 10.40.1.10 [20/Nov/2025:04:54:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:23] 10.40.1.10 [20/Nov/2025:04:54:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:28] 10.40.1.10 [20/Nov/2025:04:54:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:33] 10.40.1.10 [20/Nov/2025:04:54:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:38] 10.40.1.10 [20/Nov/2025:04:54:38 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:43] 10.40.1.10 [20/Nov/2025:04:54:43 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:48] 10.40.1.10 [20/Nov/2025:04:54:48 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:53] 10.40.1.10 [20/Nov/2025:04:54:53 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:54:58] 10.40.1.10 [20/Nov/2025:04:54:58 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:55:03] 10.40.1.10 [20/Nov/2025:04:55:03 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:55:08] 10.40.1.10 [20/Nov/2025:04:55:08 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:55:13] 10.40.1.10 [20/Nov/2025:04:55:13 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:55:18] 10.40.1.10 [20/Nov/2025:04:55:18 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:55:23] 10.40.1.10 [20/Nov/2025:04:55:23 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:55:28] 10.40.1.10 [20/Nov/2025:04:55:28 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"
+[2025-11-20 04:55:33] 10.40.1.10 [20/Nov/2025:04:55:33 +0000] "GET /health HTTP/1.1" 200 154 "-" "python-requests/2.32.5"

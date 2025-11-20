@@ -1,0 +1,19 @@
+python3 submit_job_script.py \
+ --model-dir /mnt/lustre01/models/deepseek-r1-0528-fp4-v2 \
+ --container-image /mnt/lustre01/users/sgl-baizhou/lmsysorg+sglang+v0.5.5.post2-cu129-arm64.sqsh  \
+ --gpus-per-node 4 \
+ --config-dir /mnt/lustre01/users/sgl-baizhou/srt-slurm/configs \
+ --gpu-type gb200-fp4 \
+ --script-variant offload \
+ --network-interface enP6p9s0np0 \
+ --prefill-nodes 1 \
+ --decode-nodes 12 \
+ --prefill-workers 1 \
+ --decode-workers 1 \
+ --account sglang \
+ --partition batch \
+ --time-limit 4:00:00 \
+ --enable-multiple-frontends \
+ --num-additional-frontends 9 \
+ --sglang-torch-profiler \
+ --log-dir /mnt/lustre01/users/sgl-baizhou/profile_results

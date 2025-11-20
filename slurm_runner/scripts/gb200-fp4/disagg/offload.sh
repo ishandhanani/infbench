@@ -97,6 +97,8 @@ if [ "$mode" = "prefill" ]; then
 
     # set your own cache variables here
     export TORCH_DISTRIBUTED_DEFAULT_TIMEOUT=1800
+    export FLASHINFER_WORKSPACE_BASE="/configs"
+    export SGLANG_DG_CACHE_DIR="/configs/deepgemm_cache"
 
     ### TODO: make my scripts run multiple p workers on 1 node since we use 2 gpus each
     # --enable-single-batch-overlap commmented out because i dont know if it works
@@ -178,6 +180,8 @@ elif [ "$mode" = "decode" ]; then
 
     # set your own cache variables here
     export TORCH_DISTRIBUTED_DEFAULT_TIMEOUT=1800
+    export FLASHINFER_WORKSPACE_BASE="/configs"
+    export SGLANG_DG_CACHE_DIR="/configs/deepgemm_cache"
 
     # we have to install pre-release cutedsl for a integer overflow fix
     python3 -m pip install --no-cache-dir --upgrade --pre nvidia-cutlass-dsl
@@ -236,5 +240,6 @@ elif [ "$mode" = "decode" ]; then
         --prefill-round-robin-balance \
         --max-total-tokens 1703116 \
         --quantization modelopt_fp4 \
-        --moe-runner-backend flashinfer_cutedsl ${command_suffix}
+        --moe-runner-backend flashinfer_cutedsl \
+        --enable-single-batch-overlap ${command_suffix}
 fi

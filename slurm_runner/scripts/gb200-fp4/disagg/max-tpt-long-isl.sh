@@ -31,15 +31,7 @@ if [ "$mode" != "prefill" ] && [ "$mode" != "decode" ]; then
 fi
 
 echo "Mode: $mode"
-
-# Determine which Python module to use based on USE_SGLANG_LAUNCH_SERVER
-if [[ "${USE_SGLANG_LAUNCH_SERVER,,}" == "true" ]]; then
-    PYTHON_MODULE="sglang.launch_server"
-    echo "Command: sglang.launch_server (profiling mode)"
-else
-    PYTHON_MODULE="dynamo.sglang"
-    echo "Command: dynamo.sglang"
-fi
+echo "Command: dynamo"
 
 # Check if required environment variables are set
 if [ -z "$HOST_IP_MACHINE" ]; then
@@ -83,12 +75,16 @@ if [ "$mode" = "prefill" ]; then
     command_suffix=""
     if [[ "${USE_INIT_LOCATIONS,,}" == "true" ]]; then command_suffix=" "; fi
     if [[ -n "${DUMP_CONFIG_PATH}" ]]; then command_suffix="${command_suffix} --dump-config-to ${DUMP_CONFIG_PATH}"; fi
-    # Only add --disaggregation-mode if not in profiling mode
-    if [[ "${USE_SGLANG_LAUNCH_SERVER,,}" != "true" ]]; then
-        DISAGG_MODE_FLAG="--disaggregation-mode prefill"
-    else
-        DISAGG_MODE_FLAG=""
-    fi
+
+    cd /sgl-workspace/
+    rm -rf sglang
+    git clone https://github.com/sgl-project/sglang.git
+    cd sglang
+    git checkout origin/cheng/refactor/sbo
+    git config --global --add safe.directory "*"    
+    pip install -e "python"                                                                   
+    nvidia-smi
+    pip list  
 
     # we have to install pre-release cutedsl for a integer overflow fix
     python3 -m pip install --no-cache-dir --upgrade --pre nvidia-cutlass-dsl
@@ -112,14 +108,15 @@ if [ "$mode" = "prefill" ]; then
     SGLANG_MOONCAKE_CUSTOM_MEM_POOL=True \
     SGLANG_USE_MESSAGE_QUEUE_BROADCASTER=0 \
     SGLANG_DISABLE_TP_MEMORY_INBALANCE_CHECK=1 \
+    SGLANG_CUTEDSL_MOE_NVFP4_DISPATCH=1 \
     PYTHONUNBUFFERED=1 \
-    python3 -m $PYTHON_MODULE \
+    python3 -m dynamo.sglang \
         --served-model-name deepseek-ai/DeepSeek-R1 \
         --model-path /model/ \
-        $DISAGG_MODE_FLAG \
+        --disaggregation-mode prefill \
         --decode-log-interval 1000 \
         --max-running-requests 30000 \
-        --context-length 2176 \
+        --context-length 45000 \
         --disable-radix-cache \
         --disable-shared-experts-fusion \
         --watchdog-timeout 1000000 \
@@ -127,7 +124,7 @@ if [ "$mode" = "prefill" ]; then
         --attention-backend trtllm_mla \
         --kv-cache-dtype fp8_e4m3 \
         --enable-single-batch-overlap \
-        --chunked-prefill-size 524288 \
+        --chunked-prefill-size 65536 \
         --eplb-algorithm deepseek \
         --trust-remote-code \
         --disable-cuda-graph \
@@ -137,7 +134,7 @@ if [ "$mode" = "prefill" ]; then
         --load-balance-method round_robin \
         --quantization modelopt_fp4 \
         --moe-runner-backend flashinfer_cutlass \
-        --dist-init-addr "$HOST_IP_MACfHINE:$PORT" \
+        --dist-init-addr "$HOST_IP_MACHINE:$PORT" \
         --disaggregation-bootstrap-port 30001 \
         --nnodes "$TOTAL_NODES" \
         --node-rank "$RANK" \
@@ -167,17 +164,21 @@ elif [ "$mode" = "decode" ]; then
     command_suffix=""
     if [[ "${USE_INIT_LOCATIONS,,}" == "true" ]]; then command_suffix=" "; fi
     if [[ -n "${DUMP_CONFIG_PATH}" ]]; then command_suffix="${command_suffix} --dump-config-to ${DUMP_CONFIG_PATH}"; fi
-    # Only add --disaggregation-mode if not in profiling mode
-    if [[ "${USE_SGLANG_LAUNCH_SERVER,,}" != "true" ]]; then
-        DISAGG_MODE_FLAG="--disaggregation-mode decode"
-    else
-        DISAGG_MODE_FLAG=""
-    fi
 
     # set your own cache variables here
     export TORCH_DISTRIBUTED_DEFAULT_TIMEOUT=1800
     export FLASHINFER_WORKSPACE_BASE="/configs"
     export SGLANG_DG_CACHE_DIR="/configs/deepgemm_cache"
+
+    cd /sgl-workspace/
+    rm -rf sglang
+    git clone https://github.com/sgl-project/sglang.git
+    cd sglang
+    git checkout origin/cheng/refactor/sbo
+    git config --global --add safe.directory "*"    
+    pip install -e "python"                                                                   
+    nvidia-smi
+    pip list  
 
     # we have to install pre-release cutedsl for a integer overflow fix
     python3 -m pip install --no-cache-dir --upgrade --pre nvidia-cutlass-dsl
@@ -198,15 +199,15 @@ elif [ "$mode" = "decode" ]; then
     SGLANG_FLASHINFER_FP4_GEMM_BACKEND=cutlass \
     DYN_SKIP_SGLANG_LOG_FORMATTING=1 \
     PYTHONUNBUFFERED=1 \
-    python3 -m $PYTHON_MODULE \
+    python3 -m dynamo.sglang \
         --served-model-name deepseek-ai/DeepSeek-R1 \
         --model-path /model/ \
         --trust-remote-code \
-        $DISAGG_MODE_FLAG \
+        --disaggregation-mode decode \
         --host 0.0.0.0 \
         --decode-log-interval 1000 \
         --max-running-requests 67584 \
-        --context-length 2176 \
+        --context-length 45000 \
         --disable-radix-cache \
         --disable-shared-experts-fusion \
         --watchdog-timeout 1000000 \
@@ -219,7 +220,7 @@ elif [ "$mode" = "decode" ]; then
         --moe-a2a-backend deepep \
         --deepep-mode low_latency \
         --ep-dispatch-algorithm static \
-        --cuda-graph-bs 1 2 4 8 16 24 32 40 48 56 64 72 80 88 96 104 112 120 128 136 144 152 160 168 176 184 192 200 208 216 224 232 240 248 256 264 272 280 288 296 304 312 320 328 336 344 352 360 368 376 384 416 448 480 512 768 1024 \
+        --cuda-graph-bs 1 2 4 8 16 24 32 40 48 56 64 72 80 88 96 104 112 120 128 136 144 152 160 168 176 184 192 200 208 216 224 232 240 248 256 264 272 280 288 296 304 312 320 328 336 344 352 360 368 376 384 416 448 480 512 544 576 608 640 672 704 736 768 1024 \
         --num-reserved-decode-tokens 112 \
         --ep-num-redundant-experts 32 \
         --eplb-algorithm deepseek \
@@ -238,5 +239,6 @@ elif [ "$mode" = "decode" ]; then
         --dp-size "$TOTAL_GPUS" \
         --enable-dp-attention \
         --stream-interval 50 \
-        --mem-fraction-static 0.82 ${command_suffix}  # --enable-single-batch-overlap 
+        --mem-fraction-static 0.82 ${command_suffix} \
+        --enable-single-batch-overlap
 fi
