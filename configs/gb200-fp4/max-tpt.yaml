@@ -80,7 +80,7 @@ backend:
       disable-chunked-prefix-cache: true
 
       # Other flags
-      host: "0.0.0.0"
+      host: 0.0.0.0
       stream-interval: 50
       decode-log-interval: 1000
       watchdog-timeout: 1000000
