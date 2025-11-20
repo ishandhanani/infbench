@@ -60,7 +60,11 @@ done
 # Node 2+: aggregated workers + optional additional frontends
 
 NGINX_NODE=${nodes[0]}
+{% if total_nodes > 1 %}
 MASTER_NODE=${nodes[1]}
+{% else %}
+MASTER_NODE=${nodes[0]}
+{% endif %}
 MASTER_IP=$(get_node_ip "$MASTER_NODE" "$SLURM_JOB_ID" "$NETWORK_INTERFACE")
 if [ -z "$MASTER_IP" ]; then
     echo "Error: Could not retrieve IP address for master host $MASTER_NODE"
