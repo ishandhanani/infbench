@@ -16,11 +16,11 @@ resources:
 
   # Disaggregated mode: separate prefill and decode workers
   prefill_nodes: 1     # Number of nodes for prefill workers
-  decode_nodes: 4      # Number of nodes for decode workers
+  decode_nodes: 1      # Number of nodes for decode workers
   prefill_workers: 1   # Number of prefill worker processes
-  decode_workers: 4    # Number of decode worker processes
+  decode_workers: 1    # Number of decode worker processes
 
-  # Alternative: Aggregated mode (comment out prefill/decode and use these instead)
+  # Alternative: Aggregated mode 
   # agg_nodes: 4       # Total nodes for combined workers
   # agg_workers: 4     # Number of aggregated worker processes
 
@@ -53,49 +53,19 @@ backend:
     prefill:
       # Model settings
       served-model-name: "deepseek-ai/DeepSeek-R1"
-      model-path: "/model/"  # Path inside container
+      model-path: "/model/"
       trust-remote-code: true
-
-      # KV cache and memory
       kv-cache-dtype: "fp8_e4m3"
-      mem-fraction-static: 0.95
-
-      # Quantization
-      quantization: "fp8"
-
-      # Mode
+      tensor-parallel-size: 4
       disaggregation-mode: "prefill"
 
-      # Prefill-specific settings
-      max-total-tokens: 8192
-      chunked-prefill-size: 8192
-
-      # Parallelism
-      tensor-parallel-size: 4
-      data-parallel-size: 1
-
     decode:
-      # Model settings (same as prefill)
       served-model-name: "deepseek-ai/DeepSeek-R1"
       model-path: "/model/"
       trust-remote-code: true
-
-      # KV cache and memory
       kv-cache-dtype: "fp8_e4m3"
-      mem-fraction-static: 0.95
-
-      # Quantization
-      quantization: "fp8"
-
-      # Mode
       disaggregation-mode: "decode"
-
-      # Decode-specific settings
-      chunked-prefill-size: 8192
-
-      # Parallelism
       tensor-parallel-size: 4
-      data-parallel-size: 1
 
 # Benchmark configuration
 benchmark:

@@ -1,0 +1,144 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# DeepSeek-R1 with FP4 quantization in disaggregated mode
+# This configuration matches the low-precision decode setup from:
+# https://github.com/sgl-project/sglang/issues/10903
+
+name: "deepseek-r1-fp4-disagg"
+
+model:
+  path: "/model/"  # Path to DeepSeek-R1 model
+  container: "sglang-latest.sqsh"  # Container with modelopt_fp4 support
+  precision: "fp4"
+
+resources:
+  gpu_type: "gb200"
+  prefill_nodes: 1
+  decode_nodes: 12  # 12 nodes for fp4 (flashinfer_cutedsl requires experts per gpu < 8)
+  prefill_workers: 1
+  decode_workers: 12
+  gpus_per_node: 4
+
+slurm:
+  account: "your-account"
+  partition: "your-partition"
+  time_limit: "04:00:00"
+
+backend:
+  # Environment variables for prefill worker
+  prefill_environment:
+    TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
+    DYN_SKIP_SGLANG_LOG_FORMATTING: "1"
+    SGLANG_NVFP4_CKPT_FP8_GEMM_IN_ATTN: "1"
+    SGLANG_PER_TOKEN_GROUP_QUANT_8BIT_V2: "1"
+    SGLANG_DISAGGREGATION_HEARTBEAT_MAX_FAILURE: "100000"
+    SGLANG_DISAGGREGATION_BOOTSTRAP_TIMEOUT: "100000"
+    SGLANG_DISAGGREGATION_WAITING_TIMEOUT: "100000"
+    SGLANG_HACK_SEQ_BOOTSTRAP_ROOM: "1"
+    MC_TE_METRIC: "true"
+    MC_FORCE_MNNVL: "1"
+    NCCL_MNNVL_ENABLE: "1"
+    NCCL_CUMEM_ENABLE: "1"
+    SGLANG_MOONCAKE_CUSTOM_MEM_POOL: "True"
+    SGLANG_USE_MESSAGE_QUEUE_BROADCASTER: "0"
+    SGLANG_DISABLE_TP_MEMORY_INBALANCE_CHECK: "1"
+    PYTHONUNBUFFERED: "1"
+    USE_DYNAMO_WHLS: "true"  # Install dynamo wheels from /configs/
+
+  # Environment variables for decode workers
+  decode_environment:
+    TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
+    SGLANG_NVFP4_CKPT_FP8_GEMM_IN_ATTN: "1"
+    SGLANG_PER_TOKEN_GROUP_QUANT_8BIT_V2: "1"
+    MC_TE_METRIC: "true"
+    MC_FORCE_MNNVL: "1"
+    NCCL_MNNVL_ENABLE: "1"
+    NCCL_CUMEM_ENABLE: "1"
+    SGLANG_DISAGGREGATION_HEARTBEAT_MAX_FAILURE: "100000"
+    SGLANG_DISAGGREGATION_BOOTSTRAP_TIMEOUT: "100000"
+    SGLANG_DISAGGREGATION_WAITING_TIMEOUT: "100000"
+    SGLANG_HACK_SEQ_BOOTSTRAP_ROOM: "1"
+    SGLANG_MOONCAKE_CUSTOM_MEM_POOL: "True"
+    SGLANG_DEEPEP_NUM_MAX_DISPATCH_TOKENS_PER_RANK: "1024"
+    SGLANG_CUTEDSL_MOE_NVFP4_DISPATCH: "1"
+    SGLANG_FLASHINFER_FP4_GEMM_BACKEND: "cutlass"
+    DYN_SKIP_SGLANG_LOG_FORMATTING: "1"
+    PYTHONUNBUFFERED: "1"
+    USE_DYNAMO_WHLS: "true"  # Install dynamo wheels from /configs/
+
+  sglang_config:
+    prefill:
+      served-model-name: "deepseek-ai/DeepSeek-R1"
+      model-path: "/model/"
+      disaggregation-mode: "prefill"
+      decode-log-interval: 1000
+      max-running-requests: 30000
+      context-length: 2176
+      disable-radix-cache: true
+      disable-shared-experts-fusion: true
+      watchdog-timeout: 1000000
+      disable-chunked-prefix-cache: true
+      attention-backend: "trtllm_mla"
+      kv-cache-dtype: "fp8_e4m3"
+      enable-single-batch-overlap: true
+      chunked-prefill-size: 65536
+      eplb-algorithm: "deepseek"
+      trust-remote-code: true
+      disable-cuda-graph: true
+      mem-fraction-static: 0.84
+      max-total-tokens: 131072
+      max-prefill-tokens: 32768
+      load-balance-method: "round_robin"
+      quantization: "modelopt_fp4"
+      moe-runner-backend: "flashinfer_cutlass"
+      disaggregation-bootstrap-port: 30001
+      tensor-parallel-size: 4
+      ep-size: 4
+      dp-size: 4
+      enable-dp-attention: true
+      host: "0.0.0.0"
+      stream-interval: 50
+      log-level: "debug"
+
+    decode:
+      served-model-name: "deepseek-ai/DeepSeek-R1"
+      model-path: "/model/"
+      trust-remote-code: true
+      disaggregation-mode: "decode"
+      host: "0.0.0.0"
+      decode-log-interval: 1000
+      max-running-requests: 67584
+      context-length: 2176
+      disable-radix-cache: true
+      disable-shared-experts-fusion: true
+      watchdog-timeout: 1000000
+      disable-chunked-prefix-cache: true
+      attention-backend: "trtllm_mla"
+      kv-cache-dtype: "fp8_e4m3"
+      enable-dp-attention: true
+      chunked-prefill-size: 786432
+      mem-fraction-static: 0.82
+      moe-a2a-backend: "deepep"
+      deepep-mode: "low_latency"
+      ep-dispatch-algorithm: "static"
+      cuda-graph-bs: [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 264, 272, 280, 288, 296, 304, 312, 320, 328, 336, 344, 352, 360, 368, 376, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 1024]
+      num-reserved-decode-tokens: 112
+      ep-num-redundant-experts: 32
+      eplb-algorithm: "deepseek"
+      moe-dense-tp-size: 1
+      enable-dp-lm-head: true
+      prefill-round-robin-balance: true
+      max-total-tokens: 3122380
+      quantization: "modelopt_fp4"
+      moe-runner-backend: "flashinfer_cutedsl"
+      disaggregation-bootstrap-port: 30001
+      tensor-parallel-size: 4
+      ep-size: 4
+      dp-size: 4
+      stream-interval: 50
+
+benchmark:
+  type: "manual"  # For benchmarking, change to "sa-bench" and add isl/osl/concurrencies
+
+enable_config_dump: true

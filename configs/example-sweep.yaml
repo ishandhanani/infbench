@@ -1,22 +1,19 @@
-# Parameter sweep configuration template
+# Parameter sweep configuration
 # Sweeps perform Cartesian product expansion over multiple parameter values
 # This example sweeps over chunked-prefill-size (2 values) × max-total-tokens (2 values) = 4 jobs
 
 name: "example-sweep"
 
-# Define sweep parameters at the top level
-# Each parameter can have multiple values - all combinations will be tested
+# Define sweep parameters - all combinations will be tested
 sweep:
-  chunked_prefill_size: [4096, 8192]            # 2 values for chunked prefill size
-  max_total_tokens: [8192, 16384]               # 2 values for max total tokens
+  chunked_prefill_size: [4096, 8192]
+  max_total_tokens: [8192, 16384]
 
-# Model configuration (same as single job)
 model:
   path: "deepseek-r1"
   container: "lmsysorg+sglang+v0.5.5.post2.sqsh"
   precision: "fp8"
 
-# Resources (same for all sweep jobs - use templates if you want to vary these)
 resources:
   gpu_type: "gb200"
   prefill_nodes: 1
@@ -25,13 +22,11 @@ resources:
   decode_workers: 4
   gpus_per_node: 4
 
-# SLURM configuration
 slurm:
   account: "your-account"
   partition: "batch"
   time_limit: "04:00:00"
 
-# Backend configuration with template placeholders
 backend:
   prefill_environment:
     TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
@@ -46,38 +41,21 @@ backend:
       served-model-name: "deepseek-ai/DeepSeek-R1"
       model-path: "/model/"
       trust-remote-code: true
-
       kv-cache-dtype: "fp8_e4m3"
-      mem-fraction-static: 0.95
-
-      quantization: "fp8"
       disaggregation-mode: "prefill"
-
-      # Template placeholders: will be replaced with sweep values
+      tensor-parallel-size: 4
       max-total-tokens: "{max_total_tokens}"
       chunked-prefill-size: "{chunked_prefill_size}"
-
-      tensor-parallel-size: 4
-      data-parallel-size: 1
 
     decode:
       served-model-name: "deepseek-ai/DeepSeek-R1"
       model-path: "/model/"
       trust-remote-code: true
-
       kv-cache-dtype: "fp8_e4m3"
-      mem-fraction-static: 0.95
-
-      quantization: "fp8"
       disaggregation-mode: "decode"
-
-      # Template placeholder: same parameter can be used in multiple places
+      tensor-parallel-size: 4
       chunked-prefill-size: "{chunked_prefill_size}"
 
-      tensor-parallel-size: 4
-      data-parallel-size: 1
-
-# Benchmark configuration
 benchmark:
   type: "sa-bench"
   isl: 1024
@@ -85,13 +63,7 @@ benchmark:
   concurrencies: [256, 512]
   req_rate: "inf"
 
-# How sweeps work:
-# 1. Define parameters in the "sweep:" section at the top
-# 2. Use {param_name} placeholders anywhere in the config
-# 3. srtctl generates all combinations (Cartesian product)
-# 4. Each job gets a unique name with parameter values appended
-#
-# This example generates 4 jobs:
+# This generates 4 jobs:
 #   1. example-sweep_chunked_prefill_size4096_max_total_tokens8192
 #   2. example-sweep_chunked_prefill_size4096_max_total_tokens16384
 #   3. example-sweep_chunked_prefill_size8192_max_total_tokens8192
@@ -100,14 +72,3 @@ benchmark:
 # Usage:
 #   uv run srtctl example-sweep.yaml --sweep --dry-run  # Preview jobs
 #   uv run srtctl example-sweep.yaml --sweep            # Submit all jobs
-#
-# Dry-run output:
-#   dry-runs/example-sweep_sweep_{TIMESTAMP}/
-#   ├── sweep_config.yaml
-#   ├── job_001_example-sweep_chunked_prefill_size4096_max_total_tokens8192/
-#   │   ├── config.yaml
-#   │   ├── sglang_config.yaml
-#   │   └── commands.sh
-#   ├── job_002_example-sweep_chunked_prefill_size4096_max_total_tokens16384/
-#   │   └── ...
-#   └── ...
