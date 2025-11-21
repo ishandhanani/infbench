@@ -225,7 +225,7 @@ class JobConfig(BaseModel):
     name: str = Field(..., description="Job name")
     model: ModelConfig
     resources: ResourceConfig
-    slurm: SlurmConfig
+    slurm: SlurmConfig = Field(default_factory=SlurmConfig)
     backend: Optional[BackendConfig] = None  # Auto-populated
     benchmark: BenchmarkConfig = Field(default_factory=BenchmarkConfig)
 

@@ -60,6 +60,12 @@ def generate_sweep_configs(sweep_config: dict) -> list[tuple[dict, dict]]:
     if "sweep" not in sweep_config:
         raise ValueError("Sweep config must have 'sweep' section")
 
+    # Apply cluster defaults before sweep expansion
+    from srtctl.core.config import load_cluster_config, resolve_config_with_defaults
+    
+    cluster_config = load_cluster_config()
+    sweep_config = resolve_config_with_defaults(sweep_config, cluster_config)
+
     # Extract sweep parameters
     sweep_params = sweep_config["sweep"]
 
