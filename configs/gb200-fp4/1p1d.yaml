@@ -70,7 +70,6 @@ backend:
       cuda-graph-max-bs: 256
       max-running-requests: 256
       scheduler-recv-interval: 10
-      enable-flashinfer-allreduce-fusion: true
       enable-symm-mem: true
       moe-dense-tp-size: 1
       tensor-parallel-size: 8
@@ -96,7 +95,6 @@ backend:
       cuda-graph-max-bs: 256
       max-running-requests: 256
       scheduler-recv-interval: 10
-      enable-flashinfer-allreduce-fusion: true
       enable-symm-mem: true
       moe-dense-tp-size: 1
       tensor-parallel-size: 8
