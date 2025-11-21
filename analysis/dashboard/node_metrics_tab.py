@@ -6,7 +6,7 @@ import os
 
 import streamlit as st
 
-from dashboard.components import (
+from analysis.dashboard.components import (
     load_node_metrics,
     create_node_throughput_graph,
     create_kv_cache_utilization_graph,

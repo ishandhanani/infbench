@@ -8,13 +8,13 @@ import os
 import sys
 from pathlib import Path
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add project root to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import streamlit as st
 
-from dashboard import components
-from dashboard import (
+from analysis.dashboard import components
+from analysis.dashboard import (
     pareto_tab,
     latency_tab,
     node_metrics_tab,

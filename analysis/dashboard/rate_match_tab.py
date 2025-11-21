@@ -7,7 +7,7 @@ from datetime import datetime
 import plotly.graph_objects as go
 import streamlit as st
 
-from dashboard.components import load_node_metrics
+from analysis.dashboard.components import load_node_metrics
 
 
 def render(filtered_runs: list, logs_dir: str):

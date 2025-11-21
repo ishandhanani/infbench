@@ -42,6 +42,7 @@ def setup_prefill_worker(
     multiple_frontends_enabled: bool = False,
     sglang_torch_profiler: bool = False,
     sglang_config_path: str | None = None,
+    dump_config_path: str | None = None,
 ) -> int:
     """Setup the prefill worker."""
     # Setup infrastructure first (if traditional mode)
@@ -86,6 +87,7 @@ def setup_prefill_worker(
         total_nodes=nodes_per_worker,
         rank=local_rank,
         use_profiling=sglang_torch_profiler,
+        dump_config_path=dump_config_path,
     )
     return run_command(cmd_to_run)
 
@@ -99,6 +101,7 @@ def setup_decode_worker(
     gpu_type: str,
     sglang_torch_profiler: bool = False,
     sglang_config_path: str | None = None,
+    dump_config_path: str | None = None,
 ) -> int:
     """Setup the decode worker."""
     logging.info(f"Setting up decode worker {worker_idx}, local rank {local_rank}")
@@ -121,6 +124,7 @@ def setup_decode_worker(
         total_nodes=nodes_per_worker,
         rank=local_rank,
         use_profiling=sglang_torch_profiler,
+        dump_config_path=dump_config_path,
     )
     return run_command(cmd_to_run)
 
@@ -135,6 +139,7 @@ def setup_aggregated_worker(
     multiple_frontends_enabled: bool = False,
     sglang_torch_profiler: bool = False,
     sglang_config_path: str | None = None,
+    dump_config_path: str | None = None,
 ) -> int:
     """Setup the aggregated worker."""
     # Setup infrastructure first (if traditional mode)
@@ -179,5 +184,6 @@ def setup_aggregated_worker(
         total_nodes=nodes_per_worker,
         rank=local_rank,
         use_profiling=sglang_torch_profiler,
+        dump_config_path=dump_config_path,
     )
     return run_command(cmd_to_run)

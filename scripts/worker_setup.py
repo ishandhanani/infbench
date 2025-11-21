@@ -177,6 +177,7 @@ def main(input_args: list[str] | None = None):
             args.multiple_frontends_enabled,
             args.sglang_torch_profiler,
             args.sglang_config_path,
+            args.dump_config_path,
         )
     elif args.worker_type == "decode":
         setup_decode_worker(
@@ -188,6 +189,7 @@ def main(input_args: list[str] | None = None):
             args.gpu_type,
             args.sglang_torch_profiler,
             args.sglang_config_path,
+            args.dump_config_path,
         )
     elif args.worker_type == "aggregated":
         setup_aggregated_worker(
@@ -200,6 +202,7 @@ def main(input_args: list[str] | None = None):
             args.multiple_frontends_enabled,
             args.sglang_torch_profiler,
             args.sglang_config_path,
+            args.dump_config_path,
         )
 
     logging.info(f"{args.worker_type.capitalize()} worker setup complete")

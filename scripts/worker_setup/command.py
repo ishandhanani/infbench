@@ -18,6 +18,7 @@ def build_sglang_command_from_yaml(
     total_nodes: int,
     rank: int,
     use_profiling: bool = False,
+    dump_config_path: str | None = None,
 ) -> str:
     """Build SGLang command using native YAML config support.
 
@@ -98,6 +99,10 @@ def build_sglang_command_from_yaml(
             "--host 0.0.0.0",
         ]
 
+    # Add dump-config-to flag if provided
+    if dump_config_path:
+        cmd_parts.append(f"--dump-config-to {dump_config_path}")
+
     # Combine environment exports and command
     full_command = " && ".join(env_exports + [" ".join(cmd_parts)]) if env_exports else " ".join(cmd_parts)
 
@@ -140,6 +145,7 @@ def get_gpu_command(
     total_nodes: int,
     rank: int,
     use_profiling: bool = False,
+    dump_config_path: str | None = None,
 ) -> str:
     """Generate command to run SGLang worker using YAML config.
 
@@ -160,5 +166,5 @@ def get_gpu_command(
 
     logging.info(f"Building command from YAML config: {sglang_config_path}")
     return build_sglang_command_from_yaml(
-        worker_type, sglang_config_path, host_ip, port, total_nodes, rank, use_profiling
+        worker_type, sglang_config_path, host_ip, port, total_nodes, rank, use_profiling, dump_config_path
     )
