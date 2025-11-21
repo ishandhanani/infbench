@@ -11,6 +11,9 @@ resources:
   agg_workers: 1
   gpus_per_node: 4
 
+sweep:
+  ep-size: [1, 4]
+
 backend:
 
   aggregated_environment:
@@ -56,6 +59,7 @@ backend:
       enable-symm-mem: true
       moe-dense-tp-size: 1
       tensor-parallel-size: 4
+      expert-parallel-size: "{ep-size}"
 
     decode:
       disaggregation-mode: "decode"
