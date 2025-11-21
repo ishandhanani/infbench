@@ -7,7 +7,7 @@ model:
 
 resources:
   gpu_type: "gb200"
-  agg_nodes: 1
+  agg_nodes: 2
   agg_workers: 1
   gpus_per_node: 4
 
@@ -15,22 +15,16 @@ backend:
 
   aggregated_environment:
     TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
-    PYTHONUNBUFFERED: "1"
+    PYTHONBUFFERED: "1"
     DYN_SKIP_SGLANG_LOG_FORMATTING: "1"
-    SGLANG_NVFP4_CKPT_FP8_GEMM_IN_ATTN: "1"
-    SGLANG_PER_TOKEN_GROUP_QUANT_8BIT_V2: "1"
-    SGLANG_DISAGGREGATION_HEARTBEAT_MAX_FAILURE: "100000"
-    SGLANG_DISAGGREGATION_BOOTSTRAP_TIMEOUT: "100000"
-    SGLANG_DISAGGREGATION_WAITING_TIMEOUT: "100000"
-    SGLANG_HACK_SEQ_BOOTSTRAP_ROOM: "1"
-    MC_TE_METRIC: "true"
+    #SGLANG_NVFP4_CKPT_FP8_GEMM_IN_ATTN: "1"
+    #SGLANG_PER_TOKEN_GROUP_QUANT_8BIT_V2: "1"
     MC_FORCE_MNNVL: "1"
     NCCL_MNNVL_ENABLE: "1"
     NCCL_CUMEM_ENABLE: "1"
     SGLANG_MOONCAKE_CUSTOM_MEM_POOL: "True"
-    SGLANG_USE_MESSAGE_QUEUE_BROADCASTER: "0"
-    SGLANG_DISABLE_TP_MEMORY_INBALANCE_CHECK: "1"
-    SGLANG_FLASHINFER_FP4_GEMM_BACKEND: "cutlass"
+    SGLANG_ENABLE_JIT_DEEPGEMM: "false"
+    SGLANG_ENABLE_FLASHINFER_GEMM: "true" #instead of SGLANG_FLASHINFER_FP4_GEMM_BACKEND
 
   sglang_config:
     aggregated:
@@ -45,16 +39,18 @@ backend:
       stream-interval: 10
       watchdog-timeout: 1000000
       context-length: 2200
-      mem-fraction-static: 0.90
+      mem-fraction-static: 0.85
       max-total-tokens: 8192
-      chunked-prefill-size: 8192
-      cuda-graph-max-bs: 128
-      max-running-requests: 6000
+      chunked-prefill-size: 16384
+      cuda-graph-max-bs: 256
+      max-running-requests: 256
       scheduler-recv-interval: 10
       enable-flashinfer-allreduce-fusion: true
       enable-symm-mem: true
       moe-dense-tp-size: 1
-      tensor-parallel-size: 4
+      tensor-parallel-size: 8
+      data-parallel-size: 1
+      expert-parallel-size: 8
 
 benchmark:
   type: "sa-bench"
