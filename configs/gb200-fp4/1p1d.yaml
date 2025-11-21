@@ -16,7 +16,7 @@ sweep:
 
 backend:
 
-  aggregated_environment:
+  prefill_environment:
     TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
     PYTHONUNBUFFERED: "1"
     DYN_SKIP_SGLANG_LOG_FORMATTING: "1"
@@ -33,7 +33,26 @@ backend:
     SGLANG_MOONCAKE_CUSTOM_MEM_POOL: "True"
     SGLANG_USE_MESSAGE_QUEUE_BROADCASTER: "0"
     SGLANG_DISABLE_TP_MEMORY_INBALANCE_CHECK: "1"
-    SGLANG_FLASHINFER_FP4_GEMM_BACKEND: "cutlass"
+    SGLANG_FLASHINFER_FP4_GEMM_BACKEND: "trtllm" # this might be a bit faster
+
+  decode_environment:
+    TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
+    PYTHONUNBUFFERED: "1"
+    DYN_SKIP_SGLANG_LOG_FORMATTING: "1"
+    SGLANG_NVFP4_CKPT_FP8_GEMM_IN_ATTN: "1"
+    SGLANG_PER_TOKEN_GROUP_QUANT_8BIT_V2: "1"
+    SGLANG_DISAGGREGATION_HEARTBEAT_MAX_FAILURE: "100000"
+    SGLANG_DISAGGREGATION_BOOTSTRAP_TIMEOUT: "100000"
+    SGLANG_DISAGGREGATION_WAITING_TIMEOUT: "100000"
+    SGLANG_HACK_SEQ_BOOTSTRAP_ROOM: "1"
+    MC_TE_METRIC: "true"
+    MC_FORCE_MNNVL: "1"
+    NCCL_MNNVL_ENABLE: "1"
+    NCCL_CUMEM_ENABLE: "1"
+    SGLANG_MOONCAKE_CUSTOM_MEM_POOL: "True"
+    SGLANG_USE_MESSAGE_QUEUE_BROADCASTER: "0"
+    SGLANG_DISABLE_TP_MEMORY_INBALANCE_CHECK: "1"
+    SGLANG_FLASHINFER_FP4_GEMM_BACKEND: "trtllm" # this might be a bit faster
 
   sglang_config:
     prefill:
@@ -84,6 +103,7 @@ backend:
       enable-symm-mem: true
       moe-dense-tp-size: 1
       tensor-parallel-size: 4
+      expert-parallel-size: "{ep-size}"
 
 benchmark:
   type: "sa-bench"
