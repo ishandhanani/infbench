@@ -12,9 +12,6 @@ resources:
   gpus_per_node: 4
 
 backend:
-
-  enable_multiple_frontends: false
-
   aggregated_environment:
     TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
     PYTHONBUFFERED: "1"
