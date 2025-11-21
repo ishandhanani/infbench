@@ -408,7 +408,7 @@ def setup_frontend_worker(
     frontend_cmd = "python3 -m dynamo.frontend --http-port=8000"
     if use_dynamo_whls:
         arch = get_wheel_arch_from_gpu_type(gpu_type)
-        frontend_cmd = f"python3 -m pip install /configs/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_{arch}.whl && python3 -m pip install /configs/ai_dynamo-0.6.1-py3-none-any.whl && python3 -m dynamo.frontend --http-port=8000"
+        frontend_cmd = f"python3 -m pip install /configs/ai_dynamo_runtime-0.7.0-cp310-abi3-manylinux_2_28_{arch}.whl && python3 -m pip install /configs/ai_dynamo-0.7.0-py3-none-any.whl && python3 -m dynamo.frontend --http-port=8000"
     return run_command(frontend_cmd)
 
 

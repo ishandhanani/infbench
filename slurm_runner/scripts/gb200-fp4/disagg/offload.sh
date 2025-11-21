@@ -77,8 +77,8 @@ fi
 if [ "$mode" = "prefill" ]; then
     set -x
     if [[ "${USE_DYNAMO_WHLS,,}" == "true" ]]; then
-        python3 -m pip install /configs/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_aarch64.whl
-        python3 -m pip install /configs/ai_dynamo-0.6.1-py3-none-any.whl
+        python3 -m pip install /configs/ai_dynamo_runtime-0.7.0-cp310-abi3-manylinux_2_28_aarch64.whl
+        python3 -m pip install /configs/ai_dynamo-0.7.0-py3-none-any.whl
     fi
     # no expert locations collected for fp4 yet
     command_suffix=""
@@ -161,8 +161,8 @@ if [ "$mode" = "prefill" ]; then
 elif [ "$mode" = "decode" ]; then
     set -x
     if [[ "${USE_DYNAMO_WHLS,,}" == "true" ]]; then
-        python3 -m pip install /configs/ai_dynamo_runtime-0.6.1-cp310-abi3-manylinux_2_28_aarch64.whl
-        python3 -m pip install /configs/ai_dynamo-0.6.1-py3-none-any.whl
+        python3 -m pip install /configs/ai_dynamo_runtime-0.7.0-cp310-abi3-manylinux_2_28_aarch64.whl
+        python3 -m pip install /configs/ai_dynamo-0.7.0-py3-none-any.whl
     fi
     # no expert locations collected for fp4 yet
     command_suffix=""
