@@ -18,11 +18,25 @@ pip install -e .
 
 ## Run Setup
 
+First, check your system architecture:
+```bash
+uname -m
+```
+
+This returns either `x86_64` (AMD/Intel) or `aarch64` (ARM). The setup downloads architecture-specific binaries for NATS and ETCD.
+
+Then run setup:
 ```bash
 make setup
 ```
 
-This creates `srtslurm.yaml` - your cluster configuration file.
+If your architecture isn't auto-detected correctly, specify it explicitly:
+```bash
+make setup ARCH=aarch64  # For ARM systems
+make setup ARCH=x86_64   # For AMD/Intel systems
+```
+
+This downloads required binaries and creates `srtslurm.yaml` - your cluster configuration file.
 
 ## Configure srtslurm.yaml
 
