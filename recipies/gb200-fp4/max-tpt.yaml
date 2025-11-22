@@ -1,6 +1,4 @@
-# GB200 FP4 Max Throughput Configuration
-# Converted from scripts/gb200-fp4/disagg/max-tpt.sh
-# Reference: https://github.com/sgl-project/sglang/issues/10903 (low-prec decode setup)
+# Remove SBO and change D to 32 for alt
 
 name: "gb200-fp4-max-tpt"
 
@@ -12,7 +10,7 @@ model:
 resources:
   gpu_type: "gb200"
   prefill_nodes: 4
-  decode_nodes: 8
+  decode_nodes: 12
   prefill_workers: 4
   decode_workers: 1
   gpus_per_node: 4
@@ -96,11 +94,11 @@ backend:
       max-total-tokens: 131072
       max-prefill-tokens: 32768
       chunked-prefill-size: 65536
+      enable-single-batch-overlap: true
 
       # Request handling
       max-running-requests: 30000
       load-balance-method: "round_robin"
-
 
       # Performance optimizations
       disable-cuda-graph: true
@@ -148,6 +146,7 @@ backend:
 
       # Request handling
       max-running-requests: 67584
+      enable-single-batch-overlap: true
 
       # DeepEP configuration
       moe-a2a-backend: "deepep"
@@ -174,15 +173,5 @@ benchmark:
   type: "sa-bench"
   isl: 1024
   osl: 1024
-  concurrencies: "1x8x16x32x64x128x256x512x1024x2048x4096"
+  concurrencies: "1x128x512x2048x4096x8192x12000x15000"
   req_rate: "inf"
-
-# Notes:
-# - This config uses the low-prec decode setup from sglang/issues/10903
-# - FP4 requires 12 decode nodes since flashinfer_cutedsl requires experts_per_gpu < 8
-#   (288 experts total / 48 GPUs = 6 experts per GPU)
-# - SGLANG_DEEPEP_NUM_MAX_DISPATCH_TOKENS_PER_RANK and cuda-graph-bs at 1024 until
-#   DeepEP merges https://github.com/deepseek-ai/DeepEP/pull/440
-# - nvidia-cutlass-dsl pre-release install needed for integer overflow fix
-# - Removing --enable-single-batch-overlap may relax 12 node requirement
-# for now i remove it from prefill as well

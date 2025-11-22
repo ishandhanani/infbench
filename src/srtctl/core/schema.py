@@ -70,6 +70,7 @@ class GpuType(str, Enum):
     """Supported GPU types."""
 
     GB200 = "gb200"
+    GB300 = "gb300"
     H100 = "h100"
 
 
@@ -106,7 +107,7 @@ class ResourceConfig(BaseModel):
 
     model_config = {"use_enum_values": True}
 
-    gpu_type: GpuType = Field(..., description="GPU type (gb200, h100)")
+    gpu_type: GpuType = Field(..., description="GPU type (gb200, gb300, h100)")
     gpus_per_node: int = Field(4, description="Number of GPUs per node")
 
     # Disaggregated mode

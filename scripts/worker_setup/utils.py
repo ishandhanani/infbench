@@ -14,12 +14,12 @@ def get_wheel_arch_from_gpu_type(gpu_type: str) -> str:
     Map GPU type to the appropriate wheel architecture suffix.
 
     Args:
-        gpu_type: GPU type string (e.g., "gb200-fp8", "h100-fp8")
+        gpu_type: GPU type string (e.g., "gb200-fp8", "gb300-fp8", "h100-fp8")
 
     Returns:
-        "aarch64" for GB200, "x86_64" for H100
+        "aarch64" for GB200/GB300, "x86_64" for H100
     """
-    if gpu_type.startswith("gb200"):
+    if gpu_type.startswith("gb200") or gpu_type.startswith("gb300"):
         return "aarch64"
     elif gpu_type.startswith("h100"):
         return "x86_64"
