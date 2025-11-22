@@ -12,24 +12,24 @@ from .infrastructure import setup_head_prefill_node
 from .utils import run_command, wait_for_etcd
 
 
-def _patch_sglang_engine(local_rank: int):
-    """Temporary patch to fix send_to_rpc initialization."""
-    logging.info("Applying temporary patch to engine.py")
-    sed_cmd = (
-        "sed -i '/self.send_to_rpc = get_zmq_socket(/,/^        )/c\\"
-        "        if self.server_args.node_rank == 0:\\n"
-        "            self.send_to_rpc = get_zmq_socket(\\n"
-        "                context, zmq.DEALER, self.port_args.rpc_ipc_name, True\\n"
-        "            )\\n"
-        "        else:\\n"
-        "            self.send_to_rpc = None' "
-        "/sgl-workspace/sglang/python/sglang/srt/entrypoints/engine.py"
-    )
-    result = subprocess.run(sed_cmd, shell=True, capture_output=True, text=True)
-    if result.returncode != 0:
-        logging.warning(f"Failed to apply patch: {result.stderr}")
-    else:
-        logging.info("Patch applied successfully")
+# def _patch_sglang_engine(local_rank: int):
+#     """Temporary patch to fix send_to_rpc initialization."""
+#     logging.info("Applying temporary patch to engine.py")
+#     sed_cmd = (
+#         "sed -i '/self.send_to_rpc = get_zmq_socket(/,/^        )/c\\"
+#         "        if self.server_args.node_rank == 0:\\n"
+#         "            self.send_to_rpc = get_zmq_socket(\\n"
+#         "                context, zmq.DEALER, self.port_args.rpc_ipc_name, True\\n"
+#         "            )\\n"
+#         "        else:\\n"
+#         "            self.send_to_rpc = None' "
+#         "/sgl-workspace/sglang/python/sglang/srt/entrypoints/engine.py"
+#     )
+#     result = subprocess.run(sed_cmd, shell=True, capture_output=True, text=True)
+#     if result.returncode != 0:
+#         logging.warning(f"Failed to apply patch: {result.stderr}")
+#     else:
+#         logging.info("Patch applied successfully")
 
 
 def setup_prefill_worker(
@@ -76,7 +76,7 @@ def setup_prefill_worker(
         logging.info("Frontend logs: /logs/frontend.out and /logs/frontend.err")
     
     # Apply temporary patch
-    _patch_sglang_engine(local_rank)
+    #_patch_sglang_engine(local_rank)
 
     # Build and execute SGLang command from YAML config
     cmd_to_run = get_gpu_command(
@@ -113,7 +113,7 @@ def setup_decode_worker(
     install_dynamo_wheels(gpu_type)
     
     # Apply temporary patch
-    _patch_sglang_engine(local_rank)
+    #_patch_sglang_engine(local_rank)
 
     # Build and execute SGLang command from YAML config
     cmd_to_run = get_gpu_command(
@@ -173,7 +173,7 @@ def setup_aggregated_worker(
         logging.info("Frontend logs: /logs/frontend.out and /logs/frontend.err")
     
     # Apply temporary patch
-    _patch_sglang_engine(local_rank)
+    #_patch_sglang_engine(local_rank)
 
     # Build and execute SGLang command from YAML config
     cmd_to_run = get_gpu_command(
