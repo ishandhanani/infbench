@@ -1,6 +1,6 @@
-# Remove SBO and change D to 32 for alt
+# 4P1D, with 8 Decode Nodes. Better per-gpu throughput with worse latency.
 
-name: "gb200-fp4-max-tpt"
+name: "gb200-fp4-max-tpt-2"
 
 model:
   path: "dsfp4"
