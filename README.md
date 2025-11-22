@@ -1,6 +1,6 @@
 # srtctl
 
-YAML-based toolkit for distributed LLM inference benchmarks on SLURM clusters.
+YAML-based toolkit for distributed LLM inference benchmarks on SLURM clusters using Dynamo + SGLang.
 
 ## Quick Start
 

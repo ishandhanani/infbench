@@ -16,6 +16,7 @@ scancel <job_id>
 ## Log Directory
 
 After submission, `srtctl` tells you where logs are stored:
+
 ```
 Submitted batch job 4459
 Logs: logs/4459_4P_1D_20251122_041341/
@@ -103,7 +104,7 @@ P99 TPOT (ms):                           22.36
 ==================================================
 ```
 
-### Worker Logs ({node}_prefill_w0.err, {node}_decode_w0.err)
+### Worker Logs ({node}\_prefill_w0.err, {node}\_decode_w0.err)
 
 SGLang worker logs showing model loading, memory allocation, and runtime info. Check these for debugging CUDA errors, OOM issues, or NCCL failures.
 
@@ -114,33 +115,22 @@ The fully resolved configuration showing exactly what ran, with all aliases expa
 ## Common Commands
 
 ```bash
-# Watch main log
-tail -f logs/4459_*/log.out
+# List your running jobs
+squeue -u $USER
+
+# Detailed job info
+scontrol show job <job_id>
+
+# Cancel a job
+scancel <job_id>
+
+# Watch logs
+tail -f logs/4459_*/*_prefill_*.err logs/4459_*/*_decode_*.err
 
 # Watch benchmark progress
 tail -f logs/4459_*/benchmark.out
-
-# Check for errors across all workers
-grep -l "Error\|Exception\|CUDA" logs/4459_*/*.err
-
-# Check specific worker
-cat logs/4459_*/*_decode_w0.err | tail -100
-
-# Compare throughput across runs
-for dir in logs/*/; do
-  echo "=== $dir ==="
-  grep "Output token throughput" "$dir/benchmark.out" 2>/dev/null
-done
 ```
 
 ## Connecting to Running Jobs
 
-The log.out file includes commands to connect to running nodes:
-
-```bash
-# Connect to nginx node
-srun --jobid 4459 -w watchtower-aqua-cn01 --overlap --pty bash
-
-# Connect to master node
-srun --jobid 4459 -w watchtower-aqua-cn02 --overlap --pty bash
-```
+The `log.out` file includes commands to connect to running nodes

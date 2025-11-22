@@ -16,25 +16,24 @@ cd srtctl
 pip install -e .
 ```
 
-## Run Setup
+## Gather your cluster user and target partition
 
-First, check your login node architecture:
 ```bash
-uname -m
+# user
+sacctmgr -nP show assoc where user=$(whoami) format=account
+# partition
+sacctmgr show partition-name=batch format=account,partition -n
 ```
 
-This returns either `x86_64` (AMD/Intel) or `aarch64` (ARM). The setup downloads architecture-specific binaries for NATS and ETCD.
+## Run Setup
 
-**Important:** The login node architecture sometimes differs from the compute nodes. For example, you might be on a Grace Hopper cluster with ARM compute nodes, but your login node could be x86_64. Always check with `uname -m` and use the architecture that matches your **compute nodes**.
-
-Then run setup with your architecture:
 ```bash
-make setup ARCH=aarch64  # For ARM systems (e.g., Grace Hopper)
-make setup ARCH=x86_64   # For AMD/Intel systems
+make setup
 ```
 
 The setup will:
-1. Download NATS and ETCD binaries for your architecture
+
+1. Download Dynamo wheels and NATS/ETCD binaries
 2. Prompt you for cluster settings:
    - SLURM account (default: `restricted`)
    - SLURM partition (default: `batch`)
@@ -70,6 +69,7 @@ containers:
 ```
 
 To create a container image from Docker:
+
 ```bash
 enroot import docker://lmsysorg/sglang:v0.5.5
 mv lmsysorg+sglang+v0.5.5.sqsh /mnt/containers/
@@ -83,16 +83,16 @@ Create `configs/my-job.yaml`:
 name: "my-benchmark"
 
 model:
-  path: "deepseek-r1"      # Uses alias from srtslurm.yaml
-  container: "latest"       # Uses alias from srtslurm.yaml
+  path: "deepseek-r1" # Uses alias from srtslurm.yaml
+  container: "latest" # Uses alias from srtslurm.yaml
   precision: "fp8"
 
 resources:
   gpu_type: "gb200"
   prefill_nodes: 1
-  decode_nodes: 4
+  decode_nodes: 2
   prefill_workers: 1
-  decode_workers: 4
+  decode_workers: 1
   gpus_per_node: 4
 
 slurm:
@@ -103,7 +103,6 @@ backend:
     TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
   decode_environment:
     TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
-    NCCL_MNNVL_ENABLE: "1"
 
   sglang_config:
     prefill:
@@ -113,8 +112,10 @@ backend:
     decode:
       kv-cache-dtype: "fp8_e4m3"
       mem-fraction-static: 0.83
-      tensor-parallel-size: 4
-      dp-size: 32
+      tensor-parallel-size: 8
+      expert-parallel-size: 8
+      data-parallel-size: 8
+      enable-dp-attention: true
 
 benchmark:
   type: "sa-bench"
@@ -140,22 +141,10 @@ srtctl configs/my-job.yaml
 ```
 
 Output:
+
 ```
 Submitted batch job 12345
 Logs: logs/12345_1P_4D_20251122_143052/
 ```
 
-## Monitor Your Job
-
-```bash
-# Check job status
-squeue -u $USER
-
-# Watch logs
-tail -f logs/12345_*/log.out
-
-# Check benchmark progress
-tail -f logs/12345_*/benchmark.out
-```
-
-See [Monitoring](monitoring.md) for detailed log structure.
+See [Monitoring](monitoring.md) for how to monitor your job and understand the detailed log structure.
