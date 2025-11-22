@@ -1,12 +1,12 @@
 # Introduction
 
-srtctl is a command-line tool for running distributed LLM inference benchmarks on SLURM clusters. It replaces complex shell scripts and 50+ CLI flags with clean, declarative YAML configuration files.
+`srtctl` is a command-line tool for running distributed LLM inference benchmarks on SLURM clusters. It replaces complex shell scripts and 50+ CLI flags with clean, declarative YAML configuration files.
 
 ## Why srtctl?
 
 Running large language models across multiple GPUs and nodes requires orchestrating many moving parts: SLURM job scripts, container mounts, SGLang configuration, worker coordination, and benchmark execution. Traditionally, this meant maintaining brittle bash scripts with hardcoded parameters.
 
-srtctl solves this by:
+`srtctl` solves this by:
 
 - **Declarative configuration** - Define your entire job in a single YAML file
 - **Validation** - Catch configuration errors before submitting to SLURM
@@ -15,7 +15,7 @@ srtctl solves this by:
 
 ## Architecture Overview
 
-srtctl orchestrates distributed inference using SGLang workers in either **disaggregated** or **aggregated** mode:
+`srtctl` orchestrates distributed inference using SGLang workers in either **disaggregated** or **aggregated** mode:
 
 **Disaggregated Mode** separates prefill and decode into specialized workers:
 - Prefill workers handle the initial prompt processing
@@ -84,7 +84,7 @@ srtctl config.yaml
 
 ## Next Steps
 
-- [Installation](installation.md) - Set up srtctl on your cluster
+- [Installation](installation.md) - Set up `srtctl` on your cluster
 - [Configuration](configuration.md) - Full configuration reference
 - [Monitoring](monitoring.md) - Understanding job logs and status
 - [Parameter Sweeps](sweeps.md) - Run grid searches

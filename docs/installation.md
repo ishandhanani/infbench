@@ -1,6 +1,6 @@
 # Installation
 
-This guide walks through setting up srtctl on a SLURM cluster, configuring model paths and containers, and submitting your first job.
+This guide walks through setting up `srtctl` on a SLURM cluster, configuring model paths and containers, and submitting your first job.
 
 ## Prerequisites
 
@@ -119,7 +119,7 @@ Your model directory should contain the standard HuggingFace structure:
 
 ## Step 5: Set Up Containers
 
-srtctl uses Squashfs container images (`.sqsh` files). These are typically created from Docker images:
+`srtctl` uses Squashfs container images (`.sqsh` files). These are typically created from Docker images:
 
 ```bash
 # Convert Docker image to sqsh (run once)

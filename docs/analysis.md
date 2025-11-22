@@ -5,7 +5,7 @@ The analysis UI provides interactive visualization of benchmark results.
 ## Starting the UI
 
 ```bash
-# From the srtctl directory
+# From the repo directory
 make ui
 
 # Or directly

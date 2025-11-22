@@ -19,7 +19,7 @@ scancel <job_id>
 
 ### Watching Logs
 
-After submission, srtctl tells you where logs are stored:
+After submission, `srtctl` tells you where logs are stored:
 ```
 Submitted batch job 4459
 Logs: logs/4459_4P_1D_20251122_041341/

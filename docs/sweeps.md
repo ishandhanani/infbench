@@ -11,7 +11,7 @@ Parameter sweeps let you run multiple configurations with a single command. This
 
 1. Add `{placeholder}` markers in your YAML config
 2. Run with `--sweep placeholder=value1,value2,value3`
-3. srtctl generates one job per value (or Cartesian product for multiple placeholders)
+3. `srtctl` generates one job per value (or Cartesian product for multiple placeholders)
 
 ## Basic Example
 
@@ -65,7 +65,7 @@ This submits 4 separate SLURM jobs.
 
 ## Multiple Parameters (Cartesian Product)
 
-When you specify multiple placeholders, srtctl generates the Cartesian product:
+When you specify multiple placeholders, `srtctl` generates the Cartesian product:
 
 ```yaml
 backend:
@@ -213,7 +213,7 @@ name: "decode-mem-sweep-v2"  # Not "test123"
 
 ### No Paired Sweeps
 
-srtctl generates Cartesian products, not paired values. If you need:
+`srtctl` generates Cartesian products, not paired values. If you need:
 ```
 (tp=4, nodes=1), (tp=8, nodes=2), (tp=16, nodes=4)
 ```
