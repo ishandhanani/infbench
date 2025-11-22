@@ -18,7 +18,7 @@ pip install -e .
 
 ## Run Setup
 
-First, check your system architecture:
+First, check your login node architecture:
 ```bash
 uname -m
 ```
@@ -36,24 +36,22 @@ make setup ARCH=aarch64  # For ARM systems
 make setup ARCH=x86_64   # For AMD/Intel systems
 ```
 
-This downloads required binaries and creates `srtslurm.yaml` - your cluster configuration file.
+The setup will:
+1. Download NATS and ETCD binaries for your architecture
+2. Prompt you for cluster settings:
+   - SLURM account (default: `restricted`)
+   - SLURM partition (default: `batch`)
+   - GPUs per node (default: `4`)
+   - Time limit (default: `4:00:00`)
+3. Create `srtslurm.yaml` with your settings
 
 ## Configure srtslurm.yaml
 
-Edit `srtslurm.yaml` with your cluster settings:
-
-```yaml
-cluster:
-  account: "your-slurm-account"
-  partition: "gpu-batch"
-  network_interface: "enP6p9s0np0"
-  gpus_per_node: 4
-  default_time_limit: "4:00:00"
-```
+After setup, edit `srtslurm.yaml` to add model paths and containers:
 
 ### Adding Model Paths
 
-The `model_paths` section maps short aliases to full filesystem paths. This lets you use simple names in your job configs instead of long paths.
+The `model_paths` section maps short aliases to full filesystem paths:
 
 ```yaml
 model_paths:
@@ -62,11 +60,11 @@ model_paths:
   llama-70b: "/mnt/lustre/models/Llama-3-70B"
 ```
 
-Models must be accessible from all compute nodes (typically on a shared filesystem like Lustre or GPFS). The model directory should contain the standard HuggingFace structure with `config.json`, tokenizer files, and safetensors weights.
+Models must be accessible from all compute nodes (typically on a shared filesystem like Lustre or GPFS).
 
 ### Adding Containers
 
-The `containers` section maps version aliases to `.sqsh` container images.
+The `containers` section maps version aliases to `.sqsh` container images:
 
 ```yaml
 containers:
@@ -102,6 +100,24 @@ resources:
 
 slurm:
   time_limit: "02:00:00"
+
+backend:
+  prefill_environment:
+    TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
+  decode_environment:
+    TORCH_DISTRIBUTED_DEFAULT_TIMEOUT: "1800"
+    NCCL_MNNVL_ENABLE: "1"
+
+  sglang_config:
+    prefill:
+      kv-cache-dtype: "fp8_e4m3"
+      mem-fraction-static: 0.84
+      tensor-parallel-size: 4
+    decode:
+      kv-cache-dtype: "fp8_e4m3"
+      mem-fraction-static: 0.83
+      tensor-parallel-size: 4
+      dp-size: 32
 
 benchmark:
   type: "sa-bench"
