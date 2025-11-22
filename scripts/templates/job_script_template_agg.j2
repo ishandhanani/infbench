@@ -3,6 +3,7 @@
 #SBATCH --nodes={{ total_nodes }}
 #SBATCH --ntasks={{ total_nodes }}
 #SBATCH --ntasks-per-node=1
+#SBATCH --gpus-per-node={{ gpus_per_node }}
 #SBATCH --account={{ account }}
 #SBATCH --time={{ time_limit }}
 #SBATCH --output={{ log_dir_prefix }}/%j_{{ agg_workers }}A_{{ timestamp }}/log.out
